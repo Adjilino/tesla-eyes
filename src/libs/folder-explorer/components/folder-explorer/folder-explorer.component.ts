@@ -3,11 +3,11 @@ import { BehaviorSubject } from 'rxjs';
 import { TeslaVideo } from 'src/libs/entities';
 
 @Component({
-    selector: 'file-explorer',
-    templateUrl: './file-explorer.component.html',
+    selector: 'folder-explorer',
+    templateUrl: './folder-explorer.component.html',
     styleUrls: [],
 })
-export class FileExplorerComponent {
+export class FolderExplorerComponent {
     @Input()
     set teslaVideos(teslaVideos: TeslaVideo[] | null) {
         this.teslaVideos$.next(teslaVideos || []);

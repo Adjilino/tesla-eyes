@@ -3,11 +3,11 @@ import { BehaviorSubject } from 'rxjs';
 import { TeslaVideo } from 'src/libs/entities';
 
 @Component({
-    selector: 'file-explorer-view',
-    templateUrl: './file-explorer.view.html',
+    selector: 'folder-explorer-view',
+    templateUrl: './folder-explorer.view.html',
     styleUrls: [],
 })
-export class FileExplorerView implements OnDestroy {
+export class FolderExplorerView implements OnDestroy {
     teslaVideos$ = new BehaviorSubject<TeslaVideo[]>([]);
 
     teslaVideos: TeslaVideo[] = [];

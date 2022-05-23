@@ -23,7 +23,7 @@
       "dom"
     ],
     "paths": {
-        "tesla-file-explorer/*": ["src/app/libs/file-explorer/*"],
+        "tesla-folder-explorer/*": ["src/app/libs/folder-explorer/*"],
         "tesla-player/*": ["src/app/libs/player/*"],
         "entities/*": ["src/app/libs/entities/*"]
     }

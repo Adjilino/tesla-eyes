@@ -1,1 +1,26 @@
 /* You can add global styles to this file, and also import other style files */
+body {
+    height: 100vh;
+    margin: 0;
+}
+
+.content-box {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: auto;
+
+    .horizontal {
+        flex-direction: row;
+        height: auto;
+        width: 100%;
+    }
+
+    .box-auto {
+        flex-grow: 0 auto;
+    }
+
+    .box-main {
+        flex-grow: 1;
+    }
+}

@@ -1,0 +1,13 @@
+<div class="content-box">
+    <div class="box-main">
+        <folder-explorer
+            [teslaVideos]="teslaVideos$ | async"
+            (selected)="onSelectVideo($event)"
+        ></folder-explorer>
+    </div>
+    <div class="box-auto">
+        <div style="height: 50px; display: flex; align-items: center">
+            <add-folder (selectedFolder)="addTeslaVideo($event)"></add-folder>
+        </div>
+    </div>
+</div>
