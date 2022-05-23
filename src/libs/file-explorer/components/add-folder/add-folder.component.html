@@ -1,0 +1,8 @@
+<button type="button" (click)="folderInput.click()">Select folder</button>
+<input
+    style="display: none"
+    #folderInput
+    type="file"
+    webkitdirectory
+    (change)="setSelectedFolder(folderInput.files)"
+/>

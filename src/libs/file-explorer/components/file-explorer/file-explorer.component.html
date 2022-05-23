@@ -1,0 +1,5 @@
+<div *ngFor="let teslaVideo of teslaVideos$ | async">
+    <div (click)="open(teslaVideo)">
+        <img [src]="teslaVideo.getThumb()?.getPath()" alt="thumb" />
+    </div>
+</div>
