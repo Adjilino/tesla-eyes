@@ -1,12 +1,11 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { FolderExplorerModule } from 'src/libs/folder-explorer';
-// import { FolderExplorerModule } from 'tesla-folder-explorer';
 import { AppComponent } from './app.component';
+import { AddEntry, SideBar } from './libs/components';
 
 @NgModule({
-    declarations: [AppComponent],
-    imports: [BrowserModule, FolderExplorerModule],
+    declarations: [AppComponent, SideBar, AddEntry],
+    imports: [BrowserModule],
     providers: [],
     bootstrap: [AppComponent],
 })

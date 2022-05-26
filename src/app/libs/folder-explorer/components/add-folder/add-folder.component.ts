@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Output } from '@angular/core';
-import { TeslaEvent, TeslaFile, TeslaVideo } from 'src/libs/entities';
+import { TeslaEvent, TeslaFile, TeslaVideo } from 'entities/';
 
 @Component({
     selector: 'add-folder',

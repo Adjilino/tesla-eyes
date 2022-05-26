@@ -24,3 +24,51 @@ body {
         flex-grow: 1;
     }
 }
+
+.w-100 {
+    width: 100%;
+}
+
+.h-100 {
+    height: 100%;
+}
+
+button {
+    outline: none;
+    border: 0.1rem;
+    border-radius: 0.25rem;
+    border-color: rgb(168, 168, 168);
+
+    padding: 0.25rem 0.65rem;
+
+    background-color: rgb(168, 168, 168);
+    color: black;
+}
+
+.d-flex {
+    display: flex;
+}
+
+.justify-content-center {
+    justify-content: center;
+}
+
+.justify-items-center {
+    justify-items: center;
+}
+
+.justify-self-center {
+    justify-self: center;
+}
+
+.align-content-center {
+    align-content: center;
+}
+
+.align-items-center {
+    align-items: center;
+}
+
+.align-self-center {
+    align-self: center;
+}

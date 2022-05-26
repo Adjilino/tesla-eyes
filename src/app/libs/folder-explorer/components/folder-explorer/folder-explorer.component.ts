@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { TeslaVideo } from 'src/libs/entities';
+import { TeslaVideo } from 'entities/';
 
 @Component({
     selector: 'folder-explorer',
