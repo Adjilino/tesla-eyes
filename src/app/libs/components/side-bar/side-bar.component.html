@@ -1,16 +1,17 @@
 <div class="side-bar">
     <div class="content-box">
-        <div class="box-auto">
-
-        </div>
+        <div class="box-auto"></div>
         <div class="box-main">
             <div class="entries">
                 <div class="entry" *ngFor="let entry of entries">
-            
+                    <entry
+                        [entry]="entry"
+                        (onSelectEntry)="onSelect.emit($event)"
+                    ></entry>
                 </div>
             </div>
             <div class="add-entry">
-                <add-entry></add-entry>
+                <add-entry (add)="addEntry($event)"></add-entry>
             </div>
         </div>
     </div>

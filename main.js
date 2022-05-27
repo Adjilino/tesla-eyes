@@ -5,8 +5,10 @@ let win;
 function createWindow() {
     // Create the browser window
     win = new BrowserWindow({
-        width: 600,
+        width: 750,
         height: 600,
+        minWidth: 750,
+        minHeight: 600,
         backgroundColor: "#ffffff",
         icon: `file://${__dirname}/dist/assets/logo.png`,
         webPreferences: {

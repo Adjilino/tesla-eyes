@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Entry } from './libs/entities';
 
 @Component({
     selector: 'app-root',
@@ -7,4 +8,10 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
     title = 'tesla-view';
+
+    entry!: Entry;
+    
+    setEntry(entry: Entry) {
+        this.entry = entry;
+    }
 }

@@ -1,11 +1,11 @@
 :host {
     .side-bar {
-        max-width: 150px;
+        max-width: 350px;
         width: 100%;
 
         height: 100vh;
 
-        padding: 0.5rem;
+        padding: 0.5rem 0;
 
         position: absolute;
         top: 0;
@@ -26,6 +26,10 @@
         .add-entry {
             position: sticky;
             bottom: 0;
+
+            padding: 0.5rem 0;
+
+            background-color: white;
         }
     }
 }

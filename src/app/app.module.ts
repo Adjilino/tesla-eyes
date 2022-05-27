@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
-import { AddEntry, SideBar } from './libs/components';
+import { AddEntryComponent, EntryComponent, SideBarComponent } from './libs/components';
 
 @NgModule({
-    declarations: [AppComponent, SideBar, AddEntry],
+    declarations: [AppComponent, SideBarComponent, AddEntryComponent, EntryComponent],
     imports: [BrowserModule],
     providers: [],
     bootstrap: [AppComponent],

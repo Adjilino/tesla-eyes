@@ -1,3 +1,10 @@
 <div class="w-100 d-flex justify-content-center">
-    <button type="button">Add capture</button>
+    <button type="button" (click)="directoryInput.click()">Add capture</button>
+    <input
+        style="display: none"
+        #directoryInput
+        type="file"
+        webkitdirectory
+        (change)="changeDirectory(directoryInput.files)"
+    />
 </div>

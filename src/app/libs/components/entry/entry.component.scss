@@ -1,0 +1,53 @@
+:host {
+    button {
+        border: 0;
+        border-radius: 0;
+        outline: 0;
+        width: 100%;
+
+        background-color: white;
+
+        &:hover {
+            background-color: rgb(231, 230, 230);
+        }
+
+        .entry {
+            display: flex;
+            flex-direction: row;
+
+            width: 100%;
+
+            .thumb {
+                border: 0;
+                border-radius: 0.5rem;
+
+                height: 75px;
+                width: 100px;
+                margin: 0.5rem;
+
+                background-color: cadetblue;
+            }
+
+            .details {
+                display: flex;
+                flex-grow: 1;
+                flex-direction: column;
+
+                justify-content: center;
+                text-align: left;
+
+                margin: 0.5rem;
+
+                .title {
+                    font-weight: bold;
+                    color: black;
+                }
+
+                .description {
+                    display: flex;
+                    color: darkgray;
+                }
+            }
+        }
+    }
+}
