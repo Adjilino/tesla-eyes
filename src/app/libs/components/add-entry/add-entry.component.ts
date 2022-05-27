@@ -1,4 +1,10 @@
-import { Component, EventEmitter, Output, ViewChildren } from '@angular/core';
+import {
+    Component,
+    ElementRef,
+    EventEmitter,
+    Output,
+    ViewChildren,
+} from '@angular/core';
 import { Capture, Entry, EventFile, FileDirectory } from '../../entities';
 
 @Component({
@@ -8,7 +14,7 @@ import { Capture, Entry, EventFile, FileDirectory } from '../../entities';
 })
 export class AddEntryComponent {
     @ViewChildren('directoryInput')
-    directoryInput: any;
+    directoryInput!: ElementRef;
 
     @Output()
     add = new EventEmitter();
@@ -53,8 +59,8 @@ export class AddEntryComponent {
             }
         }
 
-        if (this.directoryInput) {
-            this.directoryInput.value = '';
+        if (this.directoryInput && this.directoryInput.nativeElement) {
+            this.directoryInput.nativeElement.value = '';
         }
     }
 

@@ -1,7 +1,7 @@
 import { EventFile } from './event-file';
 import { FileDirectory } from './file-directory';
 
-const cameras = ['front', 'back', 'left_repeator', 'right_repeator'];
+const cameras = ['front', 'back', 'left_repeater', 'right_repeater'];
 
 export class Capture {
     event!: EventFile;
@@ -10,20 +10,20 @@ export class Capture {
     front: FileDirectory[] = [];
     back: FileDirectory[] = [];
 
-    left_repeator: FileDirectory[] = [];
-    set left(left_repeator: FileDirectory[]) {
-        this.left_repeator = left_repeator;
+    left_repeater: FileDirectory[] = [];
+    set left(left_repeater: FileDirectory[]) {
+        this.left_repeater = left_repeater;
     }
     get left(): FileDirectory[] {
-        return this.left_repeator;
+        return this.left_repeater;
     }
 
-    right_repeator: FileDirectory[] = [];
-    set right(right_repeator: FileDirectory[]) {
-        this.right_repeator = right_repeator;
+    right_repeater: FileDirectory[] = [];
+    set right(right_repeater: FileDirectory[]) {
+        this.right_repeater = right_repeater;
     }
     get right(): FileDirectory[] {
-        return this.right_repeator;
+        return this.right_repeater;
     }
 
     private _fileNames!: string[];
@@ -110,10 +110,6 @@ export class Capture {
             return undefined;
         }
 
-        if (!files.length) {
-            return undefined;
-        }
-
         return files as FileDirectory[];
     }
 
@@ -136,7 +132,7 @@ export class Capture {
 
         if (!this._fileNames.length) {
             files.forEach((f) => {
-                this._fileNames.push(f.name.replace(camera, ''));
+                this._fileNames.push(f.name.replace(camera, '{{camera}}'));
             });
         }
     }
@@ -151,7 +147,11 @@ export class Capture {
         let valid = true;
 
         for (const name of this._fileNames) {
-            if (!files.find((f) => f.name.includes(name))) {
+            if (
+                !files.find((f) =>
+                    `${f.name}`.replace('{{camera}}', camera).includes(name)
+                )
+            ) {
                 valid = false;
 
                 return valid;

@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 import { Entry } from './libs/entities';
 
 @Component({
@@ -9,9 +10,9 @@ import { Entry } from './libs/entities';
 export class AppComponent {
     title = 'tesla-view';
 
-    entry!: Entry;
+    entry$ = new BehaviorSubject<Entry | undefined>(undefined);
     
     setEntry(entry: Entry) {
-        this.entry = entry;
+        this.entry$.next(entry);
     }
 }

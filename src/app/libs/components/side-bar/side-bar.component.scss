@@ -1,5 +1,6 @@
 :host {
     .side-bar {
+        z-index: 1;
         max-width: 350px;
         width: 100%;
 
@@ -10,6 +11,8 @@
         position: absolute;
         top: 0;
         left: 0;
+
+        background-color: white;
 
         .entries {
             display: flex;
