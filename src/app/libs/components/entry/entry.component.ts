@@ -11,5 +11,5 @@ export class EntryComponent {
     entry!: Entry;
 
     @Output()
-    onSelectEntry = new EventEmitter();
+    onSelectEntry = new EventEmitter<Entry>();
 }

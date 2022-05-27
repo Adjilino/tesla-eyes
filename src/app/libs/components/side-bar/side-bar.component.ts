@@ -1,4 +1,4 @@
-import { Component, EventEmitter } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { Entry } from '../../entities';
 
 @Component({
@@ -13,7 +13,8 @@ export class SideBarComponent {
     entries: Entry[] = [];
 
     // emit when select entry
-    onSelect = new EventEmitter<Entry>();
+    @Output()
+    onSelectEntry = new EventEmitter<Entry>();
 
     constructor() {
         // Add one ad
@@ -21,5 +22,9 @@ export class SideBarComponent {
 
     addEntry(entry: Entry) {
         this.entries.push(entry);
+    }
+
+    onSelect(entry: Entry) {
+        this.onSelectEntry.emit(entry);
     }
 }

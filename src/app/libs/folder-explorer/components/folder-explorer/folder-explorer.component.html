@@ -1,9 +1,0 @@
-<div *ngFor="let teslaVideo of teslaVideos$ | async">
-    <button
-        type="button"
-        (click)="open(teslaVideo)"
-        >
-        <!-- style="border: 0; outline: none; background-color: transparent" -->
-        <img [src]="teslaVideo.getThumb()?.getPath()" alt="thumb" />
-    </button>
-</div>
