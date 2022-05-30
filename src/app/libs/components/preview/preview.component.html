@@ -1,8 +1,64 @@
 <div class="layout">
-    <div class="top-bar"></div>
+    <div class="top-bar">
+        <button type="button" (click)="openSideBar()">
+            <fa-icon [icon]="['fas', 'bars']"></fa-icon>
+        </button>
+    </div>
     <div class="preview">
-        <div class="main" *ngIf="entry">
-            <player [sources]="sources"></player>
+        <div
+            class="camera front"
+            [ngClass]="{
+                main: camera == 'front'
+            }"
+        >
+            <div class="frame" (click)="setCamera('front')">
+                <div class="legend">Front</div>
+            </div>
+            <div class="video">
+                <player [sources]="sources.front"></player>
+            </div>
+        </div>
+
+        <div
+            class="camera back"
+            [ngClass]="{
+                main: camera == 'back'
+            }"
+        >
+            <div class="frame" (click)="setCamera('back')">
+                <div class="legend">Back</div>
+            </div>
+            <div class="video">
+                <player [sources]="sources.back"></player>
+            </div>
+        </div>
+
+        <div
+            class="camera left"
+            [ngClass]="{
+                main: camera == 'left'
+            }"
+        >
+            <div class="frame" (click)="setCamera('left')">
+                <div class="legend">left</div>
+            </div>
+            <div class="video">
+                <player [sources]="sources.left"></player>
+            </div>
+        </div>
+
+        <div
+            class="camera right"
+            [ngClass]="{
+                main: camera == 'right'
+            }"
+        >
+            <div class="frame" (click)="setCamera('right')">
+                <div class="legend">right</div>
+            </div>
+            <div class="video">
+                <player [sources]="sources.right"></player>
+            </div>
         </div>
     </div>
     <div class="time-line"></div>

@@ -9,6 +9,11 @@ import {
     PreviewComponent,
     SideBarComponent,
 } from './libs/components';
+import {
+    FaIconLibrary,
+    FontAwesomeModule,
+} from '@fortawesome/angular-fontawesome';
+import { faBars } from '@fortawesome/free-solid-svg-icons';
 
 @NgModule({
     declarations: [
@@ -19,8 +24,12 @@ import {
         PreviewComponent,
         PlayerComponent,
     ],
-    imports: [BrowserModule, CommonModule],
+    imports: [BrowserModule, CommonModule, FontAwesomeModule],
     providers: [],
     bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule {
+    constructor(library: FaIconLibrary) {
+        library.addIcons(faBars);
+    }
+}

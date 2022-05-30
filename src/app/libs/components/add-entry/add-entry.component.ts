@@ -19,10 +19,10 @@ export class AddEntryComponent {
     @Output()
     add = new EventEmitter();
 
-    public changeDirectory(files: FileList | null) {
+    public async changeDirectory(files: FileList | null) {
         if (files && files.length) {
             let videos: FileDirectory[] = [];
-            let event!: EventFile;
+            let event!: File;
             let thumb!: FileDirectory;
 
             for (let index = 0; index < files.length; index++) {
@@ -34,7 +34,11 @@ export class AddEntryComponent {
                     } else if (this.isThumb(file)) {
                         thumb = new FileDirectory(file);
                     } else if (this.isEvent(file)) {
-                        event = new EventFile(file);
+                        // await new Promise(() => {
+
+                        // })
+
+                        event = file;
                     }
                 }
             }
@@ -46,12 +50,17 @@ export class AddEntryComponent {
                 thumb,
             });
 
+setTimeout(() => {
+    
+}, 0);
+            console.log(capture.event);
+
             if (capture.valid) {
                 const entry = new Entry({
                     thumb: thumb.path,
                     type: 'tesla',
-                    title: undefined,
-                    description: undefined,
+                    title: capture?.event?.city || undefined,
+                    description: capture?.event?.timestamp || undefined,
                     capture: capture,
                 });
 
