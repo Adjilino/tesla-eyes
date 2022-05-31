@@ -1,14 +1,17 @@
 <button type="button" (click)="onSelectEntry.emit(entry)">
     <div class="entry">
         <div class="thumb">
-            <img [src]="entry.thumb">
+            <img [src]="entry.thumb" />
         </div>
         <div class="details">
             <div class="title">
                 {{ entry?.title || "Event street not found" }}
             </div>
-            <div class="description">
-                {{ entry?.description || "No date" }}
+            <div class="description" *ngIf="entry?.description">
+                {{ entry?.description | date: "medium" }}
+            </div>
+            <div class="description" *ngIf="!entry?.description">
+                {{ "No date" }}
             </div>
         </div>
     </div>

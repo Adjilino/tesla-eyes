@@ -1,8 +1,19 @@
 <div class="layout">
     <div class="top-bar">
-        <button type="button" (click)="openSideBar()">
-            <fa-icon [icon]="['fas', 'bars']"></fa-icon>
-        </button>
+        <div class="actions">
+            <button type="button" (click)="openSideBar()">
+                <fa-icon [icon]="['fas', 'bars']"></fa-icon>
+            </button>
+        </div>
+        <div class="title" *ngIf="entry">
+            <span *ngIf="entry?.description">
+                {{ entry?.description | date: "fullDate" }}
+                {{ entry?.description | date: "mediumTime" }}
+            </span>
+            <span *ngIf="!entry?.description">
+                {{ "No date" }}
+            </span>
+        </div>
     </div>
     <div class="preview">
         <div
@@ -40,7 +51,7 @@
             }"
         >
             <div class="frame" (click)="setCamera('left')">
-                <div class="legend">left</div>
+                <div class="legend">Left</div>
             </div>
             <div class="video">
                 <player [sources]="sources.left"></player>
@@ -54,7 +65,7 @@
             }"
         >
             <div class="frame" (click)="setCamera('right')">
-                <div class="legend">right</div>
+                <div class="legend">Right</div>
             </div>
             <div class="video">
                 <player [sources]="sources.right"></player>

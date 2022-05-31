@@ -19,10 +19,12 @@ export class AddEntryComponent {
     @Output()
     add = new EventEmitter();
 
+    private _file!: File;
+
     public async changeDirectory(files: FileList | null) {
         if (files && files.length) {
             let videos: FileDirectory[] = [];
-            let event!: File;
+            let event!: EventFile;
             let thumb!: FileDirectory;
 
             for (let index = 0; index < files.length; index++) {
@@ -34,11 +36,20 @@ export class AddEntryComponent {
                     } else if (this.isThumb(file)) {
                         thumb = new FileDirectory(file);
                     } else if (this.isEvent(file)) {
-                        // await new Promise(() => {
+                        this._file = file;
+                        event = await new Promise((resolve, reject) => {
+                            const fileReader = new FileReader();
 
-                        // })
+                            fileReader.onload = (e) => {
+                                resolve(
+                                    new EventFile(
+                                        JSON.parse(`${fileReader.result}`)
+                                    )
+                                );
+                            };
 
-                        event = file;
+                            fileReader.readAsText(this._file);
+                        });
                     }
                 }
             }
@@ -50,17 +61,14 @@ export class AddEntryComponent {
                 thumb,
             });
 
-setTimeout(() => {
-    
-}, 0);
-            console.log(capture.event);
-
             if (capture.valid) {
                 const entry = new Entry({
                     thumb: thumb.path,
                     type: 'tesla',
                     title: capture?.event?.city || undefined,
-                    description: capture?.event?.timestamp || undefined,
+                    description: capture?.event?.timestamp
+                        ? new Date(capture?.event?.timestamp)
+                        : undefined,
                     capture: capture,
                 });
 

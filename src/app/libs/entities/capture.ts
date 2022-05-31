@@ -35,9 +35,7 @@ export class Capture {
 
     constructor(values?: any) {
         if (values) {
-            if (values.event) {
-                this.setEvent(values.event);
-            }
+            this.event = values.event;
 
             this.thumb = values.thumb;
 
@@ -162,25 +160,5 @@ export class Capture {
         }
 
         return valid;
-    }
-
-    public setEvent(event: any) {
-        if (event) {
-            if (event as File) {
-                const fileReader = new FileReader();
-
-                fileReader.onload = (e) => {
-                    this.event = new EventFile(
-                        JSON.parse(`${fileReader.result}`)
-                    );
-                };
-
-                fileReader.readAsText(event);
-            } else if (event as EventFile) {
-                this.event = event;
-            } else {
-                this.event = new EventFile(event);
-            }
-        }
     }
 }
