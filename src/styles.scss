@@ -37,18 +37,6 @@ body {
     height: 100%;
 }
 
-button {
-    outline: none;
-    border: 0.1rem;
-    border-radius: 0.25rem;
-    border-color: rgb(168, 168, 168);
-
-    padding: 0.25rem 0.65rem;
-
-    background-color: rgb(168, 168, 168);
-    color: black;
-}
-
 .d-flex {
     display: flex;
 }
@@ -75,4 +63,39 @@ button {
 
 .align-self-center {
     align-self: center;
+}
+
+button {
+    outline: none;
+    border: 0.1rem;
+    border-radius: 0.25rem;
+    border-color: rgb(193, 193, 193);
+
+    padding: 0.5rem 0.75rem;
+
+    background-color: rgb(193, 193, 193);
+    color: black;
+
+    &:hover,
+    &:active,
+    &:focus {
+        cursor: pointer;
+        outline: none;
+
+        border-color: rgb(169, 169, 169);
+        background-color: rgb(169, 169, 169);
+    }
+}
+
+a,
+button {
+    &:hover,
+    &:active,
+    &:focus {
+        cursor: pointer;
+    }
+
+    fa-icon ~ * {
+        margin-left: 0.5rem;
+    }
 }

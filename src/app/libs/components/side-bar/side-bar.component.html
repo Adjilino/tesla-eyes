@@ -2,7 +2,7 @@
     <div class="content-box">
         <div class="box-auto">
             <div class="top-bar">
-                <button type="button" (click)="close()">
+                <button class="icon" type="button" (click)="close()">
                     <fa-icon [icon]="['fas', 'bars']"></fa-icon>
                 </button>
             </div>
@@ -16,8 +16,23 @@
                     ></entry>
                 </div>
             </div>
-            <div class="add-entry">
-                <add-entry (add)="addEntry($event)"></add-entry>
+        </div>
+        <div class="box-auto bottom-bar">
+            <div class="content-box horizontal">
+                <div class="box-auto">
+                    <div class="bottom-item">
+                        <a (click)="openLink()">
+                            <fa-icon [icon]="['fas', 'mug-hot']"></fa-icon>
+                            <span>Buy me a coffee</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="box-main"></div>
+                <div class="box-auto">
+                    <div class="bottom-item">
+                        <add-entry (add)="addEntry($event)"></add-entry>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

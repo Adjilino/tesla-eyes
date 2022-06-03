@@ -2,6 +2,7 @@ import { Component, EventEmitter, OnDestroy, Output } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import { Entry } from '../../entities';
 import { SideBarService } from './side-bar.service';
+import { shell } from 'electron'
 
 @Component({
     selector: 'side-bar',
@@ -56,5 +57,10 @@ export class SideBarComponent implements OnDestroy {
 
     open() {
         this._sideBarService.open();
+    }
+
+    public openLink() {
+        shell.openExternal('https://www.buymeacoffee.com/adjilino')
+        // this._shell.openExternal('https://www.buymeacoffee.com/adjilino');
     }
 }

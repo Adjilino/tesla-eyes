@@ -1,5 +1,8 @@
 <div class="w-100 d-flex justify-content-center">
-    <button type="button" (click)="directoryInput.click()">Add capture</button>
+    <button type="button" (click)="directoryInput.click()">
+        <fa-icon [icon]="['fas', 'plus-circle']"></fa-icon>
+        <span>Add capture</span>
+    </button>
     <input
         style="display: none"
         #directoryInput
