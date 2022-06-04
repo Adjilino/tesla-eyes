@@ -2,6 +2,6 @@
     #videoPlayer
     muted
     autoplay
-    [src]="source"
+    [src]="sanitizeUrl(source)"
     (ended)="finished()"
 ></video>

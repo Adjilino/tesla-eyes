@@ -1,4 +1,5 @@
 import { Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 @Component({
     selector: 'player',
@@ -23,6 +24,12 @@ export class PlayerComponent {
     source!: string;
 
     index!: number;
+
+    constructor(private sanitizer: DomSanitizer) {}
+
+    sanitizeUrl(url: string): SafeUrl {
+        return this.sanitizer.bypassSecurityTrustUrl(url);
+    }
 
     finished() {
         this.index++;

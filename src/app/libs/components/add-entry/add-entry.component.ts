@@ -35,6 +35,7 @@ export class AddEntryComponent {
                         videos.push(new FileDirectory(file));
                     } else if (this.isThumb(file)) {
                         thumb = new FileDirectory(file);
+                        console.log("Thumb FileDirectory", thumb)
                     } else if (this.isEvent(file)) {
                         this._file = file;
                         event = await new Promise((resolve, reject) => {
@@ -83,6 +84,7 @@ export class AddEntryComponent {
 
     private isThumb(file: File): boolean {
         if (file.type === 'image/png' && file.name === 'thumb.png') {
+            console.log("Thumb file:", file)
             return true;
         }
 

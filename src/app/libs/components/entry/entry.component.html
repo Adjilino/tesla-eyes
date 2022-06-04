@@ -1,7 +1,7 @@
 <button type="button" (click)="onSelectEntry.emit(entry)">
     <div class="entry">
         <div class="thumb">
-            <img [src]="entry.thumb" />
+            <img [src]="sanitizeUrl(entry.thumb)" />
         </div>
         <div class="details">
             <div class="title">
