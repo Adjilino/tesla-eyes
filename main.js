@@ -13,6 +13,7 @@ function createWindow() {
         icon: `file://${__dirname}/dist/assets/logo.png`,
         webPreferences: {
             nodeIntegration: true,
+            contextIsolation: false,
         },
     });
 
