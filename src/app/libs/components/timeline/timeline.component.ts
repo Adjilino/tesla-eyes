@@ -55,6 +55,8 @@ export class TimelineComponent implements AfterViewInit, OnDestroy {
         return this.elTimelineProgress.nativeElement;
     }
 
+    paused = false;
+
     private _subscriptions$ = new Subject();
 
     constructor(private _timelineService: PlayerTimelineService) {}
@@ -71,6 +73,12 @@ export class TimelineComponent implements AfterViewInit, OnDestroy {
             .subscribe((time) => {
                 this.time = time;
             });
+
+        this._timelineService.pausedChanges
+            .pipe(takeUntil(this._subscriptions$))
+            .subscribe((paused) => {
+                this.paused = paused;
+            });
     }
 
     ngOnDestroy(): void {
@@ -86,6 +94,14 @@ export class TimelineComponent implements AfterViewInit, OnDestroy {
         }
 
         this._timelineProgress.style.width = `${width}%`;
+    }
+
+    togglePlay() {
+        if (this.paused) {
+            this._timelineService.play();
+        } else {
+            this._timelineService.pause();
+        }
     }
 }
 

@@ -1,9 +1,14 @@
 <div class="content">
     <div class="content-box horizontal">
-        <div class="box-auto times">
+        <div class="box-auto space">
+            <a class="play" (click)="togglePlay()">
+                <fa-icon [icon]="['fas', paused ? 'play' : 'pause']"></fa-icon>
+            </a>
+        </div>
+        <div class="box-auto space">
             {{ time$ | async }}
         </div>
-        <div class="box-main times">
+        <div class="box-main space">
             <div class="timeline">
                 <div class="timeline-line"></div>
                 <div #timelineProgress class="timeline-progress">
@@ -11,7 +16,7 @@
                 </div>
             </div>
         </div>
-        <div class="box-auto times">
+        <div class="box-auto space">
             {{ duration$ | async }}
         </div>
     </div>

@@ -18,7 +18,7 @@ import { PlayerTimelineService } from '../../services';
 export class PlayerComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('videoPlayer')
     videoPlayer!: ElementRef;
-    
+
     get player(): HTMLVideoElement {
         return this.videoPlayer.nativeElement as HTMLVideoElement;
     }
@@ -27,6 +27,8 @@ export class PlayerComponent implements OnInit, AfterViewInit, OnDestroy {
     camera!: string;
 
     video$ = new BehaviorSubject<string>('');
+
+    private _paused = false;
 
     private _subscription$ = new Subject<void>();
 
@@ -48,6 +50,26 @@ export class PlayerComponent implements OnInit, AfterViewInit, OnDestroy {
         this.video$.asObservable().subscribe((src) => {
             this.player.src = src;
         });
+
+        this.player.onloadeddata = () => {
+            if (this._paused) {
+                this.player.pause();
+            } else {
+                this.player.play();
+            }
+        };
+
+        this._playerService.pausedChanges
+            .pipe(takeUntil(this._subscription$))
+            .subscribe((paused) => {
+                this._paused = paused;
+
+                if (paused) {
+                    this.player.pause();
+                } else {
+                    this.player.play();
+                }
+            });
     }
 
     ngOnDestroy(): void {

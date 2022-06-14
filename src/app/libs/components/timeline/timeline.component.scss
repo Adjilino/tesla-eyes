@@ -1,7 +1,4 @@
 :host {
-    --pointer-width: 0.75rem;
-    --progress-width: 3px;
-
     .content {
         height: 100%;
         display: flex;
@@ -10,9 +7,13 @@
         padding: 0 1rem;
     }
 
-    .times {
+    .space {
         display: flex;
         align-items: center;
+    }
+
+    .play {
+        margin: 0 1rem;
     }
 
     .timeline {

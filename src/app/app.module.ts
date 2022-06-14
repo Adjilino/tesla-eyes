@@ -8,6 +8,8 @@ import {
 import {
     faBars,
     faMugHot,
+    faPause,
+    faPlay,
     faPlusCircle,
     faSpinner,
 } from '@fortawesome/free-solid-svg-icons';
@@ -37,6 +39,13 @@ import {
 })
 export class AppModule {
     constructor(library: FaIconLibrary) {
-        library.addIcons(faBars, faPlusCircle, faMugHot, faSpinner);
+        library.addIcons(
+            faBars,
+            faPlusCircle,
+            faMugHot,
+            faSpinner,
+            faPause,
+            faPlay
+        );
     }
 }

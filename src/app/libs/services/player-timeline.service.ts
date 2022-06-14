@@ -25,6 +25,9 @@ export class PlayerTimelineService {
 
     private _duration$ = new BehaviorSubject<number>(0);
 
+    private _paused$ = new BehaviorSubject<boolean>(false);
+    private _paused = false;
+
     get videoChanges() {
         return this._timestamp$.asObservable();
     }
@@ -45,11 +48,13 @@ export class PlayerTimelineService {
         return this._duration$.asObservable();
     }
 
+    get pausedChanges() {
+        return this._paused$.asObservable();
+    }
+
     constructor() {
         // Create video player
         this._player = document.createElement('video');
-        // this._player.controls;
-        this._player.autoplay = true;
         this._player.muted = true;
 
         // Hide the player
@@ -70,6 +75,22 @@ export class PlayerTimelineService {
                 this._setSrc(nextSrc);
             }
         });
+
+        this._player.addEventListener('pause', () => {
+            this._paused$.next(true);
+        });
+
+        this._player.addEventListener('play', () => {
+            this._paused$.next(false);
+        });
+
+        this._player.onloadeddata = () => {
+            if (this._paused) {
+                this.pause();
+            } else {
+                this.play();
+            }
+        };
     }
 
     setCapture(capture: Capture) {
