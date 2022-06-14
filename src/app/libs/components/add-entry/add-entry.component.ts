@@ -19,72 +19,64 @@ export class AddEntryComponent {
     @Output()
     add = new EventEmitter();
 
+    isLoading = false;
+
     private _file!: File;
 
     public async changeDirectory(files: FileList | null) {
+        this.isLoading = true;
+
         if (files && files.length) {
-            let videos: FileDirectory[] = [];
+            let videos: File[] = [];
             let event!: EventFile;
-            let thumb!: FileDirectory;
+            let thumb!: string;
 
             for (let index = 0; index < files.length; index++) {
                 const file = files.item(index);
 
                 if (file) {
                     if (this.isVideo(file)) {
-                        videos.push(new FileDirectory(file));
+                        videos.push(file);
                     } else if (this.isThumb(file)) {
-                        thumb = new FileDirectory(file);
-                        console.log("Thumb FileDirectory", thumb)
+                        thumb = await this._readFileAsUrl(file);
                     } else if (this.isEvent(file)) {
-                        this._file = file;
-                        event = await new Promise((resolve, reject) => {
-                            const fileReader = new FileReader();
-
-                            fileReader.onload = (e) => {
-                                resolve(
-                                    new EventFile(
-                                        JSON.parse(`${fileReader.result}`)
-                                    )
-                                );
-                            };
-
-                            fileReader.readAsText(this._file);
-                        });
+                        event = new EventFile(
+                            JSON.parse(`${await this._readFileAsText(file)}`)
+                        );
                     }
                 }
             }
 
             // Validate if is a valid capture;
             const capture = new Capture({
-                videos,
                 event,
                 thumb,
             });
 
-            if (capture.valid) {
-                const entry = new Entry({
-                    thumb: thumb.path,
-                    type: 'tesla',
-                    title: capture?.event?.city || undefined,
-                    description: capture?.event?.timestamp
-                        ? new Date(capture?.event?.timestamp)
-                        : undefined,
-                    capture: capture,
-                });
+            await capture.setVideos(videos);
 
-                this.add.emit(entry);
-            }
+            const entry = new Entry({
+                thumb: thumb,
+                type: 'tesla',
+                title: capture?.event?.city || undefined,
+                description: capture?.event?.timestamp
+                    ? new Date(capture?.event?.timestamp)
+                    : undefined,
+                capture: capture,
+            });
+
+            this.add.emit(entry);
         }
 
         if (this.directoryInput && this.directoryInput.nativeElement) {
             this.directoryInput.nativeElement.value = '';
         }
+
+        this.isLoading = false;
     }
 
     private isThumb(file: File): boolean {
         if (file.type === 'image/png' && file.name === 'thumb.png') {
-            console.log("Thumb file:", file)
             return true;
         }
 
@@ -105,5 +97,37 @@ export class AddEntryComponent {
         }
 
         return false;
+    }
+
+    private _readFileAsText(file: File) {
+        return new Promise((resolve, reject) => {
+            const fileReader = new FileReader();
+
+            fileReader.onload = (e) => {
+                resolve(fileReader.result);
+            };
+
+            fileReader.onerror = (error) => {
+                reject(error);
+            };
+
+            fileReader.readAsText(file);
+        });
+    }
+
+    private _readFileAsUrl(file: File): Promise<string> {
+        return new Promise((resolve, reject) => {
+            const fileReader = new FileReader();
+
+            fileReader.onload = (e) => {
+                resolve(fileReader.result as string);
+            };
+
+            fileReader.onerror = (error) => {
+                reject(error);
+            };
+
+            fileReader.readAsDataURL(file);
+        });
     }
 }

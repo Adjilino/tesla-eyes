@@ -1,0 +1,18 @@
+<div class="content">
+    <div class="content-box horizontal">
+        <div class="box-auto times">
+            {{ time$ | async }}
+        </div>
+        <div class="box-main times">
+            <div class="timeline">
+                <div class="timeline-line"></div>
+                <div #timelineProgress class="timeline-progress">
+                    <div class="progress-point"></div>
+                </div>
+            </div>
+        </div>
+        <div class="box-auto times">
+            {{ duration$ | async }}
+        </div>
+    </div>
+</div>

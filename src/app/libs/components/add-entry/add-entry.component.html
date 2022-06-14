@@ -1,6 +1,13 @@
 <div class="w-100 d-flex justify-content-center">
-    <button type="button" (click)="directoryInput.click()">
-        <fa-icon [icon]="['fas', 'plus-circle']"></fa-icon>
+    <button
+        type="button"
+        (click)="directoryInput.click()"
+        [disabled]="isLoading"
+    >
+        <fa-icon
+            [icon]="['fas', isLoading ? 'spinner' : 'plus-circle']"
+            [pulse]="isLoading"
+        ></fa-icon>
         <span>Add capture</span>
     </button>
     <input
