@@ -38,25 +38,27 @@
         .timeline-progress {
             position: absolute;
             left: 0;
+            width: 100%;
+            z-index: 1;
 
-            width: 0px;
-            height: 2px;
+            // width: 0px;
+            // height: 2px;
 
-            background-color: black;
+            // background-color: black;
 
-            transition: width 500ms;
+            // transition: width 500ms;
 
-            .progress-point {
-                position: absolute;
-                right: calc(-0.5rem / 2);
-                top: calc((-0.5rem / 2) + (2px / 2));
+            // .progress-point {
+            //     position: absolute;
+            //     right: calc(-0.5rem / 2);
+            //     top: calc((-0.5rem / 2) + (2px / 2));
 
-                width: 0.5rem;
-                height: 0.5rem;
+            //     width: 0.5rem;
+            //     height: 0.5rem;
 
-                background-color: black;
-                border-radius: 10rem;
-            }
+            //     background-color: black;
+            //     border-radius: 10rem;
+            // }
         }
     }
 }

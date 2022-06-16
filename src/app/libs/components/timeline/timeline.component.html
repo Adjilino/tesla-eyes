@@ -11,9 +11,20 @@
         <div class="box-main space">
             <div class="timeline">
                 <div class="timeline-line"></div>
-                <div #timelineProgress class="timeline-progress">
+                <!-- <div #timelineProgress class="timeline-progress">
                     <div class="progress-point"></div>
-                </div>
+                </div> -->
+                <input
+                    #timelineProgress
+                    type="range"
+                    class="timeline-progress"
+                    min="0"
+                    [max]="duration"
+                    step="0.05"
+                    (mousedown)="setPressingProgress(true)"
+                    (mouseup)="setPressingProgress(false)"
+                    (change)="changeProgress($event.target)"
+                />
             </div>
         </div>
         <div class="box-auto space">

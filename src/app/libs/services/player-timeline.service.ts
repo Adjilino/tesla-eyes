@@ -69,10 +69,8 @@ export class PlayerTimelineService {
         this._player.addEventListener('ended', () => {
             if (this._timestampsKeys.length > this._timestampIndex + 1) {
                 this._timestampIndex++;
-                this._timestampKey = this._timestampsKeys[this._timestampIndex];
-                const nextSrc = this._timestamps[this._timestampKey];
 
-                this._setSrc(nextSrc);
+                this._setSrcIndex(this._timestampIndex);
             }
         });
 
@@ -99,15 +97,32 @@ export class PlayerTimelineService {
 
         if (capture.timestamps) {
             this.setTime(0);
-            this._timestampKey = 0;
-            this._timestampIndex = 0;
-
-            this._setSrc(this._timestamps[0]);
         }
     }
 
-    setTime(time: number) {
-        this._player.currentTime = time;
+    setTime(time: number = 0) {
+        let index = 0;
+
+        // Get the timestamp
+        for (let i = 0; this._timestampsKeys.length > i; i++) {
+            if (this._timestampsKeys[i] > time) {
+                break;
+            }
+
+            index = i;
+        }
+
+        const key = this._timestampsKeys[index];
+
+        // Substract the timestamp and time to get the player time
+        const playerTime = key - time;
+
+        // this._setSrc(timestamp);
+        this._setSrcIndex(index);
+
+        this._player.currentTime = playerTime;
+
+        // player (component) need to know the time changed
     }
 
     play() {
@@ -119,6 +134,12 @@ export class PlayerTimelineService {
     }
 
     // -- Private function --
+    private _setSrcIndex(index: number = 0) {
+        this._timestampIndex = index;
+        this._timestampKey = this._timestampsKeys[this._timestampIndex];
+
+        this._setSrc(this._timestamps[this._timestampKey]);
+    }
 
     private _setSrc(timestamp: any) {
         if (timestamp) {

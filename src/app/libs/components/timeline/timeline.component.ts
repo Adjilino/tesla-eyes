@@ -51,11 +51,13 @@ export class TimelineComponent implements AfterViewInit, OnDestroy {
     @ViewChild('timelineProgress')
     elTimelineProgress!: ElementRef;
 
-    private get _timelineProgress(): HTMLDivElement {
+    private get _timelineProgress(): HTMLInputElement {
         return this.elTimelineProgress.nativeElement;
     }
 
     paused = false;
+
+    private _isPressingProgress = false;
 
     private _subscriptions$ = new Subject();
 
@@ -87,13 +89,15 @@ export class TimelineComponent implements AfterViewInit, OnDestroy {
     }
 
     private timeWidth(time: number = 0) {
-        let width = 0;
+        // let width = 0;
 
-        if (time) {
-            width = (time * 100) / this.duration;
+        // if (time) {
+        //     width = (time * 100) / this.duration;
+        // }
+
+        if (!this._isPressingProgress) {
+            this._timelineProgress.value = `${time}`;
         }
-
-        this._timelineProgress.style.width = `${width}%`;
     }
 
     togglePlay() {
@@ -101,6 +105,17 @@ export class TimelineComponent implements AfterViewInit, OnDestroy {
             this._timelineService.play();
         } else {
             this._timelineService.pause();
+        }
+    }
+
+    setPressingProgress(pressing: boolean) {
+        this._isPressingProgress = pressing;
+    }
+
+    changeProgress(target: EventTarget | null) {
+        if (target) {
+            const inputProgress = target as HTMLInputElement;
+            this._timelineService.setTime(inputProgress.valueAsNumber);
         }
     }
 }
