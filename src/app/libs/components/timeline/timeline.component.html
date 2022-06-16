@@ -11,13 +11,10 @@
         <div class="box-main space">
             <div class="timeline">
                 <div class="timeline-line"></div>
-                <!-- <div #timelineProgress class="timeline-progress">
-                    <div class="progress-point"></div>
-                </div> -->
+                <div #timelineProgress class="timeline-line progress"></div>
                 <input
-                    #timelineProgress
+                    #timelineInput
                     type="range"
-                    class="timeline-progress"
                     min="0"
                     [max]="duration"
                     step="0.05"

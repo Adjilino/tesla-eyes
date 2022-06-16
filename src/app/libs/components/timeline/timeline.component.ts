@@ -48,6 +48,13 @@ export class TimelineComponent implements AfterViewInit, OnDestroy {
     private _duration = 0;
     duration$ = new BehaviorSubject<string>('00:00');
 
+    @ViewChild('timelineInput')
+    elTimelineInput!: ElementRef;
+
+    private get _timelineInput(): HTMLInputElement {
+        return this.elTimelineInput.nativeElement;
+    }
+
     @ViewChild('timelineProgress')
     elTimelineProgress!: ElementRef;
 
@@ -89,14 +96,16 @@ export class TimelineComponent implements AfterViewInit, OnDestroy {
     }
 
     private timeWidth(time: number = 0) {
-        // let width = 0;
-
-        // if (time) {
-        //     width = (time * 100) / this.duration;
-        // }
-
         if (!this._isPressingProgress) {
-            this._timelineProgress.value = `${time}`;
+            this._timelineInput.value = `${time}`;
+
+            let width = 0;
+
+            if (time) {
+                width = (time * 100) / this.duration;
+            }
+
+            this._timelineProgress.style.width = `${width}%`;
         }
     }
 

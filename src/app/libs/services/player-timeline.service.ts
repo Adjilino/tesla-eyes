@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, map } from 'rxjs';
+import { BehaviorSubject, map, tap } from 'rxjs';
 import { Capture } from '../entities';
 
 @Injectable({
@@ -22,6 +22,7 @@ export class PlayerTimelineService {
     private _timestamp$ = new BehaviorSubject<any>(null);
 
     private _time$ = new BehaviorSubject<number>(0);
+    private _manuallyTime$ = new BehaviorSubject<number>(0);
 
     private _duration$ = new BehaviorSubject<number>(0);
 
@@ -42,6 +43,12 @@ export class PlayerTimelineService {
                 return time + +this._timestampKey;
             })
         );
+    }
+
+    get manuallyTimeChanges() {
+        return this._manuallyTime$
+            .asObservable()
+            .pipe(tap((time) => (this._player.currentTime = time)));
     }
 
     get durationChanges() {
@@ -92,6 +99,7 @@ export class PlayerTimelineService {
     }
 
     setCapture(capture: Capture) {
+        this._timestampIndex = -1;
         this._capture = capture;
         this._duration$.next(capture.duration);
 
@@ -115,12 +123,12 @@ export class PlayerTimelineService {
         const key = this._timestampsKeys[index];
 
         // Substract the timestamp and time to get the player time
-        const playerTime = key - time;
+        const playerTime = time - key;
 
         // this._setSrc(timestamp);
         this._setSrcIndex(index);
 
-        this._player.currentTime = playerTime;
+        this._manuallyTime$.next(playerTime);
 
         // player (component) need to know the time changed
     }
@@ -135,10 +143,12 @@ export class PlayerTimelineService {
 
     // -- Private function --
     private _setSrcIndex(index: number = 0) {
-        this._timestampIndex = index;
-        this._timestampKey = this._timestampsKeys[this._timestampIndex];
+        if (this._timestampIndex != index) {
+            this._timestampIndex = index;
+            this._timestampKey = this._timestampsKeys[this._timestampIndex];
 
-        this._setSrc(this._timestamps[this._timestampKey]);
+            this._setSrc(this._timestamps[this._timestampKey]);
+        }
     }
 
     private _setSrc(timestamp: any) {

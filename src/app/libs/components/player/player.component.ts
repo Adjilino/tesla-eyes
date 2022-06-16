@@ -70,6 +70,12 @@ export class PlayerComponent implements OnInit, AfterViewInit, OnDestroy {
                     this.player.play();
                 }
             });
+
+        this._playerService.manuallyTimeChanges
+            .pipe(takeUntil(this._subscription$))
+            .subscribe((playerTime) => {
+                this.player.currentTime = playerTime;
+            });
     }
 
     ngOnDestroy(): void {
