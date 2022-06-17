@@ -12,6 +12,8 @@ export class Capture {
 
     duration: number = 0;
 
+    alert: number = 0;
+
     constructor(values?: any) {
         if (values) {
             this.event = values.event;
@@ -21,6 +23,8 @@ export class Capture {
             this.timestamps = values.timestamps || {};
 
             this.duration = values.duration || 0;
+
+            this.alert = values.alert || 0;
         }
     }
 
@@ -36,6 +40,8 @@ export class Capture {
             this.duration = 0;
             let time = 0;
 
+            this._defineAlert(videos[0]);
+
             for (let video of videos) {
                 // Get camera
                 let camera = this._getVideoCamera(video);
@@ -44,6 +50,7 @@ export class Capture {
                 if (camera) {
                     // Know duration of video
                     let _duration = await this._getVideoDurantion(video);
+                    console.log('_duration camera ', camera, _duration);
 
                     // Verify if the camera is already added to jummp to another timestamp
                     if (
@@ -60,6 +67,7 @@ export class Capture {
 
                         // Will add the video's duration to "global" durantion
                         this.duration += _duration;
+                        console.log(this.duration);
                     } else {
                         // Add the video to existing timestamp
                         this.timestamps[time][camera] =
@@ -68,6 +76,25 @@ export class Capture {
                 }
             }
         }
+    }
+
+    private _defineAlert(video: File) {
+        // convert first video name in date "2022-05-01_17-16-50-back.mp4"
+        let _cameraName = cameras.filter((camera) =>
+            video.name.includes(camera)
+        );
+
+        const name = video.name.split(`-${_cameraName}`)[0];
+        // name.replace('_', 'T');
+        const dates = name.split('_');
+        const date = dates[0];
+        const dateTime = dates[1].replace(/-/g, ':');
+        const startAt = new Date(`${date}T${dateTime}`);
+
+        // calculate the alert point
+        this.alert =
+            (new Date(this.event.timestamp).getTime() - startAt.getTime()) /
+            1000;
     }
 
     /**

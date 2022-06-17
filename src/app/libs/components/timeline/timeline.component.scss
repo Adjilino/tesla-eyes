@@ -38,9 +38,19 @@
                 width: 0;
                 background-color: #000000;
             }
+        }
 
-            .alert {
-            }
+        .alert {
+            position: absolute;
+            left: 0;
+
+            width: 12px;
+            height: 12px;
+
+            background-color: rgb(250, 75, 75);
+
+            border: solid white 2px;
+            border-radius: 100rem;
         }
 
         input[type="range"] {

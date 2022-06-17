@@ -7,7 +7,7 @@ import {
     ViewChild,
 } from '@angular/core';
 import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
-import { Capture } from '../../entities';
+import { Capture, EventFile } from '../../entities';
 import { PlayerTimelineService } from '../../services';
 
 @Component({
@@ -20,8 +20,12 @@ export class TimelineComponent implements AfterViewInit, OnDestroy {
     set capture(capture: Capture | null) {
         if (capture) {
             this._timelineService.setCapture(capture);
+
+            this._setAlertPosition(capture.alert || 0);
         }
     }
+
+    public event!: EventFile;
 
     time$ = new BehaviorSubject<string>('00:00');
     get time(): number {
@@ -58,8 +62,15 @@ export class TimelineComponent implements AfterViewInit, OnDestroy {
     @ViewChild('timelineProgress')
     elTimelineProgress!: ElementRef;
 
-    private get _timelineProgress(): HTMLInputElement {
+    private get _timelineProgress(): HTMLDivElement {
         return this.elTimelineProgress.nativeElement;
+    }
+
+    @ViewChild('timelineAlert')
+    elTimelineAlert!: ElementRef;
+
+    private get _timelineAlert(): HTMLDivElement {
+        return this.elTimelineAlert.nativeElement;
     }
 
     paused = false;
@@ -99,13 +110,7 @@ export class TimelineComponent implements AfterViewInit, OnDestroy {
         if (!this._isPressingProgress) {
             this._timelineInput.value = `${time}`;
 
-            let width = 0;
-
-            if (time) {
-                width = (time * 100) / this.duration;
-            }
-
-            this._timelineProgress.style.width = `${width}%`;
+            this._timelineProgress.style.width = this._calculateWidth(time);
         }
     }
 
@@ -125,6 +130,22 @@ export class TimelineComponent implements AfterViewInit, OnDestroy {
         if (target) {
             const inputProgress = target as HTMLInputElement;
             this._timelineService.setTime(inputProgress.valueAsNumber);
+        }
+    }
+
+    private _calculateWidth(time: number = 0) {
+        let width = 0;
+
+        if (time) {
+            width = (time * 100) / this.duration;
+        }
+
+        return `${width}%`;
+    }
+
+    private _setAlertPosition(alert: number = 0) {
+        if (alert) {
+            this._timelineAlert.style.left = this._calculateWidth(alert);
         }
     }
 }
