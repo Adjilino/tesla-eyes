@@ -1,4 +1,3 @@
-import { DomSanitizer } from '@angular/platform-browser';
 import { EventFile } from './event-file';
 import { FileDirectory } from './file-directory';
 
@@ -50,7 +49,6 @@ export class Capture {
                 if (camera) {
                     // Know duration of video
                     let _duration = await this._getVideoDurantion(video);
-                    console.log('_duration camera ', camera, _duration);
 
                     // Verify if the camera is already added to jummp to another timestamp
                     if (
@@ -67,7 +65,6 @@ export class Capture {
 
                         // Will add the video's duration to "global" durantion
                         this.duration += _duration;
-                        console.log(this.duration);
                     } else {
                         // Add the video to existing timestamp
                         this.timestamps[time][camera] =
@@ -95,6 +92,7 @@ export class Capture {
         this.alert =
             (new Date(this.event.timestamp).getTime() - startAt.getTime()) /
             1000;
+        console.log('Alert', this.alert);
     }
 
     /**

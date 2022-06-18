@@ -75,9 +75,7 @@ export class PlayerTimelineService {
         // Listener whe video reach the end
         this._player.addEventListener('ended', () => {
             if (this._timestampsKeys.length > this._timestampIndex + 1) {
-                this._timestampIndex++;
-
-                this._setSrcIndex(this._timestampIndex);
+                this._setSrcIndex(this._timestampIndex + 1);
             }
         });
 
