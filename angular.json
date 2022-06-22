@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "tesla-view": {
+    "tesla-eyes": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -111,5 +111,5 @@
       }
     }
   },
-  "defaultProject": "tesla-view"
+  "defaultProject": "tesla-eyes"
 }

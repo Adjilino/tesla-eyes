@@ -10,7 +10,7 @@ function createWindow() {
         minWidth: 750,
         minHeight: 600,
         backgroundColor: "#ffffff",
-        icon: `file://${__dirname}/dist/assets/logo.png`,
+        icon: `file://${__dirname}/dist/assets/logo.icns`,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
