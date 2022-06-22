@@ -24,9 +24,9 @@ export class AddEntryComponent {
     private _file!: File;
 
     public async changeDirectory(files: FileList | null) {
-        this.isLoading = true;
-
         if (files && files.length) {
+            this.isLoading = true;
+
             let videos: File[] = [];
             let event!: EventFile;
             let thumb!: string;
