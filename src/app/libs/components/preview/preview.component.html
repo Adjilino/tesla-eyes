@@ -26,7 +26,7 @@
                 <div class="legend">Front</div>
             </div>
             <div class="video">
-                <player [sources]="sources.front"></player>
+                <player camera="front"></player>
             </div>
         </div>
 
@@ -40,37 +40,39 @@
                 <div class="legend">Back</div>
             </div>
             <div class="video">
-                <player [sources]="sources.back"></player>
+                <player camera="back"></player>
             </div>
         </div>
 
         <div
             class="camera left"
             [ngClass]="{
-                main: camera == 'left'
+                main: camera == 'left_repeater'
             }"
         >
-            <div class="frame" (click)="setCamera('left')">
+            <div class="frame" (click)="setCamera('left_repeater')">
                 <div class="legend">Left</div>
             </div>
             <div class="video">
-                <player [sources]="sources.left"></player>
+                <player camera="left_repeater"></player>
             </div>
         </div>
 
         <div
             class="camera right"
             [ngClass]="{
-                main: camera == 'right'
+                main: camera == 'right_repeater'
             }"
         >
-            <div class="frame" (click)="setCamera('right')">
+            <div class="frame" (click)="setCamera('right_repeater')">
                 <div class="legend">Right</div>
             </div>
             <div class="video">
-                <player [sources]="sources.right"></player>
+                <player camera="right_repeater"></player>
             </div>
         </div>
     </div>
-    <div class="time-line"></div>
+    <div class="time-line">
+        <timeline [capture]="capture$ | async"></timeline>
+    </div>
 </div>

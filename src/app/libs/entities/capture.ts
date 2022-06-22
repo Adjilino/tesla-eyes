@@ -7,31 +7,11 @@ export class Capture {
     event!: EventFile;
     thumb!: FileDirectory;
 
-    front: FileDirectory[] = [];
-    back: FileDirectory[] = [];
+    timestamps: any = {};
 
-    left_repeater: FileDirectory[] = [];
-    set left(left_repeater: FileDirectory[]) {
-        this.left_repeater = left_repeater;
-    }
-    get left(): FileDirectory[] {
-        return this.left_repeater;
-    }
+    duration: number = 0;
 
-    right_repeater: FileDirectory[] = [];
-    set right(right_repeater: FileDirectory[]) {
-        this.right_repeater = right_repeater;
-    }
-    get right(): FileDirectory[] {
-        return this.right_repeater;
-    }
-
-    private _fileNames!: string[];
-
-    get valid(): boolean {
-        return this._valid;
-    }
-    private _valid: boolean = true;
+    alert: number = 0;
 
     constructor(values?: any) {
         if (values) {
@@ -39,126 +19,151 @@ export class Capture {
 
             this.thumb = values.thumb;
 
-            this.front = [];
-            if (values.front && values.front.length) {
-                values.front.forEach((f: any) => {
-                    this.front.push(new FileDirectory(f));
-                });
-            }
+            this.timestamps = values.timestamps || {};
 
-            this.back = [];
-            if (values.back && values.back.length) {
-                values.back.forEach((f: any) => {
-                    this.back.push(new FileDirectory(f));
-                });
-            }
+            this.duration = values.duration || 0;
 
-            this.left = [];
-            if (values.left && values.left.length) {
-                values.left.forEach((f: any) => {
-                    this.left.push(new FileDirectory(f));
-                });
-            }
+            this.alert = values.alert || 0;
+        }
+    }
 
-            this.right = [];
-            if (values.right && values.right.length) {
-                values.right.forEach((f: any) => {
-                    this.right.push(new FileDirectory(f));
-                });
-            }
+    async setVideos(videos: File[]) {
+        if (videos && videos.length) {
+            // Order the videos
+            videos.sort((a, b) =>
+                `${a.name}`
+                    .toLowerCase()
+                    .localeCompare(`${b.name}`.toLowerCase())
+            );
 
-            if (values.videos && values.videos.length) {
-                values.videos.forEach((video: any) => {
-                    const v = new FileDirectory(video);
+            this.duration = 0;
+            let time = 0;
 
-                    for (const camera of cameras) {
-                        if (`${v.name}`.includes(camera)) {
-                            const file = this.getCamera(camera);
+            this._defineAlert(videos[0]);
 
-                            if (file) {
-                                file.push(v);
-                                return;
-                            }
-                        }
+            for (let video of videos) {
+                // Get camera
+                let camera = this._getVideoCamera(video);
+
+                // Validate if is a valid video
+                if (camera) {
+                    // Know duration of video
+                    let _duration = await this._getVideoDurantion(video);
+
+                    // Verify if the camera is already added to jummp to another timestamp
+                    if (
+                        !this.timestamps[time] ||
+                        this.timestamps[time][camera]
+                    ) {
+                        // Time if the start of the timeline of the video
+                        time = +`${this.duration}`;
+
+                        // Create timestamp for the video
+                        this.timestamps[time] = {
+                            [camera]: await this._readFileAsUrl(video),
+                        };
+
+                        // Will add the video's duration to "global" durantion
+                        this.duration += _duration;
+                    } else {
+                        // Add the video to existing timestamp
+                        this.timestamps[time][camera] =
+                            await this._readFileAsUrl(video);
                     }
-                });
+                }
+            }
+        }
+    }
+
+    private _defineAlert(video: File) {
+        // convert first video name in date "2022-05-01_17-16-50-back.mp4"
+        let _cameraName = cameras.filter((camera) =>
+            video.name.includes(camera)
+        );
+
+        const name = video.name.split(`-${_cameraName}`)[0];
+        // name.replace('_', 'T');
+        const dates = name.split('_');
+        const date = dates[0];
+        const dateTime = dates[1].replace(/-/g, ':');
+        const startAt = new Date(`${date}T${dateTime}`);
+
+        // calculate the alert point
+        this.alert =
+            (new Date(this.event.timestamp).getTime() - startAt.getTime()) /
+            1000;
+        console.log('Alert', this.alert);
+    }
+
+    /**
+     * Get the camera of the video
+     *
+     * @param video File of the video
+     * @returns string of camera or undifined if camera as not finded
+     */
+    private _getVideoCamera(video: File): string | undefined {
+        let _camera;
+
+        for (let camera of cameras) {
+            if (`${video.name}`.includes(camera)) {
+                _camera = camera;
+                return _camera;
             }
         }
 
-        this.validate();
+        return _camera;
     }
 
-    validate() {
-        this._valid = true;
-        this._fileNames = [];
+    /**
+     * Get the video duration
+     *
+     * @param video File of the video
+     * @returns durantion in sec of the video
+     */
+    private async _getVideoDurantion(video: File): Promise<number> {
+        let player: HTMLVideoElement = document.createElement('video');
+        player.controls = true;
 
-        // Sort the videos
-        cameras.forEach((camera: any, index) => {
-            this.sortFilesDirectory(camera);
+        // hide the player
+        player.style['display'] = 'none';
 
-            if (index === 0) {
-                this.mapFilesNames(camera);
-            } else if (!this._valid) {
-                this._valid = this.validateCamera(camera);
+        player.src = await this._readFileAsUrl(video);
+        player.load();
+
+        await this._loadSrc(player);
+
+        const durantion = player.duration;
+
+        player.remove();
+
+        return durantion;
+    }
+
+    private async _loadSrc(player: HTMLVideoElement) {
+        return new Promise((resolve, reject) => {
+            if (!player) {
+                reject(false);
             }
+
+            player.addEventListener('loadedmetadata', () => {
+                resolve(true);
+            });
         });
     }
 
-    private getCamera(camera: string) {
-        const files = this[camera as keyof typeof this] as any;
+    private async _readFileAsUrl(file: File): Promise<string> {
+        return new Promise((resolve, reject) => {
+            const fileReader = new FileReader();
 
-        if (!files) {
-            return undefined;
-        }
+            fileReader.onload = (e) => {
+                resolve(fileReader.result as string);
+            };
 
-        return files as FileDirectory[];
-    }
+            fileReader.onerror = (error) => {
+                reject(error);
+            };
 
-    private sortFilesDirectory(camera: string) {
-        const files = this.getCamera(camera);
-
-        if (!files) {
-            return;
-        }
-
-        files.sort((a, b) => `${a.name}`.localeCompare(`${b.name}`));
-    }
-
-    private mapFilesNames(camera: string) {
-        const files = this.getCamera(camera);
-
-        if (!files) {
-            return;
-        }
-
-        if (!this._fileNames.length) {
-            files.forEach((f) => {
-                this._fileNames.push(f.name.replace(camera, '{{camera}}'));
-            });
-        }
-    }
-
-    private validateCamera(camera: string): boolean {
-        const files = this.getCamera(camera);
-
-        if (!files) {
-            return false;
-        }
-
-        let valid = true;
-
-        for (const name of this._fileNames) {
-            if (
-                !files.find((f) =>
-                    `${f.name}`.replace('{{camera}}', camera).includes(name)
-                )
-            ) {
-                valid = false;
-
-                return valid;
-            }
-        }
-
-        return valid;
+            fileReader.readAsDataURL(file);
+        });
     }
 }

@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
-import { Entry } from '../../entities';
+import { BehaviorSubject } from 'rxjs';
+import { Capture, Entry } from '../../entities';
 import { SideBarService } from '../side-bar';
 
 @Component({
@@ -12,21 +13,8 @@ export class PreviewComponent {
     set entry(entry: Entry | null | undefined) {
         this._entry = entry;
 
-        if (entry && entry.capture) {
-            const capture = entry.capture;
-
-            if (capture.front && capture.front.length) {
-                this.sources.front = capture.front.map((f) => f.path);
-            }
-            if (capture.back && capture.back.length) {
-                this.sources.back = capture.back.map((f) => f.path);
-            }
-            if (capture.left && capture.left.length) {
-                this.sources.left = capture.left.map((f) => f.path);
-            }
-            if (capture.right && capture.right.length) {
-                this.sources.right = capture.right.map((f) => f.path);
-            }
+        if (entry?.capture) {
+            this.capture$.next(entry.capture);
         }
     }
     get entry(): Entry | null | undefined {
@@ -34,19 +22,9 @@ export class PreviewComponent {
     }
     private _entry: Entry | null | undefined;
 
-    public sources: {
-        front: string[];
-        back: string[];
-        left: string[];
-        right: string[];
-    } = {
-        front: [],
-        back: [],
-        left: [],
-        right: [],
-    };
+    camera: string = 'front';
 
-    public camera: string = 'front';
+    capture$ = new BehaviorSubject<Capture | null>(null);
 
     constructor(private _sideBarService: SideBarService) {}
 

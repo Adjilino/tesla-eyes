@@ -1,40 +1,85 @@
-import { Component, ElementRef, Input, ViewChild } from '@angular/core';
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import {
+    AfterViewInit,
+    Component,
+    ElementRef,
+    Input,
+    OnDestroy,
+    OnInit,
+    ViewChild,
+} from '@angular/core';
+import { BehaviorSubject, filter, map, Subject, takeUntil } from 'rxjs';
+import { PlayerTimelineService } from '../../services';
 
 @Component({
     selector: 'player',
     templateUrl: './player.component.html',
     styleUrls: ['./player.component.scss'],
 })
-export class PlayerComponent {
+export class PlayerComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('videoPlayer')
     videoPlayer!: ElementRef;
 
+    get player(): HTMLVideoElement {
+        return this.videoPlayer.nativeElement as HTMLVideoElement;
+    }
+
     @Input()
-    set sources(sources: string[]) {
-        this.index = -1;
-        this._sources = sources;
-        this.finished();
+    camera!: string;
+
+    video$ = new BehaviorSubject<string>('');
+
+    private _paused = false;
+
+    private _subscription$ = new Subject<void>();
+
+    constructor(private _playerService: PlayerTimelineService) {}
+
+    ngOnInit(): void {
+        this._playerService.videoChanges
+            .pipe(
+                takeUntil(this._subscription$),
+                filter((videos) => !!videos),
+                map((videos) => videos[this.camera] as string)
+            )
+            .subscribe((video) => {
+                this.video$.next(video);
+            });
     }
-    get sources(): string[] {
-        return this._sources;
+
+    ngAfterViewInit(): void {
+        this.video$.asObservable().subscribe((src) => {
+            this.player.src = src;
+        });
+
+        this.player.onloadeddata = () => {
+            if (this._paused) {
+                this.player.pause();
+            } else {
+                this.player.play();
+            }
+        };
+
+        this._playerService.pausedChanges
+            .pipe(takeUntil(this._subscription$))
+            .subscribe((paused) => {
+                this._paused = paused;
+
+                if (paused) {
+                    this.player.pause();
+                } else {
+                    this.player.play();
+                }
+            });
+
+        this._playerService.manuallyTimeChanges
+            .pipe(takeUntil(this._subscription$))
+            .subscribe((playerTime) => {
+                this.player.currentTime = playerTime;
+            });
     }
-    private _sources!: string[];
 
-    source!: string;
-
-    index!: number;
-
-    constructor(private sanitizer: DomSanitizer) {}
-
-    sanitizeUrl(url: string): SafeUrl {
-        return this.sanitizer.bypassSecurityTrustUrl(url);
-    }
-
-    finished() {
-        this.index++;
-        if (this.sources && this.index < this.sources.length) {
-            this.source = this.sources[this.index];
-        }
+    ngOnDestroy(): void {
+        this._subscription$.next();
+        this._subscription$.complete();
     }
 }

@@ -31,5 +31,11 @@ module.exports = (config, options) => {
         }),
     ];
 
+    // config.resolve = {
+    //     fallback: {
+    //         fs: false,
+    //     },
+    // };
+
     return config;
 };

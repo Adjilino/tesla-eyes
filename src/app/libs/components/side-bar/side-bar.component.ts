@@ -59,7 +59,7 @@ export class SideBarComponent implements OnDestroy {
         this._sideBarService.open();
     }
 
-    public openLink() {
+    openLink() {
         Electron.shell.openExternal('https://www.buymeacoffee.com/adjilino');
     }
 }
