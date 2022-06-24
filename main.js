@@ -15,6 +15,7 @@ function createWindow() {
             nodeIntegration: true,
             contextIsolation: false,
         },
+        title: 'Tesla eyes'
     });
 
     win.loadURL(`file://${__dirname}/dist/index.html`);
