@@ -1,6 +1,7 @@
 {
-    "name": "tesla-view",
-    "version": "0.0.0",
+    "name": "tesla-eyes",
+    "version": "0.5.0",
+    "author": "Adjilino",
     "main": "main.js",
     "scripts": {
         "ng": "ng",
