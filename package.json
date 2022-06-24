@@ -2,6 +2,7 @@
     "name": "tesla-eyes",
     "version": "0.5.0",
     "author": "Adjilino",
+    "description": "Tesla eyes is utility to watch the Tesla's clips with the identical experience",
     "main": "main.js",
     "scripts": {
         "ng": "ng",
