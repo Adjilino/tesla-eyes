@@ -5,12 +5,14 @@
     "main": "main.js",
     "scripts": {
         "ng": "ng",
-        "start": "ng serve",
+        "start": "electron-forge start",
         "build": "ng build",
         "watch": "ng build --watch --configuration development",
         "test": "ng test",
         "electron": "electron .",
-        "electron-build": "ng build --prod && electron ."
+        "electron-build": "ng build --prod && electron .",
+        "package": "electron-forge package",
+        "make": "electron-forge make"
     },
     "private": true,
     "dependencies": {
@@ -27,6 +29,7 @@
         "@fortawesome/free-brands-svg-icons": "^6.1.0",
         "@fortawesome/free-regular-svg-icons": "^6.1.0",
         "@fortawesome/free-solid-svg-icons": "^6.1.0",
+        "electron-squirrel-startup": "^1.0.0",
         "rxjs": "~7.5.0",
         "tslib": "^2.3.0",
         "zone.js": "~0.11.4"
@@ -36,6 +39,11 @@
         "@angular-devkit/build-angular": "~13.3.3",
         "@angular/cli": "~13.3.3",
         "@angular/compiler-cli": "~13.3.0",
+        "@electron-forge/cli": "^6.0.0-beta.64",
+        "@electron-forge/maker-deb": "^6.0.0-beta.64",
+        "@electron-forge/maker-rpm": "^6.0.0-beta.64",
+        "@electron-forge/maker-squirrel": "^6.0.0-beta.64",
+        "@electron-forge/maker-zip": "^6.0.0-beta.64",
         "@types/jasmine": "~3.10.0",
         "@types/node": "^12.11.1",
         "electron": "^18.2.4",
@@ -47,5 +55,32 @@
         "karma-jasmine-html-reporter": "~1.7.0",
         "node-polyfill-webpack-plugin": "^1.1.4",
         "typescript": "~4.6.2"
+    },
+    "config": {
+        "forge": {
+            "packagerConfig": {},
+            "makers": [
+                {
+                    "name": "@electron-forge/maker-squirrel",
+                    "config": {
+                        "name": "tesla_eyes"
+                    }
+                },
+                {
+                    "name": "@electron-forge/maker-zip",
+                    "platforms": [
+                        "darwin"
+                    ]
+                },
+                {
+                    "name": "@electron-forge/maker-deb",
+                    "config": {}
+                },
+                {
+                    "name": "@electron-forge/maker-rpm",
+                    "config": {}
+                }
+            ]
+        }
     }
 }
