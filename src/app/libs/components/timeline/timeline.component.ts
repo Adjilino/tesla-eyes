@@ -110,7 +110,9 @@ export class TimelineComponent implements AfterViewInit, OnDestroy {
         if (!this._isPressingProgress) {
             this._timelineInput.value = `${time}`;
 
-            this._timelineProgress.style.width = this._calculateWidth(time);
+            this._timelineProgress.style.width = `${this._calculateWidth(
+                time
+            )}%`;
         }
     }
 
@@ -133,19 +135,22 @@ export class TimelineComponent implements AfterViewInit, OnDestroy {
         }
     }
 
-    private _calculateWidth(time: number = 0) {
+    private _calculateWidth(time: number = 0): number {
         let width = 0;
 
         if (time) {
             width = (time * 100) / this.duration;
         }
 
-        return `${width}%`;
+        return width;
     }
 
     private _setAlertPosition(alert: number = 0) {
         if (alert) {
-            this._timelineAlert.style.left = this._calculateWidth(alert);
+            const width = this._calculateWidth(alert);
+            const pxPerPercentage = (12 * width) / 100;
+
+            this._timelineAlert.style.left = `calc(${width}% - ${pxPerPercentage}px`;
         }
     }
 }

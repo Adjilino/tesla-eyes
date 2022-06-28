@@ -3,6 +3,8 @@ import { FileDirectory } from './file-directory';
 
 const cameras = ['front', 'back', 'left_repeater', 'right_repeater'];
 
+const marginSeconds = 5;
+
 export class Capture {
     event!: EventFile;
     thumb!: FileDirectory;
@@ -91,7 +93,8 @@ export class Capture {
         // calculate the alert point
         this.alert =
             (new Date(this.event.timestamp).getTime() - startAt.getTime()) /
-            1000;
+                1000 -
+            marginSeconds;
         console.log('Alert', this.alert);
     }
 
