@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, map, tap } from 'rxjs';
 import { Capture } from '../entities';
 
+const marginAlert = 15;
+
 @Injectable({
     providedIn: 'root',
 })
@@ -102,7 +104,11 @@ export class PlayerTimelineService {
         this._duration$.next(capture.duration);
 
         if (capture.timestamps) {
-            this.setTime(0);
+            const startAt =
+                capture.alert - marginAlert > 0
+                    ? capture.alert - marginAlert
+                    : 0;
+            this.setTime(startAt);
         }
     }
 
