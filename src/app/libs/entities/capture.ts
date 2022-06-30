@@ -30,50 +30,59 @@ export class Capture {
     }
 
     async setVideos(videos: File[]) {
-        if (videos && videos.length) {
-            // Order the videos
-            videos.sort((a, b) =>
-                `${a.name}`
-                    .toLowerCase()
-                    .localeCompare(`${b.name}`.toLowerCase())
-            );
+        try {
+            if (videos && videos.length) {
+                // Order the videos
+                videos.sort((a, b) =>
+                    `${a.name}`
+                        .toLowerCase()
+                        .localeCompare(`${b.name}`.toLowerCase())
+                );
 
-            this.duration = 0;
-            let time = 0;
+                this.duration = 0;
+                let time = 0;
 
-            this._defineAlert(videos[0]);
+                this._defineAlert(videos[0]);
 
-            for (let video of videos) {
-                // Get camera
-                let camera = this._getVideoCamera(video);
+                for (const video of videos) {
+                    // Verify if video have "seconds"
+                    if (video.size < 128000) {
+                        break;
+                    }
+                    // Get camera
+                    let camera = this._getVideoCamera(video);
 
-                // Validate if is a valid video
-                if (camera) {
-                    // Know duration of video
-                    let _duration = await this._getVideoDurantion(video);
+                    // Validate if is a valid video
+                    if (camera) {
+                        // Verify if the camera is already added to jummp to another timestamp
+                        if (
+                            !this.timestamps[time] ||
+                            this.timestamps[time][camera]
+                        ) {
+                            // Time if the start of the timeline of the video
+                            time = +`${this.duration}`;
 
-                    // Verify if the camera is already added to jummp to another timestamp
-                    if (
-                        !this.timestamps[time] ||
-                        this.timestamps[time][camera]
-                    ) {
-                        // Time if the start of the timeline of the video
-                        time = +`${this.duration}`;
+                            // Create timestamp for the video
+                            this.timestamps[time] = {
+                                [camera]: video,
+                                // await this._readFileAsUrl(video),
+                            };
 
-                        // Create timestamp for the video
-                        this.timestamps[time] = {
-                            [camera]: await this._readFileAsUrl(video),
-                        };
+                            // Know duration of video
+                            let _duration = await this._getVideoDuration(video);
 
-                        // Will add the video's duration to "global" durantion
-                        this.duration += _duration;
-                    } else {
-                        // Add the video to existing timestamp
-                        this.timestamps[time][camera] =
-                            await this._readFileAsUrl(video);
+                            // Will add the video's duration to "global" durantion
+                            this.duration += _duration;
+                        } else {
+                            // Add the video to existing timestamp
+                            this.timestamps[time][camera] = video;
+                            // await this._readFileAsUrl(video);
+                        }
                     }
                 }
             }
+        } catch (error) {
+            console.error('Error during set videos', error);
         }
     }
 
@@ -95,7 +104,6 @@ export class Capture {
             (new Date(this.event.timestamp).getTime() - startAt.getTime()) /
                 1000 -
             marginSeconds;
-        console.log('Alert', this.alert);
     }
 
     /**
@@ -121,36 +129,37 @@ export class Capture {
      * Get the video duration
      *
      * @param video File of the video
-     * @returns durantion in sec of the video
+     * @returns duration in sec of the video
      */
-    private async _getVideoDurantion(video: File): Promise<number> {
+    private async _getVideoDuration(video: File): Promise<number> {
         let player: HTMLVideoElement = document.createElement('video');
         player.controls = true;
 
         // hide the player
         player.style['display'] = 'none';
 
-        player.src = await this._readFileAsUrl(video);
-        player.load();
+        await this._loadSrc(player, video);
 
-        await this._loadSrc(player);
-
-        const durantion = player.duration;
+        const duration = player.duration;
 
         player.remove();
 
-        return durantion;
+        return duration;
     }
 
-    private async _loadSrc(player: HTMLVideoElement) {
+    private async _loadSrc(player: HTMLVideoElement, video: File) {
         return new Promise((resolve, reject) => {
             if (!player) {
                 reject(false);
             }
 
-            player.addEventListener('loadedmetadata', () => {
+            player.onloadedmetadata = () => {
                 resolve(true);
-            });
+            };
+
+            // await this._readFileAsUrl(video);
+            player.src = video.path;
+            player.load();
         });
     }
 

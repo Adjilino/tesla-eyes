@@ -160,7 +160,7 @@ export class PlayerTimelineService {
             this._timestamp$.next(timestamp);
 
             // Set src with first value finded (not array)
-            this._player.src = timestamp[Object.keys(timestamp)[0]];
+            this._player.src = timestamp[Object.keys(timestamp)[0]].path;
         }
     }
 }
