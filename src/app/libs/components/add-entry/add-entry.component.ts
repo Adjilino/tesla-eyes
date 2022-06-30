@@ -58,7 +58,6 @@ export class AddEntryComponent {
 
                 await capture.setVideos(videos);
 
-                console.log('Before set videos');
                 const entry = new Entry({
                     thumb: thumb,
                     type: 'tesla',
@@ -69,11 +68,9 @@ export class AddEntryComponent {
                     capture: capture,
                 });
 
-                console.log('Before emit entry');
-
                 this.add.emit(entry);
             } catch (err) {
-                console.log(err);
+                console.error(err);
                 this.isLoading = false;
             }
         }

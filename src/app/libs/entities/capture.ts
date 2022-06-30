@@ -38,6 +38,7 @@ export class Capture {
                         .toLowerCase()
                         .localeCompare(`${b.name}`.toLowerCase())
                 );
+                videos = videos.filter((video) => !video.name.includes('._'));
 
                 this.duration = 0;
                 let time = 0;
@@ -47,7 +48,7 @@ export class Capture {
                 for (const video of videos) {
                     // Verify if video have "seconds"
                     if (video.size < 128000) {
-                        break;
+                        continue;
                     }
                     // Get camera
                     let camera = this._getVideoCamera(video);
@@ -91,8 +92,9 @@ export class Capture {
         let _cameraName = cameras.filter((camera) =>
             video.name.includes(camera)
         );
-
-        const name = video.name.split(`-${_cameraName}`)[0];
+        
+        let name = video.name.split(`-${_cameraName}`)[0];
+        
         // name.replace('_', 'T');
         const dates = name.split('_');
         const date = dates[0];
