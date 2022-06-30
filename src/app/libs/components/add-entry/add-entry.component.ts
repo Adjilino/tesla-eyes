@@ -25,53 +25,59 @@ export class AddEntryComponent {
 
     public async changeDirectory(files: FileList | null) {
         if (files && files.length) {
-            this.isLoading = true;
+            try {
+                this.isLoading = true;
 
-            let videos: File[] = [];
-            let event!: EventFile;
-            let thumb!: string;
+                let videos: File[] = [];
+                let event!: EventFile;
+                let thumb!: string;
 
-            for (let index = 0; index < files.length; index++) {
-                const file = files.item(index);
+                for (let index = 0; index < files.length; index++) {
+                    const file = files.item(index);
 
-                if (file) {
-                    if (this.isVideo(file)) {
-                        videos.push(file);
-                    } else if (this.isThumb(file)) {
-                        thumb = await this._readFileAsUrl(file);
-                    } else if (this.isEvent(file)) {
-                        event = new EventFile(
-                            JSON.parse(`${await this._readFileAsText(file)}`)
-                        );
+                    if (file) {
+                        if (this.isVideo(file)) {
+                            videos.push(file);
+                        } else if (this.isThumb(file)) {
+                            thumb = await this._readFileAsUrl(file);
+                        } else if (this.isEvent(file)) {
+                            event = new EventFile(
+                                JSON.parse(
+                                    `${await this._readFileAsText(file)}`
+                                )
+                            );
+                        }
                     }
                 }
+
+                // Validate if is a valid capture;
+                const capture = new Capture({
+                    event,
+                    thumb,
+                });
+
+                await capture.setVideos(videos);
+
+                const entry = new Entry({
+                    thumb: thumb,
+                    type: 'tesla',
+                    title: capture?.event?.city || undefined,
+                    description: capture?.event?.timestamp
+                        ? new Date(capture?.event?.timestamp)
+                        : undefined,
+                    capture: capture,
+                });
+
+                this.add.emit(entry);
+            } catch (err) {
+                console.error(err);
+                this.isLoading = false;
             }
-
-            // Validate if is a valid capture;
-            const capture = new Capture({
-                event,
-                thumb,
-            });
-
-            await capture.setVideos(videos);
-
-            const entry = new Entry({
-                thumb: thumb,
-                type: 'tesla',
-                title: capture?.event?.city || undefined,
-                description: capture?.event?.timestamp
-                    ? new Date(capture?.event?.timestamp)
-                    : undefined,
-                capture: capture,
-            });
-
-            this.add.emit(entry);
         }
 
         if (this.directoryInput && this.directoryInput.nativeElement) {
             this.directoryInput.nativeElement.value = '';
         }
-
         this.isLoading = false;
     }
 

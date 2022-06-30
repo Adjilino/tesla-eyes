@@ -26,7 +26,7 @@ export class PlayerComponent implements OnInit, AfterViewInit, OnDestroy {
     @Input()
     camera!: string;
 
-    video$ = new BehaviorSubject<string>('');
+    video$ = new BehaviorSubject<File | undefined>(undefined);
 
     private _paused = false;
 
@@ -39,7 +39,7 @@ export class PlayerComponent implements OnInit, AfterViewInit, OnDestroy {
             .pipe(
                 takeUntil(this._subscription$),
                 filter((videos) => !!videos),
-                map((videos) => videos[this.camera] as string)
+                map((videos) => videos[this.camera] as File)
             )
             .subscribe((video) => {
                 this.video$.next(video);
@@ -48,7 +48,7 @@ export class PlayerComponent implements OnInit, AfterViewInit, OnDestroy {
 
     ngAfterViewInit(): void {
         this.video$.asObservable().subscribe((src) => {
-            this.player.src = src;
+            this.player.src = src?.path || '';
         });
 
         this.player.onloadeddata = () => {
