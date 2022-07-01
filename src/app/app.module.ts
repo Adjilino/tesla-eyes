@@ -19,6 +19,7 @@ import {
     EntryComponent,
     PlayerComponent,
     PreviewComponent,
+    PreviewTitleComponent,
     SideBarComponent,
     TimelineComponent,
 } from './libs/components';
@@ -32,6 +33,7 @@ import {
         PreviewComponent,
         PlayerComponent,
         TimelineComponent,
+        PreviewTitleComponent,
     ],
     imports: [BrowserModule, CommonModule, FontAwesomeModule],
     providers: [],

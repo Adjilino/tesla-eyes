@@ -15,6 +15,8 @@ export class Capture {
 
     alert: number = 0;
 
+    startAt!: Date;
+
     constructor(values?: any) {
         if (values) {
             this.event = values.event;
@@ -26,6 +28,8 @@ export class Capture {
             this.duration = values.duration || 0;
 
             this.alert = values.alert || 0;
+
+            this.startAt = values.startAt;
         }
     }
 
@@ -50,6 +54,7 @@ export class Capture {
                     if (video.size < 128000) {
                         continue;
                     }
+
                     // Get camera
                     let camera = this._getVideoCamera(video);
 
@@ -99,11 +104,11 @@ export class Capture {
         const dates = name.split('_');
         const date = dates[0];
         const dateTime = dates[1].replace(/-/g, ':');
-        const startAt = new Date(`${date}T${dateTime}`);
+        this.startAt = new Date(`${date}T${dateTime}`);
 
         // calculate the alert point
         this.alert =
-            (new Date(this.event.timestamp).getTime() - startAt.getTime()) /
+            (new Date(this.event.timestamp).getTime() - this.startAt.getTime()) /
                 1000 -
             marginSeconds;
     }

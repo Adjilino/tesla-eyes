@@ -1,0 +1,5 @@
+<span *ngIf="timestamp$ | async; else elseTemplate">
+    {{ timestamp$ | async | date: "fullDate" }}
+    {{ timestamp$ | async | date: "mediumTime" }}
+</span>
+<ng-template #elseTemplate>{{ "No date" }}</ng-template>

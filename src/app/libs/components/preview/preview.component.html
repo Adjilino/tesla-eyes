@@ -6,13 +6,7 @@
             </button>
         </div>
         <div class="title" *ngIf="entry">
-            <span *ngIf="entry?.description">
-                {{ entry?.description | date: "fullDate" }}
-                {{ entry?.description | date: "mediumTime" }}
-            </span>
-            <span *ngIf="!entry?.description">
-                {{ "No date" }}
-            </span>
+            <preview-title [entry]="entry"></preview-title>
         </div>
     </div>
     <div class="preview">
