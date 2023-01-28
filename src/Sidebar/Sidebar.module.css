@@ -1,0 +1,13 @@
+.sidebarWidth {
+    --sidebar-width: 250px;
+    width: var(--sidebar-width);
+    transition: all 0.25s ease-out;
+}
+
+.sidebarWidth.sidebarOpen {
+    max-width: var(--sidebar-width);
+}
+
+.sidebarWidth.sidebarClosed {
+    max-width: 0;
+}
