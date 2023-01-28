@@ -14,7 +14,7 @@ const App: Component = () => {
         "h-screen w-full relative flex flex-col items-center justify-center "
       }
     >
-      <Sidebar isSidebarOpen={isSidebarOpen()} />
+      <Sidebar isSidebarOpen={isSidebarOpen} setisSidebarOpen={setIsSidebarOpen} />
 
       <img src={logo} class="h-12 w-12" alt="logo" />
       <button onClick={() => setIsSidebarOpen((o) => !o)}>Open</button>
