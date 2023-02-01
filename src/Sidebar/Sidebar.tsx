@@ -1,10 +1,14 @@
 import { Accessor, Setter } from "solid-js";
+import SidebarFooter from "./Footer";
+import SidebarHeader from "./Header";
 import styles from "./Sidebar.module.css";
 
 function Sidebar(props: {
   isSidebarOpen: Accessor<boolean>;
   setisSidebarOpen: Setter<boolean>;
 }) {
+  // const [videos, setVideos] = createSignal<Video[]>([]);
+
   return (
     <div
       class={
@@ -19,14 +23,18 @@ function Sidebar(props: {
         [styles.sidebarClosed]: !props.isSidebarOpen(),
       }}
     >
-      <div class={"h-8 p-2 w-full flex items-center gap-2"}>
-        <button onClick={() => props.setisSidebarOpen((o) => !o)}>close</button>
-        <h1>Sidebar</h1>
+      <div class={"h-16 p-2 flex items-center gap-2 " + styles.sidebarWidth}>
+        <SidebarHeader
+          isSidebarOpen={props.isSidebarOpen}
+          setisSidebarOpen={props.setisSidebarOpen}
+        />
       </div>
-      <div class={"flex-grow p-2 w-full flex overflow-y-auto"}>
+      <div class={"flex-grow p-2 flex overflow-y-auto " + styles.sidebarWidth}>
         content
       </div>
-      <div class={"h-8 p-2 w-full flex items-center gap-2"}>footer</div>
+      <div class={"h-16 p-2 flex items-center gap-2 " + styles.sidebarWidth}>
+        <SidebarFooter />
+      </div>
     </div>
   );
 }
