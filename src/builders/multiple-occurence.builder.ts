@@ -21,7 +21,7 @@ export class MultipleOccurenceBuilder {
     return this;
   }
 
-  build(): Occurence[] | undefined {
+  async build(): Promise<Occurence[] | undefined> {
     // build the files
 
     // Separate the file.webkitRelativePath by folders
@@ -35,11 +35,11 @@ export class MultipleOccurenceBuilder {
       return;
     }
 
-    Object.keys(filesByFolder).forEach((folderName) => {
+    await Object.keys(filesByFolder).forEach(async (folderName) => {
       const files = filesByFolder[folderName];
 
       // Create a new OccurenceBuilder for each folder
-      const occurence = new OccurenceBuilder().addFiles(files).build();
+      const occurence = await new OccurenceBuilder().addFiles(files).build();
     });
   }
 
