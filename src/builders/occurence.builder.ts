@@ -1,4 +1,6 @@
+import { VideosByCameraPosition } from "../models";
 import { Config, Occurence } from "../models";
+import { getBase64 } from "../utils";
 
 export class OccurenceBuilder {
   files: File[] = [];
@@ -27,6 +29,12 @@ export class OccurenceBuilder {
 
     const config = await this.getOccurenceConfig();
     occurence.setConfig(config);
+
+    const cameraPositions = await this.getOccurenceCameraPositions();
+    occurence.setVideosByCameraPositions(cameraPositions);
+
+    const thumbnail = await this.getOccurenceThumbnail();
+    occurence.setThumbnail(thumbnail);
 
     return occurence;
   }
@@ -70,9 +78,7 @@ export class OccurenceBuilder {
     return dateTime;
   }
 
-  private async getOccurenceConfig(): Promise<
-    Config | undefined
-  > {
+  private async getOccurenceConfig(): Promise<Config | undefined> {
     if (!this.files || this.files.length === 0) {
       return;
     }
@@ -89,10 +95,95 @@ export class OccurenceBuilder {
 
     const configString = new TextDecoder("utf-8").decode(configArrayBuffer);
 
-    const configJson= JSON.parse(configString);
+    const configJson = JSON.parse(configString);
 
     const config = new Config(configJson);
-    
+
     return config;
+  }
+
+  private async getOccurenceCameraPositions(): Promise<
+    VideosByCameraPosition | undefined
+  > {
+    if (!this.files || this.files.length === 0) {
+      return;
+    }
+
+    const videoFiles = this.files.filter((file) => {
+      return file.type.startsWith("video/");
+    });
+
+    if (!videoFiles || videoFiles.length === 0) {
+      return;
+    }
+
+    const videoFilesSorted = videoFiles.sort((a, b) => {
+      return a.name.localeCompare(b.name);
+    });
+
+    const separatedShorts = videoFilesSorted.reduce((acc, file) => {
+      const player = document.createElement("video");
+      player.src = URL.createObjectURL(file);
+
+      const splittedPath = file.webkitRelativePath.split("/");
+
+      // get file name
+      const fileName = splittedPath[splittedPath.length - 1];
+
+      const foundPosition = VideosByCameraPosition.positions().find(
+        (position) => {
+          return fileName.includes(position);
+        }
+      );
+
+      if (foundPosition) {
+        switch (foundPosition) {
+          case "front":
+            acc.addFront(player);
+            break;
+
+          case "back":
+            acc.addBack(player);
+            break;
+
+          case "left_repeater":
+            acc.addLeftRepeater(player);
+            break;
+
+          case "right_repeater":
+            acc.addRightRepeater(player);
+            break;
+
+          default:
+            break;
+        }
+      }
+
+      return acc;
+    }, new VideosByCameraPosition());
+
+    return separatedShorts;
+  }
+
+  private async getOccurenceThumbnail(): Promise<string | undefined> {
+    if (!this.files || this.files.length === 0) {
+      return;
+    }
+
+    const thumbnailFile = this.files.find((file) => {
+      return file.type.startsWith("image/");
+    });
+
+    if (!thumbnailFile) {
+      return;
+    }
+
+    const thumbnailString = await getBase64(thumbnailFile);
+
+    if (!thumbnailString) {
+      return;
+    }
+
+    return thumbnailString as string;
   }
 }

@@ -1,7 +1,7 @@
 import { Setter } from "solid-js";
-import Button from "../ui/Button";
+import Button from "../../ui/Button";
 
-function Navbar(props: { setIsSidebarOpen: Setter<boolean> }) {
+export function Navbar(props: { setIsSidebarOpen: Setter<boolean> }) {
   const toggleSidebar = () => {
     props.setIsSidebarOpen((o) => !o);
   };

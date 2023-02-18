@@ -1,9 +1,7 @@
 import { Component, createSignal } from "solid-js";
 
 import logo from "./logo.svg";
-import styles from "./App.module.css";
-import Sidebar from "./sidebar/Sidebar";
-import Navbar from "./navbar/Navbar";
+import { Sidebar, Navbar } from "./components";
 
 const App: Component = () => {
   const [isSidebarOpen, setIsSidebarOpen] = createSignal(false);

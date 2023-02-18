@@ -1,6 +1,6 @@
 import { JSXElement } from "solid-js";
 
-function Button(props: { children: JSXElement; onClick?: () => void }) {
+export function Button(props: { children: JSXElement; onClick?: () => void }) {
   const onClick = () => {
     props.onClick && props.onClick();
   };

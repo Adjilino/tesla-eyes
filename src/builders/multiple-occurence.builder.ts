@@ -35,12 +35,11 @@ export class MultipleOccurenceBuilder {
       return;
     }
 
-    await Object.keys(filesByFolder).forEach(async (folderName) => {
-      const files = filesByFolder[folderName];
+    const occurences: Occurence[] | undefined = await this.getAllOccurence(
+      filesByFolder
+    );
 
-      // Create a new OccurenceBuilder for each folder
-      const occurence = await new OccurenceBuilder().addFiles(files).build();
-    });
+    return occurences;
   }
 
   private _separateFilesByFolders(): Record<string, File[]> | undefined {
@@ -65,5 +64,42 @@ export class MultipleOccurenceBuilder {
     }
 
     return folders;
+  }
+
+  private getAllOccurence(
+    filesByFolder: Record<string, File[]> | undefined
+  ): Promise<Occurence[] | undefined> {
+    return new Promise((resolve) => {
+      // Separate the file.webkitRelativePath by folders
+      if (!this.files || this.files.length === 0) {
+        resolve(undefined);
+      }
+
+      if (!filesByFolder) {
+        resolve(undefined);
+      }
+
+      const occurencesPromises: Promise<Occurence | undefined>[] = [];
+
+      for (const folderName in filesByFolder) {
+        const files = filesByFolder[folderName];
+
+        // Create a new OccurenceBuilder for each folder
+        const occurence = new OccurenceBuilder().addFiles(files).build();
+
+        if (occurence) {
+          occurencesPromises.push(occurence);
+        }
+      }
+
+      Promise.all(occurencesPromises).then((occurencesBuilds) => {
+        const occurences = occurencesBuilds.filter(
+          (occurence) =>
+            occurence !== undefined && occurence instanceof Occurence
+        ) as Occurence[];
+
+        resolve(occurences);
+      });
+    });
   }
 }
