@@ -45,27 +45,38 @@ export function Sidebar(props: {
       >
         <For each={occurences()}>
           {(occurence) => (
-            <div
+            <button
               class={[
                 "bg-white dark:bg-slate-800 text-gray-900 dark:text-white",
+                "hover:bg-gray-100 dark:hover:bg-gray-700",
+                "focus:bg-gray-200 dark:focus:bg-gray-600 focus:outline-none",
+                "active:bg-gray-300 dark:active:bg-gray-500",
                 "flex gap-2 rounded-md shadow-md p-2 w-full h-24",
               ].join(" ")}
             >
-              <div class="flex">
-                <img
-                  class={["rounded-md", styles.thumbnail].join(" ")}
-                  src={occurence.getThumbnail() || ""}
-                />
-              </div>
-              <div class="flex-grow flex flex-col overflow-hidden">
-                <span class="text-ellipsis">
-                  {getOccurrenceDateTime(occurence)}
-                </span>
-                <span class="text-ellipsis">
+              <img
+                class={["rounded-md max-h-full", styles.thumbnail].join(" ")}
+                src={occurence.getThumbnail() || ""}
+              />
+              <div
+                class={[
+                  "flex-grow flex flex-col overflow-hidden justify-center",
+                  "text-sm text-left my-auto",
+                ].join(" ")}
+              >
+                <span
+                  class={[
+                    "text-ellipsis overflow-hidden whitespace-nowrap",
+                    "font-bold",
+                  ].join(" ")}
+                >
                   {getOccurrenceLocation(occurence)}
                 </span>
+                <span class="dark:text-gray-400 text-gray-600">
+                  {getOccurrenceDateTime(occurence)}
+                </span>
               </div>
-            </div>
+            </button>
           )}
         </For>
       </div>

@@ -1,5 +1,5 @@
 .sidebarWidth {
-  --sidebar-width: 360px;
+  --sidebar-width: 100%;
   width: var(--sidebar-width);
   transition: all 0.25s ease-out;
 }
