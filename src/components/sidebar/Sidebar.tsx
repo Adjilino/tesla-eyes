@@ -1,6 +1,6 @@
 import { Accessor, For, Setter } from "solid-js";
 import { Occurence } from "../../models";
-import { occurences } from "../../stores";
+import { occurences, setSelectedOccurence } from "../../stores";
 import SidebarFooter from "./Footer";
 import SidebarHeader from "./Header";
 import styles from "./Sidebar.module.css";
@@ -53,6 +53,7 @@ export function Sidebar(props: {
                 "active:bg-gray-300 dark:active:bg-gray-500",
                 "flex gap-2 rounded-md shadow-md p-2 w-full h-24",
               ].join(" ")}
+              onClick={() => setSelectedOccurence(occurence)}
             >
               <img
                 class={["rounded-md max-h-full", styles.thumbnail].join(" ")}
