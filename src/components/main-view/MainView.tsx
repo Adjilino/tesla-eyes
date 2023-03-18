@@ -2,7 +2,9 @@ import { createEffect, createSignal } from "solid-js";
 import { selectedTimestampVideo } from "../../stores";
 
 export function MainView() {
-  const cameraClasses = "absolute z-10 w-32 h-24 rounded-lg overflow-hidden shadow cursor-pointer";
+  const cameraClasses =
+    "absolute z-10 w-32 h-24 rounded-lg overflow-hidden shadow cursor-pointer";
+  const activeCameraClasses = "flex max-w-full max-h-full";
   const [selectedCamera, setSelectedCamera] = createSignal("front");
 
   createEffect(() => {
@@ -48,7 +50,9 @@ export function MainView() {
         id="frontElement"
         class={[
           "m-auto",
-          selectedCamera() === "front" ? "" : `${cameraClasses} top-2 left-2`,
+          selectedCamera() === "front"
+            ? activeCameraClasses
+            : `${cameraClasses} top-2 left-2`,
         ].join(" ")}
         onClick={() => selectCamera("front")}
       />
@@ -56,7 +60,9 @@ export function MainView() {
         id="backElement"
         class={[
           "m-auto",
-          selectedCamera() === "back" ? "" : `${cameraClasses} top-2 right-2`,
+          selectedCamera() === "back"
+            ? activeCameraClasses
+            : `${cameraClasses} top-2 right-2`,
         ].join(" ")}
         onClick={() => selectCamera("back")}
       />
@@ -65,7 +71,7 @@ export function MainView() {
         class={[
           "m-auto",
           selectedCamera() === "left_repeater"
-            ? ""
+            ? activeCameraClasses
             : `${cameraClasses} bottom-2 left-2`,
         ].join(" ")}
         onClick={() => selectCamera("left_repeater")}
@@ -75,7 +81,7 @@ export function MainView() {
         class={[
           "m-auto",
           selectedCamera() === "right_repeater"
-            ? ""
+            ? activeCameraClasses
             : `${cameraClasses} bottom-2 right-2`,
         ].join(" ")}
         onClick={() => selectCamera("right_repeater")}
