@@ -121,9 +121,19 @@ export class OccurenceBuilder {
       return a.name.localeCompare(b.name);
     });
 
-    const separatedShorts = videoFilesSorted.reduce((acc, file) => {
-      const player = document.createElement("video");
-      player.src = URL.createObjectURL(file);
+    const separatedShorts = new VideosByCameraPosition();
+    for (const file of videoFilesSorted) {
+      // const source = document.createElement("source");
+      // source.src = URL.createObjectURL(file);
+      // source.src = await getBase64(file) as string;
+      // source.type = file.type;
+      
+      const videoElement = document.createElement("video");
+      // videoElement.appendChild(source);
+      videoElement.src = URL.createObjectURL(file);
+      // videoElement.src = await getBase64(file) as string;
+      // videoElement.controls = true;
+      // videoElement.crossOrigin = "anonymous";
 
       const splittedPath = file.webkitRelativePath.split("/");
 
@@ -139,28 +149,26 @@ export class OccurenceBuilder {
       if (foundPosition) {
         switch (foundPosition) {
           case "front":
-            acc.addFront(player);
+            separatedShorts.addFront(videoElement);
             break;
 
           case "back":
-            acc.addBack(player);
+            separatedShorts.addBack(videoElement);
             break;
 
           case "left_repeater":
-            acc.addLeftRepeater(player);
+            separatedShorts.addLeftRepeater(videoElement);
             break;
 
           case "right_repeater":
-            acc.addRightRepeater(player);
+            separatedShorts.addRightRepeater(videoElement);
             break;
 
           default:
             break;
         }
       }
-
-      return acc;
-    }, new VideosByCameraPosition());
+    }
 
     return separatedShorts;
   }

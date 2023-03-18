@@ -13,5 +13,6 @@
 }
 
 .thumbnail {
-  aspect-ratio: 4 / 3;
+  width: 100px;
+  height: 75px;
 }

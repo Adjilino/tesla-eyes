@@ -1,14 +1,11 @@
-import { Accessor, For, Setter } from "solid-js";
+import { For } from "solid-js";
 import { Occurence } from "../../models";
-import { occurences, setSelectedOccurence } from "../../stores";
+import { isSidebarOpen, occurences, setSelectedOccurence } from "../../stores";
 import SidebarFooter from "./Footer";
 import SidebarHeader from "./Header";
 import styles from "./Sidebar.module.css";
 
-export function Sidebar(props: {
-  isSidebarOpen: Accessor<boolean>;
-  setisSidebarOpen: Setter<boolean>;
-}) {
+export function Sidebar(props: {class: string}) {
   function getOccurrenceDateTime(occurence: Occurence) {
     return occurence.getConfig()?.getDateTime()?.toLocaleString() || "";
   }
@@ -20,6 +17,7 @@ export function Sidebar(props: {
   return (
     <div
       class={[
+        props.class,
         "bg-slate-50 dark:bg-slate-900",
         "absolute top-0 left-0",
         "flex flex-col",
@@ -27,15 +25,12 @@ export function Sidebar(props: {
         styles.sidebarWidth,
       ].join(" ")}
       classList={{
-        [styles.sidebarOpen]: props.isSidebarOpen(),
-        [styles.sidebarClosed]: !props.isSidebarOpen(),
+        [styles.sidebarOpen]: isSidebarOpen(),
+        [styles.sidebarClosed]: !isSidebarOpen(),
       }}
     >
       <div class={"h-16 p-2 flex items-center gap-2 " + styles.sidebarWidth}>
-        <SidebarHeader
-          isSidebarOpen={props.isSidebarOpen}
-          setisSidebarOpen={props.setisSidebarOpen}
-        />
+        <SidebarHeader />
       </div>
       <div
         class={
@@ -45,18 +40,19 @@ export function Sidebar(props: {
       >
         <For each={occurences()}>
           {(occurence) => (
-            <button
+            <a
               class={[
                 "bg-white dark:bg-slate-800 text-gray-900 dark:text-white",
                 "hover:bg-gray-100 dark:hover:bg-gray-700",
                 "focus:bg-gray-200 dark:focus:bg-gray-600 focus:outline-none",
                 "active:bg-gray-300 dark:active:bg-gray-500",
                 "flex gap-2 rounded-md shadow-md p-2 w-full h-24",
+                "cursor-pointer",
               ].join(" ")}
               onClick={() => setSelectedOccurence(occurence)}
             >
               <img
-                class={["rounded-md max-h-full", styles.thumbnail].join(" ")}
+                class={["rounded-md", styles.thumbnail].join(" ")}
                 src={occurence.getThumbnail() || ""}
               />
               <div
@@ -73,11 +69,16 @@ export function Sidebar(props: {
                 >
                   {getOccurrenceLocation(occurence)}
                 </span>
-                <span class="dark:text-gray-400 text-gray-600">
+                <span
+                  class={[
+                    "dark:text-gray-400 text-gray-600",
+                    "overflow-hidden whitespace-nowrap text-ellipsis",
+                  ].join(" ")}
+                >
                   {getOccurrenceDateTime(occurence)}
                 </span>
               </div>
-            </button>
+            </a>
           )}
         </For>
       </div>

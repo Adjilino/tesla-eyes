@@ -1,12 +1,9 @@
-import { Accessor, Setter } from "solid-js";
+import { setIsSidebarOpen } from "../../stores";
 import { Button } from "../../ui";
 
-export function SidebarHeader(props: {
-  isSidebarOpen: Accessor<boolean>;
-  setisSidebarOpen: Setter<boolean>;
-}) {
+export function SidebarHeader() {
   function toggleSidebar() {
-    props.setisSidebarOpen((o) => !o);
+    setIsSidebarOpen((o) => !o);
   }
 
   return (

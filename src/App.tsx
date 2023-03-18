@@ -1,11 +1,8 @@
-import { Component, createSignal } from "solid-js";
+import { Component } from "solid-js";
 
-import logo from "./logo.svg";
-import { Sidebar, Navbar } from "./components";
+import { MainView, Navbar, Sidebar } from "./components";
 
 const App: Component = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = createSignal(false);
-
   return (
     <div
       class={
@@ -13,14 +10,11 @@ const App: Component = () => {
         "h-screen w-full relative flex flex-col"
       }
     >
-      <Sidebar
-        isSidebarOpen={isSidebarOpen}
-        setisSidebarOpen={setIsSidebarOpen}
-      />
-      <Navbar setIsSidebarOpen={setIsSidebarOpen} />
+      <Sidebar class="z-30" />
+      <Navbar />
 
-      <div class="flex-grow">
-        <img src={logo} class="h-12 w-12" alt="logo" />
+      <div class="flex-grow overflow-hidden">
+        <MainView />
       </div>
     </div>
   );
