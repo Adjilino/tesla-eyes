@@ -1,4 +1,4 @@
-import { createEffect, createSignal } from "solid-js";
+import { createEffect, createMemo, createSignal } from "solid-js";
 import { Timestamp, TimestampVideo } from "../interfaces";
 import { Occurence } from "../models";
 
@@ -7,9 +7,14 @@ export const [occurences, setOccurences] = createSignal<Occurence[]>([]);
 export const [selectedOccurence, setSelectedOccurence] =
   createSignal<Occurence | null>(null);
 
-// TODO: This can be a memo
-export const [selectedTimestamp, setSelectedTimestamp] =
-  createSignal<Timestamp | null>(null);
+export const selectedTimestamp = createMemo<Timestamp | null>(() => {
+  const _selectedOccurence = selectedOccurence();
+  if (!_selectedOccurence) {
+    return null;
+  }
+
+  return _selectedOccurence.timestamp || null;
+});
 
 export const [selectedTimestampIndex, setSelectedTimestampIndex] = createSignal<
   number | null
@@ -20,23 +25,6 @@ export const [selectedTimestampVideo, setSelectedTimestampVideo] =
 
 export const [currentTime, setCurrentTime] = createSignal<number>(0);
 export const [isPlaying, setIsPlaying] = createSignal<boolean>(false);
-
-// On select occurence
-createEffect(() => {
-  // Verify if selected occurence is not null
-  const _selectedOccurence = selectedOccurence();
-  if (!_selectedOccurence) {
-    return;
-  }
-
-  // Verify if timestamp is not null
-  const timestamp = _selectedOccurence.timestamp;
-  if (!timestamp) {
-    return;
-  }
-
-  setSelectedTimestamp(timestamp);
-});
 
 // On select timestamp
 createEffect(() => {
@@ -127,5 +115,5 @@ function endVideoEvent() {
 function ontimeupdate(element: HTMLVideoElement) {
   return () => {
     setCurrentTime(element.currentTime);
-  }
+  };
 }
