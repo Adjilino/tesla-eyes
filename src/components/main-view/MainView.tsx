@@ -19,10 +19,15 @@ export function MainView() {
     const leftRepeaterVideoElement = _selectedTimestampVideo.left_repeater;
     const rightRepeaterVideoElement = _selectedTimestampVideo.right_repeater;
 
-    setVideo("frontElement", frontVideoElement);
-    setVideo("backElement", backVideoElement);
-    setVideo("leftRepeaterElement", leftRepeaterVideoElement);
-    setVideo("rightRepeaterElement", rightRepeaterVideoElement);
+    frontVideoElement && setVideo("frontElement", frontVideoElement);
+
+    backVideoElement && setVideo("backElement", backVideoElement);
+
+    leftRepeaterVideoElement &&
+      setVideo("leftRepeaterElement", leftRepeaterVideoElement);
+
+    rightRepeaterVideoElement &&
+      setVideo("rightRepeaterElement", rightRepeaterVideoElement);
   });
 
   const setVideo = (element: string, video: HTMLVideoElement) => {
@@ -37,7 +42,29 @@ export function MainView() {
     positionElement?.appendChild(video);
 
     video.currentTime = 0;
+
+    if (element === "frontElement") {
+      addVideoEvent(video);
+    }
+
     video.play();
+  };
+
+  const addVideoEvent = (videoElement: HTMLVideoElement) => {
+    videoElement.onended = () => {
+      console.log("ended");
+    };
+
+    videoElement.ontimeupdate = () => {
+      console.log("timeupdate");
+    }
+  }
+
+  const removeVideoEvent = (videoElement: HTMLVideoElement) => {    
+    videoElement.onended = null;
+    videoElement.ontimeupdate = null;
+
+    videoElement.pause();
   };
 
   const selectCamera = (camera: string) => {

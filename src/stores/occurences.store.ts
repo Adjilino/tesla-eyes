@@ -1,18 +1,20 @@
 import { createEffect, createSignal } from "solid-js";
 import { Timestamp, TimestampVideo } from "../interfaces";
-import { Occurence, VideosByCameraPosition } from "../models";
+import { Occurence } from "../models";
 
 export const [occurences, setOccurences] = createSignal<Occurence[]>([]);
 
 export const [selectedOccurence, setSelectedOccurence] =
   createSignal<Occurence | null>(null);
-
 export const [selectedTimestamp, setSelectedTimestamp] =
   createSignal<Timestamp | null>(null);
 
 export const [selectedTimestampIndex, setSelectedTimestampIndex] = createSignal<
   number | null
 >(null);
+
+export const [currentTime, setCurrentTime] = createSignal<number>(0);
+export const [isPlaying, setIsPlaying] = createSignal<boolean>(false);
 
 export const [selectedTimestampVideo, setSelectedTimestampVideo] =
   createSignal<TimestampVideo | null>(null);
@@ -24,14 +26,7 @@ createEffect(() => {
     return;
   }
 
-  const videosByCameraPosition =
-    _selectedOccurence.getVideosByCameraPositions();
-
-  if (!videosByCameraPosition) {
-    return;
-  }
-
-  const timestamp = convertVideosInTimestampsKeys(videosByCameraPosition);
+  const timestamp = _selectedOccurence.timestamp;
 
   if (!timestamp) {
     return;
@@ -62,7 +57,7 @@ createEffect(() => {
     return;
   }
 
-  const _videos = Object.values(_selectedTimestamp.timestamp);
+  const _videos = Object.values(_selectedTimestamp.timestampVideo);
 
   if (_videos.length === 0) {
     return;
@@ -78,42 +73,21 @@ createEffect(() => {
     return;
   }
 
-  _selectedTimestampVideo.front.addEventListener("ended", () => {
+  const endVideo = () => {
     console.log("ended");
     setSelectedTimestampIndex((index) => (index != null ? (index += 1) : null));
     console.log("After end, selected index: ", selectedTimestampIndex());
-  });
-});
+  };
 
-function convertVideosInTimestampsKeys(
-  videosByCameraPosition: VideosByCameraPosition
-): Timestamp | undefined {
-  if (!videosByCameraPosition) {
+  const frontElement = _selectedTimestampVideo.front;
+
+  if (!frontElement) {
     return;
   }
 
-  const videosInTimestampsKeys: Record<number, TimestampVideo> = {};
+  frontElement.onended = endVideo;
 
-  const front = videosByCameraPosition.getFront();
-  const left = videosByCameraPosition.getLeftRepeater();
-  const right = videosByCameraPosition.getRightRepeater();
-  const back = videosByCameraPosition.getBack();
-
-  let currentTimestamp = 0;
-
-  front.forEach((video, index) => {
-    videosInTimestampsKeys[currentTimestamp] = {
-      front: video,
-      left_repeater: left[index],
-      right_repeater: right[index],
-      back: back[index],
-    };
-
-    currentTimestamp += video.duration;
-  });
-
-  return {
-    duration: currentTimestamp,
-    timestamp: videosInTimestampsKeys,
+  frontElement.ontimeupdate = () => {
+    setCurrentTime(frontElement.currentTime);
   };
-}
+});

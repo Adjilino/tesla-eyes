@@ -1,5 +1,5 @@
-import { VideosByCameraPosition } from "../models";
-import { Config, Occurence } from "../models";
+import { Timestamp } from "../interfaces";
+import { Config, Occurence, VideosByCameraPosition } from "../models";
 import { getBase64 } from "../utils";
 
 export class OccurenceBuilder {
@@ -30,8 +30,8 @@ export class OccurenceBuilder {
     const config = await this.getOccurenceConfig();
     occurence.setConfig(config);
 
-    const cameraPositions = await this.getOccurenceCameraPositions();
-    occurence.setVideosByCameraPositions(cameraPositions);
+    const timestamp = await this.getOccurenceTimestamp();
+    occurence.timestamp = timestamp;
 
     const thumbnail = await this.getOccurenceThumbnail();
     occurence.setThumbnail(thumbnail);
@@ -102,9 +102,7 @@ export class OccurenceBuilder {
     return config;
   }
 
-  private async getOccurenceCameraPositions(): Promise<
-    VideosByCameraPosition | undefined
-  > {
+  private async getOccurenceTimestamp(): Promise<Timestamp | undefined> {
     if (!this.files || this.files.length === 0) {
       return;
     }
@@ -121,19 +119,15 @@ export class OccurenceBuilder {
       return a.name.localeCompare(b.name);
     });
 
-    const separatedShorts = new VideosByCameraPosition();
+    const separatedShorts = {
+      duration: 0,
+      timestampVideo: {},
+    } as Timestamp;
+
+    let currentDuration = 0;
+
     for (const file of videoFilesSorted) {
-      // const source = document.createElement("source");
-      // source.src = URL.createObjectURL(file);
-      // source.src = await getBase64(file) as string;
-      // source.type = file.type;
-      
-      const videoElement = document.createElement("video");
-      // videoElement.appendChild(source);
-      videoElement.src = URL.createObjectURL(file);
-      // videoElement.src = await getBase64(file) as string;
-      // videoElement.controls = true;
-      // videoElement.crossOrigin = "anonymous";
+      const videoElement = await this._createVideoElement(file);
 
       const splittedPath = file.webkitRelativePath.split("/");
 
@@ -149,19 +143,27 @@ export class OccurenceBuilder {
       if (foundPosition) {
         switch (foundPosition) {
           case "front":
-            separatedShorts.addFront(videoElement);
+            separatedShorts.timestampVideo[currentDuration].front =
+              videoElement;
             break;
 
           case "back":
-            separatedShorts.addBack(videoElement);
+            currentDuration = separatedShorts.duration;
+            separatedShorts.timestampVideo[currentDuration] = {
+              back: videoElement,
+            };
+
+            separatedShorts.duration += videoElement.duration;
             break;
 
           case "left_repeater":
-            separatedShorts.addLeftRepeater(videoElement);
+            separatedShorts.timestampVideo[currentDuration].left_repeater =
+              videoElement;
             break;
 
           case "right_repeater":
-            separatedShorts.addRightRepeater(videoElement);
+            separatedShorts.timestampVideo[currentDuration].right_repeater =
+              videoElement;
             break;
 
           default:
@@ -171,6 +173,22 @@ export class OccurenceBuilder {
     }
 
     return separatedShorts;
+  }
+
+  private async _createVideoElement(file: File): Promise<HTMLVideoElement> {
+    return new Promise((resolve, reject) => {
+      const videoElement = document.createElement("video");
+      videoElement.src = URL.createObjectURL(file);
+
+      videoElement.onloadedmetadata = () => {
+        resolve(videoElement);
+      };
+
+      videoElement.onerror = () => {
+        console.error("Error durantion", videoElement.duration);
+        reject(videoElement);
+      };
+    });
   }
 
   private async getOccurenceThumbnail(): Promise<string | undefined> {

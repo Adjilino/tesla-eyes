@@ -1,10 +1,10 @@
-import { VideosByCameraPosition } from "./camera-position";
+import { Timestamp } from "../interfaces";
 import { Config } from "./config";
 
 export class Occurence {
   private dateTime?: Date;
   private config?: Config;
-  private videosByCameraPositions?: VideosByCameraPosition;
+  public timestamp?: Timestamp;
   private thumbnail?: string;
 
   setDateTime(dateTime: Date | undefined): void {
@@ -21,16 +21,6 @@ export class Occurence {
 
   getConfig(): Config | undefined {
     return this.config;
-  }
-
-  setVideosByCameraPositions(
-    videosByCameraPositions: VideosByCameraPosition | undefined
-  ): void {
-    this.videosByCameraPositions = videosByCameraPositions;
-  }
-
-  getVideosByCameraPositions(): VideosByCameraPosition | undefined {
-    return this.videosByCameraPositions;
   }
 
   setThumbnail(thumbnail: string | undefined): void {
