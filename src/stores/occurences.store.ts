@@ -20,8 +20,24 @@ export const [selectedTimestampIndex, setSelectedTimestampIndex] = createSignal<
   number | null
 >(null);
 
-export const [selectedTimestampVideo, setSelectedTimestampVideo] =
-  createSignal<TimestampVideo | null>(null);
+export const selectedTimestampVideo = createMemo<TimestampVideo | null>(() => {
+  const _selectedTimestampIndex = selectedTimestampIndex();
+  if (_selectedTimestampIndex === null) {
+    return null;
+  }
+
+  const _selectedTimestamp = selectedTimestamp();
+  if (!_selectedTimestamp) {
+    return null;
+  }
+
+  const _videos = Object.values(_selectedTimestamp.timestampVideo);
+  if (_videos.length === 0) {
+    return null;
+  }
+
+  return _videos[_selectedTimestampIndex];
+});
 
 export const [currentTime, setCurrentTime] = createSignal<number>(0);
 export const [isPlaying, setIsPlaying] = createSignal<boolean>(false);
@@ -35,29 +51,6 @@ createEffect(() => {
   }
 
   setSelectedTimestampIndex(0);
-});
-
-// On select timestamp index
-createEffect(() => {
-  // Verify if selected timestamp index is not null
-  const _selectedTimestampIndex = selectedTimestampIndex();
-  if (_selectedTimestampIndex === null) {
-    return;
-  }
-
-  // Verify if selected timestamp is not null
-  const _selectedTimestamp = selectedTimestamp();
-  if (!_selectedTimestamp) {
-    return;
-  }
-
-  // Verify if videos is not empty
-  const _videos = Object.values(_selectedTimestamp.timestampVideo);
-  if (_videos.length === 0) {
-    return;
-  }
-
-  setSelectedTimestampVideo(_videos[_selectedTimestampIndex]);
 });
 
 // Remove all event listeners from videos
