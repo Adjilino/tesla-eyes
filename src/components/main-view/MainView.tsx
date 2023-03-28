@@ -1,10 +1,8 @@
 import { createEffect, createSignal } from "solid-js";
 import { selectedTimestampVideo } from "../../stores";
+import { Camera } from "./Camera";
 
 export function MainView() {
-  const cameraClasses =
-    "absolute z-10 w-32 h-24 rounded-lg overflow-hidden shadow cursor-pointer";
-  const activeCameraClasses = "flex max-w-full max-h-full";
   const [selectedCamera, setSelectedCamera] = createSignal("front");
 
   createEffect(() => {
@@ -44,45 +42,32 @@ export function MainView() {
 
   return (
     <div class="flex relative w-full h-full">
-      <a
+      <Camera
         id="frontElement"
-        class={[
-          "m-auto",
-          selectedCamera() === "front"
-            ? activeCameraClasses
-            : `${cameraClasses} top-2 left-2`,
-        ].join(" ")}
+        isActive={selectedCamera() === "front"}
         onClick={() => selectCamera("front")}
+        class="top-2 left-2"
       />
-      <a
+
+      <Camera
         id="backElement"
-        class={[
-          "m-auto",
-          selectedCamera() === "back"
-            ? activeCameraClasses
-            : `${cameraClasses} top-2 right-2`,
-        ].join(" ")}
+        isActive={selectedCamera() === "back"}
         onClick={() => selectCamera("back")}
+        class="top-2 right-2"
       />
-      <a
+
+      <Camera
         id="leftRepeaterElement"
-        class={[
-          "m-auto",
-          selectedCamera() === "left_repeater"
-            ? activeCameraClasses
-            : `${cameraClasses} bottom-2 left-2`,
-        ].join(" ")}
+        isActive={selectedCamera() === "left_repeater"}
         onClick={() => selectCamera("left_repeater")}
+        class="bottom-2 left-2"
       />
-      <a
+
+      <Camera
         id="rightRepeaterElement"
-        class={[
-          "m-auto",
-          selectedCamera() === "right_repeater"
-            ? activeCameraClasses
-            : `${cameraClasses} bottom-2 right-2`,
-        ].join(" ")}
+        isActive={selectedCamera() === "right_repeater"}
         onClick={() => selectCamera("right_repeater")}
+        class="bottom-2 right-2"
       />
     </div>
   );
