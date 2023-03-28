@@ -1,5 +1,6 @@
 export interface Timestamp {
   duration: number;
+  recordsFrom: Date;
   timestampVideo: Record<number, TimestampVideo>;
 }
 

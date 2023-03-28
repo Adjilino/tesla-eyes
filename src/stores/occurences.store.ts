@@ -13,6 +13,21 @@ export const selectedTimestamp = createMemo<Timestamp | null>(() => {
     return null;
   }
 
+  console.log("selectedOccurence", _selectedOccurence);
+  const date = _selectedOccurence.getDateTime();
+  const recordsFrom = _selectedOccurence.timestamp?.recordsFrom;
+
+
+  if (!date || !recordsFrom) {
+    return null;
+  }
+
+  const diff = (date.getTime() - recordsFrom.getTime()) / 1000;
+
+  if (diff < 0 || diff > (_selectedOccurence.timestamp?.duration || 0)) {
+    console.log("diff", diff);
+  }
+
   return _selectedOccurence.timestamp || null;
 });
 
@@ -50,6 +65,7 @@ createEffect(() => {
     return;
   }
 
+  // TODO: Calculate duration to select start timestamp
   setSelectedTimestampIndex(0);
 });
 

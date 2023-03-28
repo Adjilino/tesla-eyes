@@ -33,7 +33,7 @@ export function SidebarFooter() {
     addFolderInput.click();
   }
 
-  return <Button onClick={addFolder}>Add folder</Button>;
+  return <Button onClick={() => addFolder()}>Add folder</Button>;
 }
 
 export default SidebarFooter;

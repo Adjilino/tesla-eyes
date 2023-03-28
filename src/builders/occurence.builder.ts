@@ -78,6 +78,18 @@ export class OccurenceBuilder {
     return dateTime;
   }
 
+  private folderNameToDateTime(folderName: string): Date | undefined {
+    // Convert date string to a valid date string
+    // example of date string: 2022-07-14_11-52-29-front.mp4
+    if (!folderName) {
+      return;
+    }
+
+    const dateString = folderName.slice(0, 19);
+
+    return this.stringToDateTime(dateString);
+  }
+
   private async getOccurenceConfig(): Promise<Config | undefined> {
     if (!this.files || this.files.length === 0) {
       return;
@@ -121,6 +133,7 @@ export class OccurenceBuilder {
 
     const separatedShorts = {
       duration: 0,
+      recordsFrom: this.folderNameToDateTime(videoFilesSorted[0].name),
       timestampVideo: {},
     } as Timestamp;
 
