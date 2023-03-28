@@ -1,17 +1,27 @@
 import { For } from "solid-js";
 import { Occurence } from "../../models";
-import { isSidebarOpen, occurences, setSelectedOccurence } from "../../stores";
+import {
+  isSidebarOpen,
+  occurences,
+  setIsSidebarOpen,
+  setSelectedOccurence,
+} from "../../stores";
 import SidebarFooter from "./Footer";
 import SidebarHeader from "./Header";
 import styles from "./Sidebar.module.css";
 
-export function Sidebar(props: {class: string}) {
+export function Sidebar(props: { class: string }) {
   function getOccurrenceDateTime(occurence: Occurence) {
     return occurence.getConfig()?.getDateTime()?.toLocaleString() || "";
   }
 
   function getOccurrenceLocation(occurence: Occurence) {
     return occurence.getConfig()?.getCity() || "";
+  }
+
+  function onClickOccurence(occurence: Occurence) {
+    setSelectedOccurence(occurence);
+    setIsSidebarOpen(false);
   }
 
   return (
@@ -49,7 +59,7 @@ export function Sidebar(props: {class: string}) {
                 "flex gap-2 rounded-md shadow-md p-2 w-full h-24",
                 "cursor-pointer",
               ].join(" ")}
-              onClick={() => setSelectedOccurence(occurence)}
+              onClick={() => onClickOccurence(occurence)}
             >
               <img
                 class={["rounded-md", styles.thumbnail].join(" ")}

@@ -14,23 +14,17 @@ export function MainView() {
       return;
     }
 
-    const frontVideoElement = _selectedTimestampVideo.front;
-    const backVideoElement = _selectedTimestampVideo.back;
-    const leftRepeaterVideoElement = _selectedTimestampVideo.left_repeater;
-    const rightRepeaterVideoElement = _selectedTimestampVideo.right_repeater;
-
-    frontVideoElement && setVideo("frontElement", frontVideoElement);
-
-    backVideoElement && setVideo("backElement", backVideoElement);
-
-    leftRepeaterVideoElement &&
-      setVideo("leftRepeaterElement", leftRepeaterVideoElement);
-
-    rightRepeaterVideoElement &&
-      setVideo("rightRepeaterElement", rightRepeaterVideoElement);
+    setVideo("frontElement", _selectedTimestampVideo.front);
+    setVideo("backElement", _selectedTimestampVideo.back);
+    setVideo("leftRepeaterElement", _selectedTimestampVideo.left_repeater);
+    setVideo("rightRepeaterElement", _selectedTimestampVideo.right_repeater);
   });
 
-  const setVideo = (element: string, video: HTMLVideoElement) => {
+  const setVideo = (element: string, video?: HTMLVideoElement) => {
+    if (!video) {
+      return;
+    }
+
     const positionElement = document.getElementById(element);
 
     if (!positionElement) {
@@ -41,30 +35,7 @@ export function MainView() {
       positionElement.removeChild(positionElement.children[0]);
     positionElement?.appendChild(video);
 
-    video.currentTime = 0;
-
-    if (element === "frontElement") {
-      addVideoEvent(video);
-    }
-
     video.play();
-  };
-
-  const addVideoEvent = (videoElement: HTMLVideoElement) => {
-    videoElement.onended = () => {
-      console.log("ended");
-    };
-
-    videoElement.ontimeupdate = () => {
-      console.log("timeupdate");
-    }
-  }
-
-  const removeVideoEvent = (videoElement: HTMLVideoElement) => {    
-    videoElement.onended = null;
-    videoElement.ontimeupdate = null;
-
-    videoElement.pause();
   };
 
   const selectCamera = (camera: string) => {

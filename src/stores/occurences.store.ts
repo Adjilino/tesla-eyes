@@ -53,21 +53,6 @@ createEffect(() => {
   setSelectedTimestampIndex(0);
 });
 
-// Remove all event listeners from videos
-function removeTimestampVideoEvents(timestampVideo: TimestampVideo) {
-  Object.values(timestampVideo).forEach((videoElement) => {
-    if (!videoElement) return;
-    removeVideoEventListeners(videoElement);
-  });
-}
-
-// Remove event listeners from video
-function removeVideoEventListeners(videoElement: HTMLVideoElement) {
-  videoElement.onended = null;
-  videoElement.ontimeupdate = null;
-
-  videoElement.pause();
-}
 
 let videos: TimestampVideo | null = null;
 
@@ -100,6 +85,22 @@ createEffect(() => {
   firstElement.onended = endVideoEvent;
   firstElement.ontimeupdate = ontimeupdate(firstElement);
 });
+
+// Remove all event listeners from videos
+function removeTimestampVideoEvents(timestampVideo: TimestampVideo) {
+  Object.values(timestampVideo).forEach((videoElement) => {
+    if (!videoElement) return;
+    removeVideoEventListeners(videoElement);
+  });
+}
+
+// Remove event listeners from video
+function removeVideoEventListeners(videoElement: HTMLVideoElement) {
+  videoElement.onended = null;
+  videoElement.ontimeupdate = null;
+
+  videoElement.pause();
+}
 
 function endVideoEvent() {
   setSelectedTimestampIndex((index) => (index != null ? (index += 1) : null));
