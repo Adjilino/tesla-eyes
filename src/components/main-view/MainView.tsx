@@ -19,10 +19,6 @@ export function MainView() {
   });
 
   const setVideo = (element: string, video?: HTMLVideoElement) => {
-    if (!video) {
-      return;
-    }
-
     const positionElement = document.getElementById(element);
 
     if (!positionElement) {
@@ -31,6 +27,11 @@ export function MainView() {
 
     positionElement.children.length &&
       positionElement.removeChild(positionElement.children[0]);
+
+    if (!video) {
+      return;
+    }
+    
     positionElement?.appendChild(video);
 
     video.play();
