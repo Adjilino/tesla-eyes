@@ -13,23 +13,57 @@ export const selectedTimestamp = createMemo<Timestamp | null>(() => {
     return null;
   }
 
-  console.log("selectedOccurence", _selectedOccurence);
   const date = _selectedOccurence.getDateTime();
   const recordsFrom = _selectedOccurence.timestamp?.recordsFrom;
-
 
   if (!date || !recordsFrom) {
     return null;
   }
 
-  const diff = (date.getTime() - recordsFrom.getTime()) / 1000;
+  diff = (date.getTime() - recordsFrom.getTime()) / 1000;
+  startIndex = 0;
 
   if (diff < 0 || diff > (_selectedOccurence.timestamp?.duration || 0)) {
-    console.log("diff", diff);
+    diff = 0;
   }
+
+  const videoXpto = getTimestampVideoIndex(
+    _selectedOccurence.timestamp?.timestampVideo || {},
+    diff
+  );
+
+  startIndex = videoXpto.index;
+  diff = videoXpto.startAt;
 
   return _selectedOccurence.timestamp || null;
 });
+
+let diff = 0;
+let startIndex = 0;
+
+function getTimestampVideoIndex(
+  timestampVideo: Record<number, TimestampVideo>,
+  time: number
+): { index: number; startAt: number } {
+  let index = 0;
+  let startAt = 0;
+
+  const keys = Object.keys(timestampVideo);
+
+  for (const [i, value] of keys.entries()) {
+    if (time >= Number(value)) {
+      index = i;
+      startAt = time - Number(value);
+      continue;
+    }
+
+    if (time < Number(value)) {
+      break;
+    }
+  }
+
+  return { index, startAt };
+}
 
 export const [selectedTimestampIndex, setSelectedTimestampIndex] = createSignal<
   number | null
@@ -65,10 +99,8 @@ createEffect(() => {
     return;
   }
 
-  // TODO: Calculate duration to select start timestamp
-  setSelectedTimestampIndex(0);
+  setSelectedTimestampIndex(startIndex);
 });
-
 
 let videos: TimestampVideo | null = null;
 
@@ -82,7 +114,6 @@ createEffect(() => {
 
   // Remove event listeners from previous video
   if (videos) {
-    console.log("remove event listeners");
     removeTimestampVideoEvents(videos);
   }
 
