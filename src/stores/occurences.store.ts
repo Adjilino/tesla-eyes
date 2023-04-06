@@ -2,34 +2,76 @@ import { createEffect, createMemo, createSignal } from "solid-js";
 import { Timestamp, TimestampVideo } from "../interfaces";
 import { Occurence } from "../models";
 
+export const [currentTime, setCurrentTime] = createSignal<number>(0);
+export const [isPlaying, setIsPlaying] = createSignal<boolean>(false);
 export const [occurences, setOccurences] = createSignal<Occurence[]>([]);
 
 export const [selectedOccurence, setSelectedOccurence] =
   createSignal<Occurence | null>(null);
 
 export const selectedTimestamp = createMemo<Timestamp | null>(() => {
+  setIsPlaying(false);
   const _selectedOccurence = selectedOccurence();
   if (!_selectedOccurence) {
     return null;
   }
 
-  console.log("selectedOccurence", _selectedOccurence);
   const date = _selectedOccurence.getDateTime();
   const recordsFrom = _selectedOccurence.timestamp?.recordsFrom;
-
 
   if (!date || !recordsFrom) {
     return null;
   }
 
-  const diff = (date.getTime() - recordsFrom.getTime()) / 1000;
+  diff = (date.getTime() - recordsFrom.getTime()) / 1000;
+  diff -= 50;
+  startIndex = 0;
 
   if (diff < 0 || diff > (_selectedOccurence.timestamp?.duration || 0)) {
-    console.log("diff", diff);
+    diff = 0;
   }
+
+  const videoXpto = getTimestampVideoIndex(
+    _selectedOccurence.timestamp?.timestampVideo || {},
+    diff
+  );
+
+  startIndex = videoXpto.index;
+  keyStamp = videoXpto.keyStamp;
+  diff = videoXpto.startAt;
 
   return _selectedOccurence.timestamp || null;
 });
+
+let diff = 0;
+let keyStamp = 0;
+let startIndex = 0;
+
+function getTimestampVideoIndex(
+  timestampVideo: Record<number, TimestampVideo>,
+  time: number
+): { index: number; keyStamp: number; startAt: number } {
+  let index = 0;
+  let keyStamp = 0;
+  let startAt = 0;
+
+  const keys = Object.keys(timestampVideo);
+
+  for (const [i, value] of keys.entries()) {
+    if (time >= Number(value)) {
+      index = i;
+      keyStamp = Number(value);
+      startAt = time - Number(value);
+      continue;
+    }
+
+    if (time < Number(value)) {
+      break;
+    }
+  }
+
+  return { index, keyStamp, startAt };
+}
 
 export const [selectedTimestampIndex, setSelectedTimestampIndex] = createSignal<
   number | null
@@ -54,9 +96,6 @@ export const selectedTimestampVideo = createMemo<TimestampVideo | null>(() => {
   return _videos[_selectedTimestampIndex];
 });
 
-export const [currentTime, setCurrentTime] = createSignal<number>(0);
-export const [isPlaying, setIsPlaying] = createSignal<boolean>(false);
-
 // On select timestamp
 createEffect(() => {
   // Verify if selected timestamp is not null
@@ -65,10 +104,8 @@ createEffect(() => {
     return;
   }
 
-  // TODO: Calculate duration to select start timestamp
-  setSelectedTimestampIndex(0);
+  setSelectedTimestampIndex(startIndex);
 });
-
 
 let videos: TimestampVideo | null = null;
 
@@ -82,7 +119,6 @@ createEffect(() => {
 
   // Remove event listeners from previous video
   if (videos) {
-    console.log("remove event listeners");
     removeTimestampVideoEvents(videos);
   }
 
@@ -93,14 +129,35 @@ createEffect(() => {
     return;
   }
 
-  const firstElement = _timestampVideoValues[0];
-  if (!firstElement) {
+  for (const [i, element] of _timestampVideoValues.entries()) {
+    // is first element
+    if (i === 0) {
+      element.onended = endVideoEvent;
+      element.ontimeupdate = ontimeupdate(element);
+    }
+  }
+});
+
+createEffect(() => {
+  const _isPlaying = isPlaying();
+  if (!videos) {
     return;
   }
 
-  firstElement.onended = endVideoEvent;
-  firstElement.ontimeupdate = ontimeupdate(firstElement);
+  setVideoPlaying(videos, _isPlaying);
 });
+
+function setVideoPlaying(timestampVideo: TimestampVideo, isPlaying: boolean) {
+  Object.values(timestampVideo).forEach((videoElement) => {
+    if (!videoElement) return;
+
+    if (isPlaying) {
+      videoElement.play();
+    } else {
+      videoElement.pause();
+    }
+  });
+}
 
 // Remove all event listeners from videos
 function removeTimestampVideoEvents(timestampVideo: TimestampVideo) {
