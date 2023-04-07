@@ -19,29 +19,11 @@ createEffect(() => {
     return;
   }
 
-  const date = _selectedOccurence.getDateTime();
-  const videosStartAt = _selectedOccurence.videosStartAt;
+  const playerStartPoint = _selectedOccurence.playerStartPoint;
 
-  if (!date || !videosStartAt) {
-    return null;
-  }
-
-  diff = (date.getTime() - videosStartAt.getTime()) / 1000;
-  diff -= 50;
-  startIndex = 0;
-
-  if (diff < 0 || diff > (_selectedOccurence.duration || 0)) {
-    diff = 0;
-  }
-
-  const videoXpto = getVideoTimeIndex(
-    _selectedOccurence.videosPerTime || {},
-    diff
-  );
-
-  startIndex = videoXpto.index;
-  keyStamp = videoXpto.keyStamp;
-  diff = videoXpto.startAt;
+  startIndex = playerStartPoint.index;
+  keyStamp = playerStartPoint.key;
+  diff = playerStartPoint.videoStartAt;
 
   setSelectedTimestampIndex(startIndex);
 });
@@ -53,7 +35,7 @@ let startIndex = 0;
 export const [selectedTimestampIndex, setSelectedTimestampIndex] = createSignal<
   number | null
 >(null);
-
+  
 export const selectedVideos = createMemo<TimestampVideo | null>(() => {
   const _selectedTimestampIndex = selectedTimestampIndex();
   if (_selectedTimestampIndex === null) {

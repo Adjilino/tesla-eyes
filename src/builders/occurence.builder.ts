@@ -1,5 +1,5 @@
 import { TimestampVideo } from "../interfaces";
-import { Config, Occurence, VideosByCameraPosition } from "../models";
+import { Config, Occurence, PlayerStartPoint, VideosByCameraPosition } from "../models";
 import { getBase64 } from "../utils";
 
 export class OccurenceBuilder {
@@ -39,6 +39,8 @@ export class OccurenceBuilder {
     occurence.duration = timestamp?.duration || 0;
 
     // get the player config
+    const playerStartPoint = await this.getPlayerStartPoint(occurence);
+    occurence.playerStartPoint = playerStartPoint;
 
     return occurence;
   }
@@ -235,5 +237,63 @@ export class OccurenceBuilder {
     }
 
     return thumbnailString as string;
+  }
+
+  private async getPlayerStartPoint(occurence: Occurence): Promise<PlayerStartPoint> {
+    const playerStartPoint = new PlayerStartPoint();
+
+    if (!occurence) {
+      return playerStartPoint;
+    }
+
+    const dateTime = occurence.getDateTime();
+    const videosStartAt = occurence.videosStartAt;
+
+    if (!dateTime || !videosStartAt) {
+      return playerStartPoint;
+    }
+
+    let triggerAt = (dateTime.getTime() - videosStartAt.getTime()) / 1000 - 50;
+
+    if (triggerAt < 0 || triggerAt > (occurence.duration || 0)) {
+      triggerAt = 0;
+    }
+
+    const videoXpto = this.getVideoTimeIndex(
+      occurence.videosPerTime || {},
+      triggerAt
+    );
+
+    playerStartPoint.index = videoXpto.index;
+    playerStartPoint.key = videoXpto.key;
+    playerStartPoint.videoStartAt = videoXpto.videoStartAt;
+
+    return playerStartPoint;
+  }
+
+  private getVideoTimeIndex(
+    videosPerTime: Record<number, TimestampVideo>,
+    time: number
+  ): { index: number; key: number; videoStartAt: number } {
+    let index = 0;
+    let key = 0;
+    let videoStartAt = 0;
+
+    const keys = Object.keys(videosPerTime);
+
+    for (const [i, value] of keys.entries()) {
+      if (time >= Number(value)) {
+        index = i;
+        key = Number(value);
+        videoStartAt = time - Number(value);
+        continue;
+      }
+
+      if (time < Number(value)) {
+        break;
+      }
+    }
+
+    return { index, key, videoStartAt: videoStartAt };
   }
 }

@@ -1,5 +1,6 @@
 import { TimestampVideo } from "../interfaces";
 import { Config } from "./config";
+import { PlayerStartPoint } from "./player-start-point";
 
 export class Occurence {
   // information
@@ -13,12 +14,7 @@ export class Occurence {
   public duration?: number;
 
   // player
-  public playerStartPoint?: {
-    index: number;
-    key: number;
-    time: number;
-    // key + time = current player time
-  };
+  public playerStartPoint: PlayerStartPoint = new PlayerStartPoint();
 
   setDateTime(dateTime: Date | undefined): void {
     this.dateTime = dateTime;
