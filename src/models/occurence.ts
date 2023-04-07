@@ -1,11 +1,24 @@
-import { Timestamp } from "../interfaces";
+import { TimestampVideo } from "../interfaces";
 import { Config } from "./config";
 
 export class Occurence {
+  // information
   private dateTime?: Date;
   private config?: Config;
-  public timestamp?: Timestamp;
   private thumbnail?: string;
+
+  // videos
+  public videosPerTime?: Record<number, TimestampVideo>;
+  public videosStartAt?: Date;
+  public duration?: number;
+
+  // player
+  public playerStartPoint?: {
+    index: number;
+    key: number;
+    time: number;
+    // key + time = current player time
+  };
 
   setDateTime(dateTime: Date | undefined): void {
     this.dateTime = dateTime;

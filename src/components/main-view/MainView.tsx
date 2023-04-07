@@ -1,5 +1,5 @@
 import { createEffect, createSignal } from "solid-js";
-import { selectedTimestampVideo, setIsPlaying } from "../../stores";
+import { selectedVideos } from "../../stores";
 import { Camera } from "./Camera";
 import { Timeline } from "./Timelime";
 
@@ -7,8 +7,7 @@ export function MainView() {
   const [selectedCamera, setSelectedCamera] = createSignal("front");
 
   createEffect(() => {
-    const _selectedTimestampVideo = selectedTimestampVideo();
-
+    const _selectedTimestampVideo = selectedVideos();
     if (!_selectedTimestampVideo) {
       return;
     }
@@ -19,7 +18,7 @@ export function MainView() {
     setVideo("rightRepeaterElement", _selectedTimestampVideo.right_repeater);
   });
 
-  const setVideo = (element: string, video?: HTMLVideoElement) => {
+  const setVideo = (element: string, video?: HTMLVideoElement, isPLaying = true) => {
     const positionElement = document.getElementById(element);
 
     if (!positionElement) {
@@ -35,7 +34,9 @@ export function MainView() {
 
     positionElement?.appendChild(video);
 
-    setIsPlaying(true);
+    if (isPLaying) {
+      video.play();
+    }
   };
 
   const selectCamera = (camera: string) => {
@@ -45,7 +46,7 @@ export function MainView() {
   return (
     <>
       <div class="flex w-full h-full flex-col">
-        <div class="flex-grow overflow-hidden relative">
+        <div class="flex-grow flex overflow-hidden relative">
           <Camera
             id="frontElement"
             isActive={selectedCamera() === "front"}

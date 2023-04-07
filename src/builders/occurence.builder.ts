@@ -1,4 +1,4 @@
-import { Timestamp } from "../interfaces";
+import { TimestampVideo } from "../interfaces";
 import { Config, Occurence, VideosByCameraPosition } from "../models";
 import { getBase64 } from "../utils";
 
@@ -30,11 +30,15 @@ export class OccurenceBuilder {
     const config = await this.getOccurenceConfig();
     occurence.setConfig(config);
 
-    const timestamp = await this.getOccurenceTimestamp();
-    occurence.timestamp = timestamp;
-
     const thumbnail = await this.getOccurenceThumbnail();
     occurence.setThumbnail(thumbnail);
+
+    const timestamp = await this.getOccurenceTimestamp();
+    occurence.videosPerTime = timestamp?.timestampVideo || {};
+    occurence.videosStartAt = timestamp?.videosStartAt || new Date();
+    occurence.duration = timestamp?.duration || 0;
+
+    // get the player config
 
     return occurence;
   }
@@ -114,7 +118,14 @@ export class OccurenceBuilder {
     return config;
   }
 
-  private async getOccurenceTimestamp(): Promise<Timestamp | undefined> {
+  private async getOccurenceTimestamp(): Promise<
+    | {
+        duration: number;
+        videosStartAt: Date | undefined;
+        timestampVideo: Record<number, TimestampVideo>;
+      }
+    | undefined
+  > {
     if (!this.files || this.files.length === 0) {
       return;
     }
@@ -133,9 +144,9 @@ export class OccurenceBuilder {
 
     const separatedShorts = {
       duration: 0,
-      recordsFrom: this.folderNameToDateTime(videoFilesSorted[0].name),
-      timestampVideo: {},
-    } as Timestamp;
+      videosStartAt: this.folderNameToDateTime(videoFilesSorted[0].name),
+      timestampVideo: {} as Record<number, TimestampVideo>,
+    };
 
     let currentDuration = 0;
 
