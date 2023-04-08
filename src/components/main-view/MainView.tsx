@@ -1,5 +1,5 @@
 import { createEffect, createSignal } from "solid-js";
-import { selectedVideos } from "../../stores";
+import { selectedVideos, setIsPlaying } from "../../stores";
 import { Camera } from "./Camera";
 import { Timeline } from "./Timelime";
 
@@ -16,6 +16,7 @@ export function MainView() {
     setVideo("backElement", _selectedTimestampVideo.back);
     setVideo("leftRepeaterElement", _selectedTimestampVideo.left_repeater);
     setVideo("rightRepeaterElement", _selectedTimestampVideo.right_repeater);
+    setIsPlaying(true);
   });
 
   const setVideo = (element: string, video?: HTMLVideoElement, isPLaying = true) => {

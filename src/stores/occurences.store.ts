@@ -19,28 +19,37 @@ createEffect(() => {
     return;
   }
 
+  videosPerTime = _selectedOccurence.videosPerTime;
+
   const playerStartPoint = _selectedOccurence.playerStartPoint;
+  const videoStartIndex = playerStartPoint.index;
+  const videoStartTime = playerStartPoint.videoStartAt;
+  videoKey = playerStartPoint.key;
 
-  startIndex = playerStartPoint.index;
-  keyStamp = playerStartPoint.key;
-  diff = playerStartPoint.videoStartAt;
-
-  setSelectedTimestampIndex(startIndex);
+  setSelectedTimestampIndex([videoStartIndex, videoStartTime]);
 });
 
-let diff = 0;
-let keyStamp = 0;
-let startIndex = 0;
+let videosPerTime: Record<number, TimestampVideo> | undefined;
+let videoKey = 0;
+let startAt = 0;
 
 export const [selectedTimestampIndex, setSelectedTimestampIndex] = createSignal<
-  number | null
+  number[] | null
 >(null);
-  
+
 export const selectedVideos = createMemo<TimestampVideo | null>(() => {
   const _selectedTimestampIndex = selectedTimestampIndex();
-  if (_selectedTimestampIndex === null) {
+  if (
+    !_selectedTimestampIndex ||
+    !Array.isArray(_selectedTimestampIndex) ||
+    _selectedTimestampIndex.length === 0
+  ) {
     return null;
   }
+
+  const [index, time = 0] = _selectedTimestampIndex;
+
+  startAt = time;
 
   const _selectedOccurence = selectedOccurence();
   if (!_selectedOccurence || !_selectedOccurence.videosPerTime) {
@@ -49,12 +58,15 @@ export const selectedVideos = createMemo<TimestampVideo | null>(() => {
 
   const _videosPerTime = _selectedOccurence.videosPerTime;
 
-  const _videos = Object.values(_videosPerTime);
-  if (_videos.length === 0) {
+  // const _videos = Object.values(_videosPerTime);
+  const _videosKeys = Object.keys(_videosPerTime);
+  if (_videosKeys.length === 0) {
     return null;
   }
 
-  return _videos[_selectedTimestampIndex];
+  // return _videos[_selectedTimestampIndex];
+  videoKey = Number(_videosKeys[index]);
+  return _videosPerTime[videoKey];
 });
 
 let videos: TimestampVideo | null = null;
@@ -85,6 +97,8 @@ createEffect(() => {
       element.onended = endVideoEvent;
       element.ontimeupdate = ontimeupdate(element);
     }
+
+    element.currentTime = startAt;
   }
 });
 
@@ -97,13 +111,30 @@ createEffect(() => {
   setVideoPlaying(videos, _isPlaying);
 });
 
-function getVideoTimeIndex(
+export const [changeCurrentTime, setChangeCurrentTime] = createSignal<
+  number | null
+>(null);
+
+createEffect(() => {
+  const _changeCurrentTime = changeCurrentTime();
+  if (!_changeCurrentTime) return;
+
+  if (!videosPerTime) return;
+
+  const { index } = getVideosPerTimeIndex(videosPerTime, _changeCurrentTime);
+
+  setSelectedTimestampIndex([index, 0]);
+  // Prevent unnexpected run if selected occurence is changed
+  // setChangeCurrentTime(null);
+});
+
+function getVideosPerTimeIndex(
   timestampVideo: Record<number, TimestampVideo>,
   time: number
 ): { index: number; keyStamp: number; startAt: number } {
   let index = 0;
   let keyStamp = 0;
-  let startAt = 0;
+  let startAt = time;
 
   const keys = Object.keys(timestampVideo);
 
@@ -154,13 +185,15 @@ function removeVideoEventListeners(videoElement: HTMLVideoElement) {
 }
 
 function endVideoEvent() {
-  setSelectedTimestampIndex((index) => {
-    return index != null ? index + 1 : null;
+  setSelectedTimestampIndex((timestamp) => {
+    if (timestamp === null) return null;
+
+    return [timestamp[0] += 1, 0];
   });
 }
 
 function ontimeupdate(element: HTMLVideoElement) {
   return () => {
-    setCurrentTime(element.currentTime);
+    setCurrentTime(videoKey + element.currentTime);
   };
 }
