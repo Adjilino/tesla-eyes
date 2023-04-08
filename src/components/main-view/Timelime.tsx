@@ -25,7 +25,6 @@ export function Timeline() {
 
   const changeTime = (e: Event) => {
     if (!(e.target instanceof HTMLInputElement)) return;
-    console.log(e.target.value);
 
     setChangeCurrentTime(Number(e.target.value));
   };

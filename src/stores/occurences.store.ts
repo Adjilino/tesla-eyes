@@ -31,12 +31,14 @@ createEffect(() => {
 
 let videosPerTime: Record<number, TimestampVideo> | undefined;
 let videoKey = 0;
-let startAt = 0;
 
 export const [selectedTimestampIndex, setSelectedTimestampIndex] = createSignal<
   number[] | null
 >(null);
 
+let videos: TimestampVideo | null = null;
+
+const [startAt, setStartAt] = createSignal<number>(0);
 export const selectedVideos = createMemo<TimestampVideo | null>(() => {
   const _selectedTimestampIndex = selectedTimestampIndex();
   if (
@@ -48,8 +50,7 @@ export const selectedVideos = createMemo<TimestampVideo | null>(() => {
   }
 
   const [index, time = 0] = _selectedTimestampIndex;
-
-  startAt = time;
+  setStartAt(time);
 
   const _selectedOccurence = selectedOccurence();
   if (!_selectedOccurence || !_selectedOccurence.videosPerTime) {
@@ -68,8 +69,6 @@ export const selectedVideos = createMemo<TimestampVideo | null>(() => {
   videoKey = Number(_videosKeys[index]);
   return _videosPerTime[videoKey];
 });
-
-let videos: TimestampVideo | null = null;
 
 // On select timestamp video
 createEffect(() => {
@@ -97,8 +96,19 @@ createEffect(() => {
       element.onended = endVideoEvent;
       element.ontimeupdate = ontimeupdate(element);
     }
+  }
+});
 
-    element.currentTime = startAt;
+createEffect(() => {
+  const _startAt = startAt() || 0;
+
+  if (!videos) return;
+
+  const videoCameras = Object.values(videos);
+  if (videoCameras.length === 0) return;
+
+  for (const element of videoCameras) {
+    element.currentTime = _startAt;
   }
 });
 
@@ -123,7 +133,7 @@ createEffect(() => {
 
   const { index } = getVideosPerTimeIndex(videosPerTime, _changeCurrentTime);
 
-  setSelectedTimestampIndex([index, 0]);
+  setSelectedTimestampIndex([index, _changeCurrentTime]);
   // Prevent unnexpected run if selected occurence is changed
   // setChangeCurrentTime(null);
 });
@@ -188,7 +198,7 @@ function endVideoEvent() {
   setSelectedTimestampIndex((timestamp) => {
     if (timestamp === null) return null;
 
-    return [timestamp[0] += 1, 0];
+    return [(timestamp[0] += 1), 0];
   });
 }
 
