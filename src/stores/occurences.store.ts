@@ -131,9 +131,9 @@ createEffect(() => {
 
   if (!videosPerTime) return;
 
-  const { index } = getVideosPerTimeIndex(videosPerTime, _changeCurrentTime);
+  const { index, startAt } = getVideosPerTimeIndex(videosPerTime, _changeCurrentTime);
 
-  setSelectedTimestampIndex([index, _changeCurrentTime]);
+  setSelectedTimestampIndex([index, startAt]);
   // Prevent unnexpected run if selected occurence is changed
   // setChangeCurrentTime(null);
 });
