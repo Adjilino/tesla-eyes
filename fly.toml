@@ -1,0 +1,26 @@
+# fly.toml file generated for tesla-eyes on 2023-04-11T19:24:36+01:00
+
+app = "tesla-eyes"
+kill_signal = "SIGINT"
+kill_timeout = 5
+mounts = []
+primary_region = "mad"
+processes = []
+
+[[services]]
+  internal_port = 80
+  processes = ["app"]
+  protocol = "tcp"
+  [services.concurrency]
+    hard_limit = 25
+    soft_limit = 20
+    type = "connections"
+
+  [[services.ports]]
+    force_https = true
+    handlers = ["http"]
+    port = 80
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
