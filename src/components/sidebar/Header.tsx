@@ -8,8 +8,10 @@ export function SidebarHeader() {
 
   return (
     <>
-      <Button onClick={toggleSidebar}>close</Button>
-      <h1>Sidebar</h1>
+      <Button onClick={toggleSidebar}>
+        <i class="mx-2 fa-solid fa-fw fa-bars"/>
+      </Button>
+      <h1 class="truncate">Tesla eyes</h1>
     </>
   );
 }

@@ -26,7 +26,11 @@ export function Timeline() {
     <div class="h-16 p-2 flex w-full gap-2">
       <div class="flex">
         <Button onClick={() => setIsPlaying((playing) => !playing)}>
-          {isPlaying() ? "Pause" : "Play"}
+          <i
+            class={
+              "mx-2 fa-solid fa-fw " + (isPlaying() ? "fa-pause" : "fa-play")
+            }
+          />
         </Button>
       </div>
       <div class="flex-grow overflow-hidden flex gap-2 items-center">
@@ -34,14 +38,16 @@ export function Timeline() {
           <div class="absolute top-1 w-full h-1 bg-slate-400" />
           <div
             class="absolute top-1 w-full h-1 bg-slate-600 transition-all duration-100"
-            style={`width: ${(currentTime() / maxTime()) * 100}%`}
+            style={{ width: `${(currentTime() / maxTime()) * 100}%` }}
           />
           <div
             class="
               absolute w-3 h-3 bg-slate-600 
               rounded-full transition-all duration-100
             "
-            style={`left: calc(${(currentTime() / maxTime()) * 100}% - 2px)`}
+            style={{
+              left: `calc(${(currentTime() / maxTime()) * 100}% - 2px)`,
+            }}
           />
           <input
             class="absolute w-full opacity-0 cursor-pointer"

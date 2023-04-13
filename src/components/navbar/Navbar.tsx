@@ -8,9 +8,11 @@ export function Navbar() {
 
   return (
     <div class="h-16 p-2 flex w-full items-center gap-2">
-      <Button onClick={toggleSidebar}>Open</Button>
+      <Button onClick={toggleSidebar}>
+        <i class="mx-2 fa-solid fa-fw fa-bars"/>
+      </Button>
       <div class="flex-grow flex">
-        <div>Text</div>
+        <div>Tesla eyes</div>
       </div>
     </div>
   );
