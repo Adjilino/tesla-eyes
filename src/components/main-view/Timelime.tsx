@@ -46,7 +46,7 @@ export function Timeline() {
               rounded-full transition-all duration-100
             "
             style={{
-              left: `calc(${(currentTime() / maxTime()) * 100}% - 2px)`,
+              left: `calc(${(currentTime() / maxTime()) * 100}% - 12px)`,
             }}
           />
           <input
