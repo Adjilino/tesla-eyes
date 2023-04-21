@@ -1,6 +1,8 @@
-import { Component } from "solid-js";
+import { Component, Show } from "solid-js";
 
 import { MainView, Navbar, Sidebar } from "./components";
+import { selectedOccurence } from "./stores";
+import NoOccurenceSelect from "./components/main-view/NoOccurenceSelect";
 
 const App: Component = () => {
   return (
@@ -13,8 +15,10 @@ const App: Component = () => {
       <Sidebar class="z-30" />
       <Navbar />
 
-      <div class="flex-grow overflow-hidden">
-        <MainView />
+      <div class="flex-grow flex overflow-hidden justify-center items-center">
+        <Show when={!!selectedOccurence()} fallback={<NoOccurenceSelect />}>
+          <MainView />
+        </Show>
       </div>
     </div>
   );
