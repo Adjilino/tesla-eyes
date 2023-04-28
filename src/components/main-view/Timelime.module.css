@@ -1,0 +1,9 @@
+.absoluteVerticalCenter {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.dotVerticalCenter {
+  top: calc(50% - (0.75rem / 2));
+}
