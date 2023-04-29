@@ -8,7 +8,7 @@ export function SidebarHeader() {
 
   return (
     <>
-      <Button onClick={toggleSidebar}>
+      <Button onClick={toggleSidebar} class='dark:bg-white'>
         <i class="mx-2 fa-solid fa-fw fa-bars"/>
       </Button>
       <h1 class="truncate">Tesla eyes</h1>

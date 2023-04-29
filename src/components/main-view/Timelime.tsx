@@ -1,4 +1,4 @@
-import { createMemo } from "solid-js";
+import { createMemo, createSignal } from "solid-js";
 import {
   currentTime,
   isPlaying,
@@ -7,6 +7,7 @@ import {
   setIsPlaying,
 } from "../../stores";
 import { Button } from "../../ui";
+import timelineStyles from "./Timelime.module.css";
 
 export function Timeline() {
   const maxTime = createMemo(() => {
@@ -16,10 +17,59 @@ export function Timeline() {
     return occurence.duration || 0;
   });
 
-  const changeTime = (e: Event) => {
-    if (!(e.target instanceof HTMLInputElement)) return;
+  const [isMouseDown, setIsMouseDown] = createSignal(false);
+  const [mouseDownTimeline, setMouseDownTimeline] = createSignal(-1);
 
-    setChangeCurrentTime(Number(e.target.value));
+  const currentTimelineWidth = createMemo(() => {
+    const _currentTime = currentTime();
+
+    if (isMouseDown()) {
+      return `${mouseDownTimeline() * 100}%`;
+    }
+
+    return `${(_currentTime / maxTime()) * 100}%`;
+  });
+
+  const getPercent = (e: MouseEvent) => {
+    const timelineElement = document.getElementById("timeline");
+
+    if (!timelineElement) return null;
+
+    const rect = timelineElement.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const width = rect.right - rect.left;
+    const percent = x / width;
+
+    return percent;
+  };
+
+  const onMouseMove = (e: MouseEvent) => {
+    if (!isMouseDown()) return;
+
+    const percent = getPercent(e);
+
+    if (percent === null) return;
+
+    setMouseDownTimeline(percent);
+  };
+
+  const onMouseDown = (e: MouseEvent) => {
+    setIsMouseDown(true);
+
+    const percent = getPercent(e);
+
+    if (percent === null) return;
+
+    setMouseDownTimeline(percent);
+  };
+
+  const onMouseUp = (e: MouseEvent) => {
+    const percent = getPercent(e);
+
+    if (percent === null) return;
+
+    setChangeCurrentTime(percent * maxTime());
+    setIsMouseDown(false);
   };
 
   return (
@@ -33,9 +83,30 @@ export function Timeline() {
           />
         </Button>
       </div>
-      <div class="flex-grow overflow-hidden flex gap-2 items-center">
-        <div class="flex align-center w-full relative">
-          <div class="absolute top-1 w-full h-1 bg-slate-400" />
+      <div
+        class="flex-grow overflow-hidden relative"
+        onMouseDown={onMouseDown}
+        onMouseMove={onMouseMove}
+        onMouseUp={onMouseUp}
+      >
+        <div
+          id="timeline"
+          class={`absolute ${timelineStyles.absoluteVerticalCenter} w-full h-1 bg-slate-400`}
+        />
+        <div
+          class={`absolute ${timelineStyles.absoluteVerticalCenter} w-full h-1 bg-slate-600 transition-all duration-100`}
+          style={{ width: currentTimelineWidth() }}
+        >
+          <div
+            class={`
+              absolute ${timelineStyles.absoluteVerticalCenter} w-3 h-3 bg-slate-600 
+              rounded-full transition-all duration-100 right-0
+            `}
+          />
+        </div>
+
+        {/* <div class="flex align-center w-full relative">
+          <div class="absolute w-full h-1 bg-slate-400" />
           <div
             class="absolute top-1 w-full h-1 bg-slate-600 transition-all duration-100"
             style={{ width: `${(currentTime() / maxTime()) * 100}%` }}
@@ -56,8 +127,8 @@ export function Timeline() {
             max={maxTime()}
             value={1 || currentTime()}
             onChange={changeTime}
-          />
-        </div>
+          /> 
+        </div> */}
       </div>
     </div>
   );
