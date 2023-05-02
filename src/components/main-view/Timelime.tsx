@@ -9,7 +9,33 @@ import {
 import { Button } from "../../ui";
 import timelineStyles from "./Timelime.module.css";
 
+function addVideoShortcutControls() {
+  window.addEventListener("keydown", (event) => {
+    if (event.target !== document.body || !event.key) return;
+
+    switch (event.key) {
+      case " ":
+        setIsPlaying((isPlaying) => !isPlaying);
+        break;
+
+      case "ArrowLeft":
+        setChangeCurrentTime(() => {
+          return currentTime() - 5;
+        });
+        break;
+
+      case "ArrowRight":
+        setChangeCurrentTime(() => {
+          return currentTime() + 5;
+        });
+        break;
+    }
+  });
+}
+
 export function Timeline() {
+  addVideoShortcutControls();
+
   const maxTime = createMemo(() => {
     const occurence = selectedOccurence();
     if (!occurence) return 0;
