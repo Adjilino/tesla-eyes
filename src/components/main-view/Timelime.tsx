@@ -43,6 +43,15 @@ export function Timeline() {
     return occurence.duration || 0;
   });
 
+  const occuredAt = createMemo(() => {
+    const occurence = selectedOccurence();
+    if (!occurence) return 0;
+
+    const playerStartPoint =  occurence.playerStartPoint || 0;
+
+    return playerStartPoint.key + playerStartPoint.videoStartAt;
+  });
+
   const [isMouseDown, setIsMouseDown] = createSignal(false);
   const [mouseDownTimeline, setMouseDownTimeline] = createSignal(-1);
 
@@ -82,6 +91,12 @@ export function Timeline() {
   const onMouseDown = (e: MouseEvent) => {
     setIsMouseDown(true);
 
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+    
+    window.addEventListener("dragover", onMouseMove)
+    window.addEventListener("dragend", onMouseUp)
+
     const percent = getPercent(e);
 
     if (percent === null) return;
@@ -90,6 +105,14 @@ export function Timeline() {
   };
 
   const onMouseUp = (e: MouseEvent) => {
+    if (!isMouseDown()) return;
+
+    window.removeEventListener("mousemove", onMouseMove);
+    window.removeEventListener("mouseup", onMouseUp);
+
+    window.removeEventListener("dragover", onMouseMove)
+    window.removeEventListener("dragend", onMouseUp)
+
     const percent = getPercent(e);
 
     if (percent === null) return;
@@ -112,12 +135,17 @@ export function Timeline() {
       <div
         class="flex-grow overflow-hidden relative"
         onMouseDown={onMouseDown}
-        onMouseMove={onMouseMove}
-        onMouseUp={onMouseUp}
       >
         <div
           id="timeline"
           class={`absolute ${timelineStyles.absoluteVerticalCenter} w-full h-1 bg-slate-400`}
+        />
+        <div
+          class={`
+            absolute ${timelineStyles.absoluteVerticalCenter} w-3 h-3 bg-red-600 
+            rounded-full transition-all duration-100
+          `}
+          style={occuredAt() ? { left: `${(occuredAt() / maxTime()) * 100}%` } : {}}
         />
         <div
           class={`absolute ${timelineStyles.absoluteVerticalCenter} w-full h-1 bg-slate-600 transition-all duration-100`}
@@ -125,8 +153,8 @@ export function Timeline() {
         >
           <div
             class={`
-              absolute ${timelineStyles.absoluteVerticalCenter} w-3 h-3 bg-slate-600 
-              rounded-full transition-all duration-100 right-0
+              absolute ${timelineStyles.absoluteVerticalCenter} w-2 h-2 bg-slate-600 
+              rounded-full transition-all duration-100 -right-1
             `}
           />
         </div>
