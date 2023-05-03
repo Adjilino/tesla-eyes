@@ -19,7 +19,11 @@ export function MainView() {
     setIsPlaying(true);
   });
 
-  const setVideo = (element: string, video?: HTMLVideoElement, isPLaying = true) => {
+  const setVideo = (
+    element: string,
+    video?: HTMLVideoElement,
+    isPLaying = true
+  ) => {
     const positionElement = document.getElementById(element);
 
     if (!positionElement) {
