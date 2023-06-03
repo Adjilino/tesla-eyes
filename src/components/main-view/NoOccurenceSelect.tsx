@@ -24,7 +24,7 @@ const NoOccurenceSelect: Component = () => {
       </p>
       <hr />
       <p class="text-xl text-gray-600 dark:text-gray-400 mt-2">
-        You can try it with the example folder.
+        You can try it with the example folder.&nbsp;
         <a
           class="underline underline-offset-2"
           href="https://mega.nz/folder/4MARkZKY#7gc5e3ZqoAKrnL4E56oS0Q"
