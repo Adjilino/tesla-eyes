@@ -93,10 +93,14 @@ export class MultipleOccurenceBuilder {
       }
 
       Promise.all(occurencesPromises).then((occurencesBuilds) => {
-        const occurences = occurencesBuilds.filter(
-          (occurence) =>
-            occurence !== undefined && occurence instanceof Occurence
-        ) as Occurence[];
+        const occurences = occurencesBuilds.filter((occurence) => {
+          return (
+            occurence &&
+            occurence instanceof Occurence &&
+            occurence.duration &&
+            occurence.duration > 0
+          );
+        }) as Occurence[];
 
         resolve(occurences);
       });

@@ -1,6 +1,13 @@
+import { Show } from "solid-js";
 import { MultipleOccurenceBuilder } from "../../builders";
-import { setOccurences } from "../../stores";
+import {
+  isLoadingOccurrences,
+  setIsLoadingOccurrences,
+  setOccurences,
+} from "../../stores";
 import { Button } from "../../ui";
+
+const LoadingOccurrences: boolean[] = [];
 
 function createFolderInput() {
   const input = document.createElement("input");
@@ -10,16 +17,25 @@ function createFolderInput() {
   input.webkitdirectory = true;
 
   input.addEventListener("change", async (event) => {
+    LoadingOccurrences.push(true);
+    setIsLoadingOccurrences(true);
+
     const files = (event.target as HTMLInputElement).files;
 
     if (!files) return;
 
-    const multipleOccurences = await new MultipleOccurenceBuilder()
+    const multipleOccurrences = await new MultipleOccurenceBuilder()
       .addFileList(files)
       .build();
 
-    if (multipleOccurences) {
-      setOccurences((occurences) => [...occurences, ...multipleOccurences]);
+    if (multipleOccurrences) {
+      setOccurences((occurences) => [...occurences, ...multipleOccurrences]);
+    }
+
+    LoadingOccurrences.pop();
+
+    if (LoadingOccurrences.length === 0) {
+      setIsLoadingOccurrences(false);
     }
   });
 
@@ -37,6 +53,11 @@ export function SidebarFooter() {
     <div class="flex w-full align-middle justify-between truncate">
       <div>
         <Button onClick={() => addFolder()}>
+          <Show when={isLoadingOccurrences()}>
+            <div class="inline mr-2">
+              <i class="fa-solid fa-video fa-beat-fade" />
+            </div>
+          </Show>
           <span class="truncate">Add folder</span>
         </Button>
       </div>
