@@ -19,8 +19,15 @@ const NoOccurenceSelect: Component = () => {
       <p class="text-xl text-gray-600 dark:text-gray-400">
         4. The occurence will be added to the sidebar
       </p>
-      <p class="text-xl text-gray-600 dark:text-gray-400">
+      <p class="text-xl text-gray-600 dark:text-gray-400 mb-2">
         5. Select occurence from the sidebar and enjoy!
+      </p>
+      <hr />
+      <p class="text-xl text-gray-600 dark:text-gray-400 mt-2">
+        You can try it with the example folder. 
+        <a class="underline underline-offset-2" href="https://mega.nz/folder/4MARkZKY#7gc5e3ZqoAKrnL4E56oS0Q">
+          Click here to download it.
+        </a>
       </p>
     </div>
   );
