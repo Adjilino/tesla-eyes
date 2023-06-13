@@ -4,7 +4,13 @@ import { MainView, Navbar, Sidebar } from "./components";
 import { selectedOccurence } from "./stores";
 import NoOccurenceSelect from "./components/main-view/NoOccurenceSelect";
 
+import { invoke } from "@tauri-apps/api";
+
 const App: Component = () => {
+  invoke('greet', {name: 'World'}).then((response) => {
+    console.log(response);
+  });
+
   return (
     <div
       class={
