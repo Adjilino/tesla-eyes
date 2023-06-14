@@ -1,14 +1,13 @@
+import { invoke } from "@tauri-apps/api";
 import { Component, Show } from "solid-js";
 
 import { MainView, Navbar, Sidebar } from "./components";
-import { selectedOccurence } from "./stores";
 import NoOccurenceSelect from "./components/main-view/NoOccurenceSelect";
-
-import { invoke } from "@tauri-apps/api";
+import { selectedOccurence, setIsDesktop } from "./stores";
 
 const App: Component = () => {
-  invoke('greet', {name: 'World'}).then((response) => {
-    console.log(response);
+  invoke('is_desktop').then((response) => {
+    setIsDesktop(!!response);
   });
 
   return (
