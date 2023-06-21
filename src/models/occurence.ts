@@ -3,6 +3,7 @@ import { Config } from "./config";
 import { PlayerStartPoint } from "./player-start-point";
 
 export class Occurence {
+  directory?: string;
   // information
   private dateTime?: Date;
   private config?: Config;

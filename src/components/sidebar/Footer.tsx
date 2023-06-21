@@ -1,3 +1,5 @@
+import { open } from "@tauri-apps/api/dialog";
+import { FileEntry, readDir } from "@tauri-apps/api/fs";
 import { Show } from "solid-js";
 import { MultipleOccurenceBuilder } from "../../builders";
 import {
@@ -22,31 +24,60 @@ function createFolderInput() {
 
     const files = (event.target as HTMLInputElement).files;
 
-    if (!files) return;
-
-    const multipleOccurrences = await new MultipleOccurenceBuilder()
-      .addFileList(files)
-      .build();
-
-    if (multipleOccurrences) {
-      setOccurences((occurences) => [...occurences, ...multipleOccurrences]);
-    }
-
-    LoadingOccurrences.pop();
-
-    if (LoadingOccurrences.length === 0) {
-      setIsLoadingOccurrences(false);
-    }
+    createMultipleOccurence(files);
   });
 
   return input;
 }
 
+async function createMultipleOccurence(files: FileList | FileEntry[] | null) {
+  if (!files) return;
+
+  const multipleOccurrences = await new MultipleOccurenceBuilder()
+    .addFileList(files)
+    .build();
+
+  if (multipleOccurrences) {
+    setOccurences((occurences) => [...occurences, ...multipleOccurrences]);
+  }
+
+  LoadingOccurrences.pop();
+
+  if (LoadingOccurrences.length === 0) {
+    setIsLoadingOccurrences(false);
+  }
+}
+
 export function SidebarFooter() {
   const addFolderInput = createFolderInput();
 
-  function addFolder() {
-    addFolderInput.click();
+  async function addFolder() {
+    // addFolderInput.click();
+
+    const folder = await open({
+      directory: true,
+    });
+
+    console.log(folder);
+
+    if (!folder || Array.isArray(folder)) {
+      return;
+    }
+
+    const entries = await readDir(folder, { recursive: true });
+
+    createMultipleOccurence(entries);
+    for (const entry of entries) {
+      console.log(entry);
+
+      if (entry.children) {
+        break;
+      }
+
+      // readBinaryFile(entry.path).then((buffer) => {
+      //   console.log(buffer);
+      // });
+    }
   }
 
   return (

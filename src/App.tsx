@@ -1,4 +1,5 @@
 import { invoke } from "@tauri-apps/api";
+import { removeDir } from "@tauri-apps/api/fs";
 import { Component, Show } from "solid-js";
 
 import { MainView, Navbar, Sidebar } from "./components";

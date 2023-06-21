@@ -1,22 +1,23 @@
+import { FileEntry } from "@tauri-apps/api/fs";
 import { Occurence } from "../models";
 import { OccurenceBuilder } from "./occurence.builder";
 
 export class MultipleOccurenceBuilder {
-  files: File[] = [];
+  files: (File | FileEntry)[] = [];
 
   constructor() {
     return this;
   }
 
-  addFileList(files: FileList | null): this {
+  addFileList(files: FileList | FileEntry[] | null): this {
     if (!files) {
       return this;
     }
 
     // add files to the builder
-    for (let i = 0; i < files.length; i++) {
-      this.files.push(files[i]);
-    }
+    this.files.push(...files);
+    // for (let i = 0; i < files.length; i++) {
+    // }
 
     return this;
   }
@@ -42,17 +43,24 @@ export class MultipleOccurenceBuilder {
     return occurences;
   }
 
-  private _separateFilesByFolders(): Record<string, File[]> | undefined {
+  private _separateFilesByFolders():
+    | Record<string, (File | FileEntry)[]>
+    | undefined {
     if (!this.files || this.files.length === 0) {
       return;
     }
     // separate the files into folders
 
-    const folders: Record<string, File[]> = {};
+    const folders: Record<string, (File | FileEntry)[]> = {};
 
     for (let i = 0; i < this.files.length; i++) {
-      const file: File = this.files[i];
-      const folder = file.webkitRelativePath.split("/");
+      const file: File | FileEntry = this.files[i];
+      let folder: string[] = [];
+      if (file instanceof File) {
+        folder = file.webkitRelativePath.split("/");
+      } else {
+        folder = file.path.split("/");
+      }
       folder.pop();
       const folderName = folder[folder.length - 1];
 
@@ -67,7 +75,7 @@ export class MultipleOccurenceBuilder {
   }
 
   private getAllOccurence(
-    filesByFolder: Record<string, File[]> | undefined
+    filesByFolder: Record<string, (File | FileEntry)[]> | undefined
   ): Promise<Occurence[] | undefined> {
     return new Promise((resolve) => {
       // Separate the file.webkitRelativePath by folders
