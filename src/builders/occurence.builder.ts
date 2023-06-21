@@ -1,5 +1,10 @@
 import { TimestampVideo } from "../interfaces";
-import { Config, Occurence, PlayerStartPoint, VideosByCameraPosition } from "../models";
+import {
+  Config,
+  Occurence,
+  PlayerStartPoint,
+  VideosByCameraPosition,
+} from "../models";
 import { getBase64 } from "../utils";
 
 export class OccurenceBuilder {
@@ -51,7 +56,7 @@ export class OccurenceBuilder {
     }
 
     // retrieve occurence name from the first file
-    const splittedPath = this.files[0].webkitRelativePath.split("/");
+    const splittedPath = this.files[0].webkitRelativePath.replaceAll("\\", "/").split("/");
 
     if (splittedPath.length < 2) {
       return;
@@ -155,7 +160,9 @@ export class OccurenceBuilder {
     for (const file of videoFilesSorted) {
       const videoElement = await this._createVideoElement(file);
 
-      const splittedPath = file.webkitRelativePath.split("/");
+      const splittedPath = file.webkitRelativePath
+        .replaceAll("\\", "/")
+        .split("/");
 
       // get file name
       const fileName = splittedPath[splittedPath.length - 1];
@@ -239,7 +246,9 @@ export class OccurenceBuilder {
     return thumbnailString as string;
   }
 
-  private async getPlayerStartPoint(occurence: Occurence): Promise<PlayerStartPoint> {
+  private async getPlayerStartPoint(
+    occurence: Occurence
+  ): Promise<PlayerStartPoint> {
     const playerStartPoint = new PlayerStartPoint();
 
     if (!occurence) {
