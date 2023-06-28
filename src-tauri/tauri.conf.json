@@ -4,7 +4,8 @@
     "beforeBuildCommand": "npm run build",
     "beforeDevCommand": "npm run dev",
     "devPath": "http://localhost:3000",
-    "distDir": "../dist"
+    "distDir": "../dist",
+    "withGlobalTauri": true
   },
   "package": {
     "productName": "tesla-eyes",
@@ -15,7 +16,7 @@
       "all": false,
       "dialog": {
         "all": false,
-        "confirm": false,
+        "confirm": true,
         "open": true
       },
       "fs": {
@@ -33,6 +34,11 @@
       },
       "path": {
         "all": true
+      },
+      "protocol": {
+        "all": false,
+        "asset": true,
+        "assetScope": ["**"]
       }
     },
     "bundle": {
@@ -69,7 +75,7 @@
       }
     },
     "security": {
-      "csp": null
+      "csp": "default-src 'self'; media-src stream: https://stream.localhost asset: https://asset.localhost"
     },
     "updater": {
       "active": false

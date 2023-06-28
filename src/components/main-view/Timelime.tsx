@@ -5,11 +5,14 @@ import {
   selectedOccurence,
   setChangeCurrentTime,
   setIsPlaying,
+  setOccurences,
+  setSelectedOccurence,
 } from "../../stores";
 import { Button } from "../../ui";
 import timelineStyles from "./Timelime.module.css";
 import { BaseDirectory, removeDir } from "@tauri-apps/api/fs";
 import { Occurence } from "../../models";
+import { confirm } from "@tauri-apps/api/dialog";
 
 function addVideoShortcutControls() {
   window.addEventListener("keydown", (event) => {
@@ -123,14 +126,26 @@ export function Timeline() {
     setIsMouseDown(false);
   };
 
-  const removeOccurence = (occurence: Occurence | null) => {
-    if (!occurence || !occurence.directory) return;
+  const removeOccurence = async (occurence: Occurence | null) => {
+    if (!occurence || !occurence.directory || !window?.__TAURI__?.tauri) return;
 
     console.log("Removing occurence", occurence.directory);
-    return
+
+    const confirmed = await confirm(
+      `Are you sure do you want to remove the occurence`,
+      { title: "Delete Occurence", type: "warning" }
+    );
+
+    if (!confirmed) return;
+
+    setIsPlaying(false);
+    setOccurences((occurences) => {
+      return occurences.filter((o) => o.directory !== occurence.directory);
+    });
+    setSelectedOccurence(null);
 
     removeDir(occurence.directory, {
-      recursive: true
+      recursive: true,
     });
   };
 

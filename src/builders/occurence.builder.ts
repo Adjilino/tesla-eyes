@@ -1,4 +1,5 @@
 import { FileEntry, readTextFile } from "@tauri-apps/api/fs";
+import { convertFileSrc } from '@tauri-apps/api/tauri';
 import { normalize } from "@tauri-apps/api/path";
 import { TimestampVideo } from "../interfaces";
 import {
@@ -276,9 +277,7 @@ export class OccurenceBuilder {
       if (file instanceof File) {
         videoElement.src = URL.createObjectURL(file);
       } else {
-        videoElement.src = 'file://' + file.path;
-
-        console.log(videoElement)
+        videoElement.src = convertFileSrc(file.path, 'asset');
       }
     });
   }
@@ -301,7 +300,7 @@ export class OccurenceBuilder {
     if (thumbnailFile instanceof File) {
       thumbnailString = await getBase64(thumbnailFile);
     } else {
-      thumbnailString = thumbnailFile.path;
+      thumbnailString = convertFileSrc(thumbnailFile.path, "asset");
     }
 
     if (!thumbnailString) {

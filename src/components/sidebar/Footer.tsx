@@ -52,11 +52,14 @@ export function SidebarFooter() {
   const addFolderInput = createFolderInput();
 
   async function addFolder() {
-    // addFolderInput.click();
+    if (window?.__TAURI__?.tauri) {
+      const folder = await open({
+        directory: true,
+      });
+    } else {
+      addFolderInput.click();
+    }
 
-    const folder = await open({
-      directory: true,
-    });
 
     console.log(folder);
 
