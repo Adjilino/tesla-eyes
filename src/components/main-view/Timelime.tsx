@@ -20,13 +20,15 @@ function addVideoShortcutControls() {
 
       case "ArrowLeft":
         setChangeCurrentTime(() => {
-          return currentTime() - 5;
+          const time = currentTime();
+          return time > 5 ? time - 5 : 0;
         });
         break;
 
       case "ArrowRight":
         setChangeCurrentTime(() => {
-          return currentTime() + 5;
+          const time = currentTime();
+          return (time || 0) + 5;
         });
         break;
     }
@@ -47,7 +49,7 @@ export function Timeline() {
     const occurence = selectedOccurence();
     if (!occurence) return 0;
 
-    const playerStartPoint =  occurence.playerStartPoint || 0;
+    const playerStartPoint = occurence.playerStartPoint || 0;
 
     return playerStartPoint.key + playerStartPoint.videoStartAt;
   });
@@ -93,7 +95,7 @@ export function Timeline() {
 
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("mouseup", onMouseUp);
-    
+
     window.addEventListener("dragover", onMouseMove)
     window.addEventListener("dragend", onMouseUp)
 

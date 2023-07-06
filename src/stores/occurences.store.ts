@@ -127,7 +127,7 @@ export const [changeCurrentTime, setChangeCurrentTime] = createSignal<
 
 createEffect(() => {
   const _changeCurrentTime = changeCurrentTime();
-  if (!_changeCurrentTime) return;
+  if (_changeCurrentTime == null) return;
 
   if (!videosPerTime) return;
 
@@ -161,11 +161,13 @@ function getVideosPerTimeIndex(
     }
   }
 
+  console.log({ index, keyStamp, startAt })
   return { index, keyStamp, startAt };
 }
 
 function setVideoPlaying(timestampVideo: TimestampVideo, isPlaying: boolean) {
   for (const videoElement of Object.values(timestampVideo)) {
+    console.log({ videoElement })
     if (!videoElement) return;
 
     if (isPlaying) {
