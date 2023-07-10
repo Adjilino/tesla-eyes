@@ -22,7 +22,7 @@ export function SidebarHeader() {
           target="_blank"
         >
           <i class="mr-2 fa-solid fa-fw fa-bug" />
-          <span class="truncate">Report</span>
+          <span class="truncate">Issues</span>
         </a>
       </div>
     </div>
