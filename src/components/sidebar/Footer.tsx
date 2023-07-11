@@ -52,15 +52,15 @@ export function SidebarFooter() {
   const addFolderInput = createFolderInput();
 
   async function addFolder() {
+    if (!window?.__TAURI__?.tauri) {
+      addFolderInput.click();
+      return;
+    }
     let folder: string | string[] | null = null;
 
-    if (window?.__TAURI__?.tauri) {
-      folder = await open({
-        directory: true,
-      });
-    } else {
-      addFolderInput.click();
-    }
+    folder = await open({
+      directory: true,
+    });
 
     if (!folder || Array.isArray(folder)) {
       return;
@@ -68,7 +68,23 @@ export function SidebarFooter() {
 
     const entries = await readDir(folder, { recursive: true });
 
-    createMultipleOccurence(entries);
+    const files = getFiles(entries);
+
+    createMultipleOccurence(files);
+  }
+
+  function getFiles(fileEntries: FileEntry[]): FileEntry[] {
+    let files: FileEntry[] = [];
+
+    for (const entry of fileEntries) {
+      if (!entry.children) {
+        files.push(entry);
+      } else {
+        files = [...files, ...getFiles(entry.children)];
+      }
+    }
+
+    return files;
   }
 
   return (

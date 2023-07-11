@@ -16,8 +16,6 @@ export class MultipleOccurenceBuilder {
 
     // add files to the builder
     this.files.push(...files);
-    // for (let i = 0; i < files.length; i++) {
-    // }
 
     return this;
   }
