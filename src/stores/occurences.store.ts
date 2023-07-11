@@ -131,7 +131,10 @@ createEffect(() => {
 
   if (!videosPerTime) return;
 
-  const { index, startAt } = getVideosPerTimeIndex(videosPerTime, _changeCurrentTime);
+  const { index, startAt } = getVideosPerTimeIndex(
+    videosPerTime,
+    _changeCurrentTime
+  );
 
   setSelectedTimestampIndex([index, startAt]);
   // Prevent unnexpected run if selected occurence is changed
@@ -161,13 +164,11 @@ function getVideosPerTimeIndex(
     }
   }
 
-  console.log({ index, keyStamp, startAt })
   return { index, keyStamp, startAt };
 }
 
 function setVideoPlaying(timestampVideo: TimestampVideo, isPlaying: boolean) {
   for (const videoElement of Object.values(timestampVideo)) {
-    console.log({ videoElement })
     if (!videoElement) return;
 
     if (isPlaying) {

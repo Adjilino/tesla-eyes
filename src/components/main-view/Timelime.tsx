@@ -11,7 +11,9 @@ import timelineStyles from "./Timelime.module.css";
 
 function addVideoShortcutControls() {
   window.addEventListener("keydown", (event) => {
-    if (event.target !== document.body || !event.key) return;
+    if (event.target !== document.body || !event.key) {
+      return;
+    }
 
     switch (event.key) {
       case " ":
@@ -19,16 +21,20 @@ function addVideoShortcutControls() {
         break;
 
       case "ArrowLeft":
-        setChangeCurrentTime(() => {
-          const time = currentTime();
-          return time > 5 ? time - 5 : 0;
+        setTimeout(() => {
+          setChangeCurrentTime(() => {
+            const time = currentTime();
+            return time > 5 ? time - 5 : 0;
+          });
         });
         break;
 
       case "ArrowRight":
-        setChangeCurrentTime(() => {
-          const time = currentTime();
-          return (time || 0) + 5;
+        setTimeout(() => {
+          setChangeCurrentTime(() => {
+            const time = currentTime();
+            return (time || 0) + 5;
+          });
         });
         break;
     }
