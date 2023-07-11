@@ -127,11 +127,14 @@ export const [changeCurrentTime, setChangeCurrentTime] = createSignal<
 
 createEffect(() => {
   const _changeCurrentTime = changeCurrentTime();
-  if (!_changeCurrentTime) return;
+  if (_changeCurrentTime == null) return;
 
   if (!videosPerTime) return;
 
-  const { index, startAt } = getVideosPerTimeIndex(videosPerTime, _changeCurrentTime);
+  const { index, startAt } = getVideosPerTimeIndex(
+    videosPerTime,
+    _changeCurrentTime
+  );
 
   setSelectedTimestampIndex([index, startAt]);
   // Prevent unnexpected run if selected occurence is changed

@@ -16,7 +16,9 @@ import { confirm } from "@tauri-apps/api/dialog";
 
 function addVideoShortcutControls() {
   window.addEventListener("keydown", (event) => {
-    if (event.target !== document.body || !event.key) return;
+    if (event.target !== document.body || !event.key) {
+      return;
+    }
 
     switch (event.key) {
       case " ":
@@ -24,14 +26,20 @@ function addVideoShortcutControls() {
         break;
 
       case "ArrowLeft":
-        setChangeCurrentTime(() => {
-          return currentTime() - 5;
+        setTimeout(() => {
+          setChangeCurrentTime(() => {
+            const time = currentTime();
+            return time > 5 ? time - 5 : 0;
+          });
         });
         break;
 
       case "ArrowRight":
-        setChangeCurrentTime(() => {
-          return currentTime() + 5;
+        setTimeout(() => {
+          setChangeCurrentTime(() => {
+            const time = currentTime();
+            return (time || 0) + 5;
+          });
         });
         break;
     }
@@ -99,8 +107,8 @@ export function Timeline() {
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("mouseup", onMouseUp);
 
-    window.addEventListener("dragover", onMouseMove);
-    window.addEventListener("dragend", onMouseUp);
+    window.addEventListener("dragover", onMouseMove)
+    window.addEventListener("dragend", onMouseUp)
 
     const percent = getPercent(e);
 

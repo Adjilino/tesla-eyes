@@ -1,5 +1,5 @@
 import { FileEntry, readTextFile } from "@tauri-apps/api/fs";
-import { convertFileSrc } from '@tauri-apps/api/tauri';
+import { convertFileSrc } from "@tauri-apps/api/tauri";
 import { normalize } from "@tauri-apps/api/path";
 import { TimestampVideo } from "../interfaces";
 import {
@@ -87,9 +87,11 @@ export class OccurenceBuilder {
     // retrieve occurence name from the first file
     let splittedPath;
     if (this.files[0] instanceof File) {
-      splittedPath = this.files[0].webkitRelativePath.split("/");
+      splittedPath = this.files[0].webkitRelativePath
+        .replaceAll("\\", "/")
+        .split("/");
     } else {
-      splittedPath = this.files[0].path.split("/");
+      splittedPath = this.files[0].path.replaceAll("\\", "/").split("/");
     }
 
     if (splittedPath.length < 2) {
@@ -205,9 +207,9 @@ export class OccurenceBuilder {
 
       let splittedPath: string[];
       if (file instanceof File) {
-        splittedPath = file.webkitRelativePath.split("/");
+        splittedPath = file.webkitRelativePath.replaceAll("\\", "/").split("/");
       } else {
-        splittedPath = file.path.split("/");
+        splittedPath = file.path.replaceAll("\\", "/").split("/");
       }
 
       // get file name
@@ -277,7 +279,7 @@ export class OccurenceBuilder {
       if (file instanceof File) {
         videoElement.src = URL.createObjectURL(file);
       } else {
-        videoElement.src = convertFileSrc(file.path, 'asset');
+        videoElement.src = convertFileSrc(file.path, "asset");
       }
     });
   }

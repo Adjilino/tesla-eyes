@@ -57,10 +57,11 @@ export class MultipleOccurenceBuilder {
       const file: File | FileEntry = this.files[i];
       let folder: string[] = [];
       if (file instanceof File) {
-        folder = file.webkitRelativePath.split("/");
+        folder = file.webkitRelativePath.replaceAll("\\", "/").split("/");
       } else {
-        folder = file.path.split("/");
+        folder = file.path.replaceAll("\\", "/").split("/");
       }
+
       folder.pop();
       const folderName = folder[folder.length - 1];
 

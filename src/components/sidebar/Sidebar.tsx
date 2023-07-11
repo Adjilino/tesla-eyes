@@ -1,4 +1,4 @@
-import { For } from "solid-js";
+import { For, Show } from "solid-js";
 import { Occurence } from "../../models";
 import {
   isSidebarOpen,
@@ -61,10 +61,26 @@ export function Sidebar(props: { class: string }) {
               ].join(" ")}
               onClick={() => onClickOccurence(occurence)}
             >
-              <img
-                class={["rounded-md", styles.thumbnail].join(" ")}
-                src={occurence.getThumbnail() || ""}
-              />
+              <Show
+                when={occurence.getThumbnail()}
+                fallback={
+                  <div
+                    class={
+                      [
+                        "flex items-center justify-center text-ellipsis italic",
+                        styles.thumbnail
+                      ].join(" ")
+                    }
+                  >
+                    <i class="fa-solid fa-image" />
+                  </div>
+                }
+              >
+                <img
+                  class={["rounded-md", styles.thumbnail].join(" ")}
+                  src={occurence.getThumbnail() || ""}
+                />
+              </Show>
               <div
                 class={[
                   "flex-grow flex flex-col overflow-hidden justify-center",
@@ -77,7 +93,7 @@ export function Sidebar(props: { class: string }) {
                     "font-bold",
                   ].join(" ")}
                 >
-                  {getOccurrenceLocation(occurence)}
+                  {getOccurrenceLocation(occurence) || "Unknown location"}
                 </span>
                 <span
                   class={[
@@ -85,7 +101,7 @@ export function Sidebar(props: { class: string }) {
                     "overflow-hidden whitespace-nowrap text-ellipsis",
                   ].join(" ")}
                 >
-                  {getOccurrenceDateTime(occurence)}
+                  {getOccurrenceDateTime(occurence) || "Unknown date"}
                 </span>
               </div>
             </a>
