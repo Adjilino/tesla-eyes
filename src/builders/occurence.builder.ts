@@ -56,7 +56,9 @@ export class OccurenceBuilder {
     }
 
     // retrieve occurence name from the first file
-    const splittedPath = this.files[0].webkitRelativePath.replaceAll("\\", "/").split("/");
+    const splittedPath = this.files[0].webkitRelativePath
+      .replaceAll("\\", "/")
+      .split("/");
 
     if (splittedPath.length < 2) {
       return;
@@ -218,7 +220,11 @@ export class OccurenceBuilder {
       };
 
       videoElement.onerror = () => {
-        console.error("Error durantion", videoElement.duration);
+        console.error(
+          `Error with the video ${file.name}`,
+          `At ${videoElement.duration} seconds`,
+          `This error is probably due to a corrupted video file.`
+        );
         reject(videoElement);
       };
     });
