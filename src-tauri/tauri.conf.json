@@ -56,7 +56,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.tauri.dev",
+      "identifier": "pt.adjilino.tesla-eyes",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
