@@ -222,7 +222,7 @@ export class OccurenceBuilder {
       videoElement.onerror = () => {
         console.error(
           `Error with the video ${file.name}`,
-          `At ${videoElement.duration} seconds`,
+          `At ${videoElement.currentTime} seconds`,
           `This error is probably due to a corrupted video file.`
         );
         reject(videoElement);
