@@ -213,7 +213,10 @@ export class OccurenceBuilder {
   private async _createVideoElement(file: File): Promise<HTMLVideoElement> {
     return new Promise((resolve, reject) => {
       const videoElement = document.createElement("video");
-      videoElement.src = URL.createObjectURL(file);
+      const srcElement = document.createElement("source");
+      srcElement.src = URL.createObjectURL(file);
+      srcElement.type = file.type;
+      videoElement.appendChild(srcElement);
 
       videoElement.onloadedmetadata = () => {
         resolve(videoElement);
