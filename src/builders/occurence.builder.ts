@@ -219,15 +219,12 @@ export class OccurenceBuilder {
       videoElement.appendChild(srcElement);
 
       videoElement.onloadedmetadata = () => {
+        // videoElement.onerror = null;
         resolve(videoElement);
       };
 
       videoElement.onerror = () => {
-        console.error(
-          `Error with the video ${file.name}`,
-          `At ${videoElement.currentTime} seconds`,
-          `This error is probably due to a corrupted video file.`
-        );
+        console.error(`Error with the video ${file.name}`);
         reject(videoElement);
       };
     });

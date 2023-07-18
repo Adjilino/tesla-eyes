@@ -30,8 +30,10 @@ export function MainView() {
       return;
     }
 
-    positionElement.children.length &&
-      positionElement.removeChild(positionElement.children[0]);
+    // Remove all children
+    for (let i = 0; i < positionElement.children.length; i++) {
+      positionElement.removeChild(positionElement.children[i]);
+    }
 
     if (!video) {
       return;
@@ -39,10 +41,38 @@ export function MainView() {
 
     positionElement?.appendChild(video);
 
+    if (video.error) {
+      const divWarning = createWarning();
+      positionElement?.appendChild(divWarning);
+    } else {
+      video.onerror = () => {
+        console.error(
+          `Error with the video`,
+          `At ${video.currentTime} seconds`,
+          `This error is probably due to a corrupted video file.`
+        );
+
+        const divWarning = createWarning();
+        positionElement?.appendChild(divWarning);
+      };
+    }
+
     if (isPLaying) {
       video.play();
     }
   };
+
+  const createWarning = () => {
+    const divWarning = document.createElement("div.warning");
+    divWarning.style.position = "absolute";
+    divWarning.style.top = "2px";
+    divWarning.style.left = "2px";
+    divWarning.style.color = "yellow";
+    divWarning.title = "This video is corrupted";
+    divWarning.innerHTML = "&#9888;";
+
+    return divWarning;
+  }
 
   const selectCamera = (camera: string) => {
     setSelectedCamera(camera);
