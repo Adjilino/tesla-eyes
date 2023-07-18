@@ -1,6 +1,5 @@
 import { FileEntry, readTextFile } from "@tauri-apps/api/fs";
 import { convertFileSrc } from "@tauri-apps/api/tauri";
-import { normalize } from "@tauri-apps/api/path";
 import { TimestampVideo } from "../interfaces";
 import {
   Config,
@@ -268,11 +267,12 @@ export class OccurenceBuilder {
       const videoElement = document.createElement("video");
 
       videoElement.onloadedmetadata = () => {
+        // videoElement.onerror = null;
         resolve(videoElement);
       };
 
       videoElement.onerror = () => {
-        console.error("Error durantion", videoElement.duration);
+        console.error(`Error with the video ${file.name}`);
         reject(videoElement);
       };
 

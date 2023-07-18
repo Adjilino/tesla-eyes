@@ -1,4 +1,7 @@
+import { confirm } from "@tauri-apps/api/dialog";
+import { removeDir } from "@tauri-apps/api/fs";
 import { Show, createMemo, createSignal } from "solid-js";
+import { Occurence } from "../../models";
 import {
   currentTime,
   isPlaying,
@@ -10,9 +13,6 @@ import {
 } from "../../stores";
 import { Button } from "../../ui";
 import timelineStyles from "./Timelime.module.css";
-import { BaseDirectory, removeDir } from "@tauri-apps/api/fs";
-import { Occurence } from "../../models";
-import { confirm } from "@tauri-apps/api/dialog";
 
 function addVideoShortcutControls() {
   window.addEventListener("keydown", (event) => {
