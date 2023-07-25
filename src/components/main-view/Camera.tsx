@@ -1,7 +1,26 @@
+import { createEffect } from "solid-js";
+import { isPlaying, ontimeupdate, ontimeupdateEvent, startAt } from "../../stores";
+
 export function Camera(props: CameraProps) {
+
+  createEffect(() => {
+    const videoElement = document.getElementById(props.id) as HTMLVideoElement;
+
+    if (isPlaying()) {
+      videoElement.play();
+    } else {
+      videoElement.pause();
+    }
+  });
+
+  createEffect(() => {
+    const videoElement = document.getElementById(props.id) as HTMLVideoElement;
+
+    videoElement.currentTime = startAt();
+  });
+
   return (
     <a
-      id={props.id}
       class={[
         "m-auto",
         props.isActive
@@ -9,7 +28,12 @@ export function Camera(props: CameraProps) {
           : `${props.class} absolute z-10 w-32 h-24 rounded-lg overflow-hidden shadow cursor-pointer`,
       ].join(" ")}
       onClick={() => props.onClick()}
-    />
+    >
+      <video
+        id={props.id}
+        ontimeupdate={(event) => ontimeupdateEvent(event.target as HTMLVideoElement)}
+      />
+    </a>
   );
 }
 

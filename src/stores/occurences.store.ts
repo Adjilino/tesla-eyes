@@ -38,7 +38,7 @@ export const [selectedTimestampIndex, setSelectedTimestampIndex] = createSignal<
 
 let videos: TimestampVideo | null = null;
 
-const [startAt, setStartAt] = createSignal<number>(0);
+export const [startAt, setStartAt] = createSignal<number>(0);
 export const selectedVideos = createMemo<TimestampVideo | null>(() => {
   const _selectedTimestampIndex = selectedTimestampIndex();
   if (
@@ -79,24 +79,24 @@ createEffect(() => {
   }
 
   // Remove event listeners from previous video
-  if (videos) {
-    removeVideosEvents(videos);
-  }
+  // if (videos) {
+  //   removeVideosEvents(videos);
+  // }
 
   videos = _selectedVideos;
 
-  const _videoCameras = Object.values(_selectedVideos);
-  if (_videoCameras.length === 0) {
-    return;
-  }
+  // const _videoCameras = Object.values(_selectedVideos);
+  // if (_videoCameras.length === 0) {
+  //   return;
+  // }
 
-  for (const [i, element] of _videoCameras.entries()) {
-    // is first element
-    if (i === 0) {
-      element.onended = endVideoEvent;
-      element.ontimeupdate = ontimeupdate(element);
-    }
-  }
+  // for (const [i, element] of _videoCameras.entries()) {
+  //   // is first element
+  //   if (i === 0) {
+  //     element.onended = endVideoEvent;
+  //     element.ontimeupdate = ontimeupdate(element);
+  //   }
+  // }
 });
 
 createEffect(() => {
@@ -171,11 +171,11 @@ function setVideoPlaying(timestampVideo: TimestampVideo, isPlaying: boolean) {
   for (const videoElement of Object.values(timestampVideo)) {
     if (!videoElement) return;
 
-    if (isPlaying) {
-      videoElement.play();
-    } else {
-      videoElement.pause();
-    }
+    // if (isPlaying) {
+    //   videoElement.play();
+    // } else {
+    //   videoElement.pause();
+    // }
   }
 }
 
@@ -205,8 +205,12 @@ function endVideoEvent() {
   });
 }
 
-function ontimeupdate(element: HTMLVideoElement) {
+export function ontimeupdate(element: HTMLVideoElement) {
   return () => {
     setCurrentTime(videoKey + element.currentTime);
   };
+}
+
+export function ontimeupdateEvent(element: HTMLVideoElement) {
+  setCurrentTime(videoKey + element.currentTime);
 }

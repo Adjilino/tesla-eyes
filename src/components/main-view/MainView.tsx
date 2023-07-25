@@ -21,7 +21,7 @@ export function MainView() {
 
   const setVideo = (
     element: string,
-    video?: HTMLVideoElement,
+    videoSource?: HTMLSourceElement,
     isPLaying = true
   ) => {
     const positionElement = document.getElementById(element);
@@ -35,12 +35,12 @@ export function MainView() {
       positionElement.removeChild(positionElement.children[i]);
     }
 
-    if (!video) {
+    if (!videoSource) {
       return;
     }
 
-    positionElement?.appendChild(video);
-
+    positionElement?.appendChild(videoSource);
+/*
     if (video.error) {
       const divWarning = createWarning();
       positionElement?.appendChild(divWarning);
@@ -56,10 +56,7 @@ export function MainView() {
         positionElement?.appendChild(divWarning);
       };
     }
-
-    if (isPLaying) {
-      video.play();
-    }
+    */
   };
 
   const createWarning = () => {

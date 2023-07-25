@@ -167,10 +167,10 @@ export class OccurenceBuilder {
 
   private async getOccurenceTimestamp(): Promise<
     | {
-        duration: number;
-        videosStartAt: Date | undefined;
-        timestampVideo: Record<number, TimestampVideo>;
-      }
+      duration: number;
+      videosStartAt: Date | undefined;
+      timestampVideo: Record<number, TimestampVideo>;
+    }
     | undefined
   > {
     if (!this.files || this.files.length === 0) {
@@ -202,7 +202,8 @@ export class OccurenceBuilder {
     let currentDuration = 0;
 
     for (const file of videoFilesSorted) {
-      const videoElement = await this._createVideoElement(file);
+      const sourceElement = await this._createSourceElement(file);
+      const videoElement = await this._createVideoElement(sourceElement);
 
       let splittedPath: string[];
       if (file instanceof File) {
@@ -224,13 +225,18 @@ export class OccurenceBuilder {
         switch (foundPosition) {
           case "front":
             separatedShorts.timestampVideo[currentDuration].front =
-              videoElement;
+              sourceElement;
             break;
 
           case "back":
+            // TODO: back video can be missing
+            // make currentDuration calculation more robust
+            //
+            // Save the time and compare based in the file name
+
             currentDuration = separatedShorts.duration;
             separatedShorts.timestampVideo[currentDuration] = {
-              back: videoElement,
+              back: sourceElement,
             };
 
             separatedShorts.duration += videoElement.duration;
@@ -238,12 +244,12 @@ export class OccurenceBuilder {
 
           case "left_repeater":
             separatedShorts.timestampVideo[currentDuration].left_repeater =
-              videoElement;
+              sourceElement;
             break;
 
           case "right_repeater":
             separatedShorts.timestampVideo[currentDuration].right_repeater =
-              videoElement;
+              sourceElement;
             break;
 
           default:
@@ -254,9 +260,27 @@ export class OccurenceBuilder {
 
     return separatedShorts;
   }
+  private async _createSourceElement(
+    file: File | FileEntry
+  ): Promise<HTMLSourceElement> {
+    // let notFile = "";
+    // if (!(file instanceof File)) {
+    //   notFile = await normalize(file.path);
+    // }
+
+    const srcElement = document.createElement("source");
+
+    if (file instanceof File) {
+      srcElement.src = URL.createObjectURL(file);
+    } else {
+      srcElement.src = convertFileSrc(file.path, "asset");
+    }
+
+    return srcElement;
+  }
 
   private async _createVideoElement(
-    file: File | FileEntry
+    sourceElement: HTMLSourceElement
   ): Promise<HTMLVideoElement> {
     // let notFile = "";
     // if (!(file instanceof File)) {
@@ -276,11 +300,7 @@ export class OccurenceBuilder {
         reject(videoElement);
       };
 
-      if (file instanceof File) {
-        videoElement.src = URL.createObjectURL(file);
-      } else {
-        videoElement.src = convertFileSrc(file.path, "asset");
-      }
+      videoElement.appendChild(sourceElement);
     });
   }
 
