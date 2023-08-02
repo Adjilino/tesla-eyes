@@ -1,5 +1,6 @@
 import { createEffect, Accessor } from "solid-js";
 import {
+    endVideoEvent,
   isPlaying,
   ontimeupdateEvent,
   setIsPlaying,
@@ -7,6 +8,8 @@ import {
 } from "../../stores";
 
 export function Camera(props: CameraProps) {
+  let isEnded = false;
+
   createEffect(() => {
     const source = props.source();
 
@@ -19,6 +22,11 @@ export function Camera(props: CameraProps) {
     if (source) {
       videoElement.appendChild(source);
       videoElement.src = source.src;
+
+      if (isEnded) {
+        isEnded = false;
+        setIsPlaying(true);
+      }
     }
   });
 
@@ -54,6 +62,12 @@ export function Camera(props: CameraProps) {
     }
   };
 
+  const handleEnded = () => {
+    isEnded = true;
+
+    endVideoEvent();
+  };
+
   return (
     <a
       class={[
@@ -71,6 +85,7 @@ export function Camera(props: CameraProps) {
         }
         onPlay={handlePlay}
         onPause={handlePause}
+        onEnded={handleEnded}
       />
     </a>
   );

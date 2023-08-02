@@ -41,6 +41,7 @@ let videos: TimestampVideo | null = null;
 export const [startAt, setStartAt] = createSignal<number>(0);
 export const selectedVideos = createMemo<TimestampVideo | null>(() => {
   const _selectedTimestampIndex = selectedTimestampIndex();
+
   if (
     !_selectedTimestampIndex ||
     !Array.isArray(_selectedTimestampIndex) ||
@@ -102,10 +103,14 @@ createEffect(() => {
 createEffect(() => {
   const _startAt = startAt() || 0;
 
-  if (!videos) return;
+  if (!videos) {
+    return;
+  }
 
   const videoCameras = Object.values(videos);
-  if (videoCameras.length === 0) return;
+  if (videoCameras.length === 0) {
+    return;
+  }
 
   for (const element of videoCameras) {
     element.currentTime = _startAt;
@@ -127,9 +132,13 @@ export const [changeCurrentTime, setChangeCurrentTime] = createSignal<
 
 createEffect(() => {
   const _changeCurrentTime = changeCurrentTime();
-  if (_changeCurrentTime == null) return;
+  if (_changeCurrentTime == null) {
+    return;
+  }
 
-  if (!videosPerTime) return;
+  if (!videosPerTime) {
+    return;
+  }
 
   const { index, startAt } = getVideosPerTimeIndex(
     videosPerTime,
@@ -169,7 +178,9 @@ function getVideosPerTimeIndex(
 
 function setVideoPlaying(timestampVideo: TimestampVideo, isPlaying: boolean) {
   for (const videoElement of Object.values(timestampVideo)) {
-    if (!videoElement) return;
+    if (!videoElement) {
+      return;
+    }
 
     // if (isPlaying) {
     //   videoElement.play();
@@ -182,7 +193,9 @@ function setVideoPlaying(timestampVideo: TimestampVideo, isPlaying: boolean) {
 // Remove all event listeners from videos
 function removeVideosEvents(timestampVideo: TimestampVideo) {
   for (const videoElement of Object.values(timestampVideo)) {
-    if (!videoElement) return;
+    if (!videoElement) {
+      return;
+    }
     removeVideoEventListeners(videoElement);
   }
 }
@@ -197,9 +210,11 @@ function removeVideoEventListeners(videoElement: HTMLVideoElement) {
   videoElement.pause();
 }
 
-function endVideoEvent() {
+export function endVideoEvent() {
   setSelectedTimestampIndex((timestamp) => {
-    if (timestamp === null) return null;
+    if (timestamp === null) {
+      return null;
+    }
 
     return [(timestamp[0] += 1), 0];
   });
