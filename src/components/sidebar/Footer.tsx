@@ -31,7 +31,7 @@ function createFolderInput() {
 }
 
 async function createMultipleOccurence(files: FileList | FileEntry[] | null) {
-  if (!files) return;
+  if (!files) {return;}
 
   const multipleOccurrences = await new MultipleOccurenceBuilder()
     .addFileList(files)
@@ -67,6 +67,9 @@ export function SidebarFooter() {
     }
 
     const entries = await readDir(folder, { recursive: true });
+    
+    LoadingOccurrences.push(true);
+    setIsLoadingOccurrences(true);
 
     const files = getFiles(entries);
 
