@@ -51,14 +51,18 @@ export function Timeline() {
 
   const maxTime = createMemo(() => {
     const occurence = selectedOccurence();
-    if (!occurence) return 0;
+    if (!occurence) {
+      return 0;
+    }
 
     return occurence.duration || 0;
   });
 
   const occuredAt = createMemo(() => {
     const occurence = selectedOccurence();
-    if (!occurence) return 0;
+    if (!occurence) {
+      return 0;
+    }
 
     const playerStartPoint = occurence.playerStartPoint || 0;
 
@@ -81,7 +85,9 @@ export function Timeline() {
   const getPercent = (e: MouseEvent) => {
     const timelineElement = document.getElementById("timeline");
 
-    if (!timelineElement) return null;
+    if (!timelineElement) {
+      return null;
+    }
 
     const rect = timelineElement.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -92,11 +98,15 @@ export function Timeline() {
   };
 
   const onMouseMove = (e: MouseEvent) => {
-    if (!isMouseDown()) return;
+    if (!isMouseDown()) {
+      return;
+    }
 
     const percent = getPercent(e);
 
-    if (percent === null) return;
+    if (percent === null) {
+      return;
+    }
 
     setMouseDownTimeline(percent);
   };
@@ -107,18 +117,22 @@ export function Timeline() {
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("mouseup", onMouseUp);
 
-    window.addEventListener("dragover", onMouseMove)
-    window.addEventListener("dragend", onMouseUp)
+    window.addEventListener("dragover", onMouseMove);
+    window.addEventListener("dragend", onMouseUp);
 
     const percent = getPercent(e);
 
-    if (percent === null) return;
+    if (percent === null) {
+      return;
+    }
 
     setMouseDownTimeline(percent);
   };
 
   const onMouseUp = (e: MouseEvent) => {
-    if (!isMouseDown()) return;
+    if (!isMouseDown()) {
+      return;
+    }
 
     window.removeEventListener("mousemove", onMouseMove);
     window.removeEventListener("mouseup", onMouseUp);
@@ -128,23 +142,27 @@ export function Timeline() {
 
     const percent = getPercent(e);
 
-    if (percent === null) return;
+    if (percent === null) {
+      return;
+    }
 
     setChangeCurrentTime(percent * maxTime());
     setIsMouseDown(false);
   };
 
   const removeOccurence = async (occurence: Occurence | null) => {
-    if (!occurence || !occurence.directory || !window?.__TAURI__?.tauri) return;
-
-    console.log("Removing occurence", occurence.directory);
+    if (!occurence || !occurence.directory || !window["__TAURI__"]?.tauri) {
+      return;
+    }
 
     const confirmed = await confirm(
-      `Are you sure do you want to remove the occurence`,
+      `Are you sure do you want to remove the occurence "${occurence.directory}"?`,
       { title: "Delete Occurence", type: "warning" }
     );
 
-    if (!confirmed) return;
+    if (!confirmed) {
+      return;
+    }
 
     setIsPlaying(false);
     setOccurences((occurences) => {
@@ -219,7 +237,7 @@ export function Timeline() {
           /> 
         </div> */}
       </div>
-      <Show when={selectedOccurence()?.directory}>
+      <Show when={window["__TAURI__"] && selectedOccurence()?.directory}>
         <div class="flex">
           <Button onClick={() => removeOccurence(selectedOccurence())}>
             <i class={"mx-2 fa-solid fa-fw fa-trash"} />
