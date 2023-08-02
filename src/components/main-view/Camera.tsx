@@ -1,14 +1,37 @@
-import { createEffect } from "solid-js";
-import { isPlaying, ontimeupdate, ontimeupdateEvent, startAt } from "../../stores";
+import { createEffect, Accessor } from "solid-js";
+import {
+  isPlaying,
+  ontimeupdateEvent,
+  setIsPlaying,
+  startAt,
+} from "../../stores";
 
 export function Camera(props: CameraProps) {
-
   createEffect(() => {
+    const source = props.source();
+
     const videoElement = document.getElementById(props.id) as HTMLVideoElement;
 
-    if (isPlaying()) {
+    while (videoElement.lastChild) {
+      videoElement.lastChild.remove();
+    }
+
+    if (source) {
+      videoElement.appendChild(source);
+      videoElement.src = source.src;
+    }
+  });
+
+  createEffect(() => {
+    const _isPlaying = isPlaying();
+
+    const videoElement = document.getElementById(props.id) as HTMLVideoElement;
+
+    if (_isPlaying) {
+      videoElement.autoplay = true;
       videoElement.play();
     } else {
+      videoElement.autoplay = false;
       videoElement.pause();
     }
   });
@@ -18,6 +41,18 @@ export function Camera(props: CameraProps) {
 
     videoElement.currentTime = startAt();
   });
+
+  const handlePause = () => {
+    if (isPlaying()) {
+      setIsPlaying(false);
+    }
+  };
+
+  const handlePlay = () => {
+    if (!isPlaying()) {
+      setIsPlaying(true);
+    }
+  };
 
   return (
     <a
@@ -31,7 +66,11 @@ export function Camera(props: CameraProps) {
     >
       <video
         id={props.id}
-        ontimeupdate={(event) => ontimeupdateEvent(event.target as HTMLVideoElement)}
+        onTimeUpdate={(event) =>
+          ontimeupdateEvent(event.target as HTMLVideoElement)
+        }
+        onPlay={handlePlay}
+        onPause={handlePause}
       />
     </a>
   );
@@ -39,6 +78,7 @@ export function Camera(props: CameraProps) {
 
 interface CameraProps {
   id: string;
+  source: Accessor<HTMLSourceElement | undefined>;
   isActive: boolean;
   onClick: () => void;
   class: string;
