@@ -1,3 +1,5 @@
+import { FileEntry, readTextFile } from "@tauri-apps/api/fs";
+import { convertFileSrc } from "@tauri-apps/api/tauri";
 import { TimestampVideo } from "../interfaces";
 import {
   Config,
@@ -8,13 +10,13 @@ import {
 import { getBase64 } from "../utils";
 
 export class OccurenceBuilder {
-  files: File[] = [];
+  files: (File | FileEntry)[] = [];
 
   constructor() {
     return this;
   }
 
-  addFiles(files: File[]) {
+  addFiles(files: (File | FileEntry)[]) {
     // add files to the builder
     this.files = files;
 
@@ -28,6 +30,8 @@ export class OccurenceBuilder {
     }
 
     const occurence = new Occurence();
+
+    occurence.directory = this.getOccurenceDirectory();
 
     const occurenceDateTime = this.getOccurenceDateTime();
     occurence.setDateTime(occurenceDateTime);
@@ -50,15 +54,44 @@ export class OccurenceBuilder {
     return occurence;
   }
 
+  private getOccurenceDirectory(): string | undefined {
+    if (!this.files || this.files.length === 0) {
+      return;
+    }
+
+    let splittedPath: string[];
+
+    if (this.files[0] instanceof File) {
+      splittedPath = this.files[0].webkitRelativePath.split("/");
+    } else {
+      splittedPath = this.files[0].path.split("/");
+    }
+
+    if (splittedPath.length < 2) {
+      return;
+    }
+
+    splittedPath.pop();
+
+    const occurenceDirectory = splittedPath.join("/");
+
+    return occurenceDirectory;
+  }
+
   private getOccurenceDateTime(): Date | undefined {
     if (!this.files || this.files.length === 0) {
       return;
     }
 
     // retrieve occurence name from the first file
-    const splittedPath = this.files[0].webkitRelativePath
-      .replaceAll("\\", "/")
-      .split("/");
+    let splittedPath;
+    if (this.files[0] instanceof File) {
+      splittedPath = this.files[0].webkitRelativePath
+        .replaceAll("\\", "/")
+        .split("/");
+    } else {
+      splittedPath = this.files[0].path.replaceAll("\\", "/").split("/");
+    }
 
     if (splittedPath.length < 2) {
       return;
@@ -109,16 +142,21 @@ export class OccurenceBuilder {
     }
 
     const configFile = this.files.find((file) => {
-      return file.type === "application/json" && file.name === "event.json";
+      return file.name === "event.json";
     });
 
     if (!configFile) {
       return;
     }
 
-    const configArrayBuffer = await configFile.arrayBuffer();
+    let configString: string;
 
-    const configString = new TextDecoder("utf-8").decode(configArrayBuffer);
+    if (configFile instanceof File) {
+      const configArrayBuffer = await configFile.arrayBuffer();
+      configString = new TextDecoder("utf-8").decode(configArrayBuffer);
+    } else {
+      configString = await readTextFile(configFile.path);
+    }
 
     const configJson = JSON.parse(configString);
 
@@ -129,10 +167,10 @@ export class OccurenceBuilder {
 
   private async getOccurenceTimestamp(): Promise<
     | {
-        duration: number;
-        videosStartAt: Date | undefined;
-        timestampVideo: Record<number, TimestampVideo>;
-      }
+      duration: number;
+      videosStartAt: Date | undefined;
+      timestampVideo: Record<number, TimestampVideo>;
+    }
     | undefined
   > {
     if (!this.files || this.files.length === 0) {
@@ -140,7 +178,7 @@ export class OccurenceBuilder {
     }
 
     const videoFiles = this.files.filter((file) => {
-      return file.type.startsWith("video/");
+      return file.name && file.name.endsWith(".mp4");
     });
 
     if (!videoFiles || videoFiles.length === 0) {
@@ -148,23 +186,31 @@ export class OccurenceBuilder {
     }
 
     const videoFilesSorted = videoFiles.sort((a, b) => {
+      if (!a.name || !b.name) {
+        return 0;
+      }
+
       return a.name.localeCompare(b.name);
     });
 
     const separatedShorts = {
       duration: 0,
-      videosStartAt: this.folderNameToDateTime(videoFilesSorted[0].name),
+      videosStartAt: this.folderNameToDateTime(videoFilesSorted[0].name || ""),
       timestampVideo: {} as Record<number, TimestampVideo>,
     };
 
     let currentDuration = 0;
 
     for (const file of videoFilesSorted) {
-      const videoElement = await this._createVideoElement(file);
+      const sourceElement = await this._createSourceElement(file);
+      const videoElement = await this._createVideoElement(sourceElement);
 
-      const splittedPath = file.webkitRelativePath
-        .replaceAll("\\", "/")
-        .split("/");
+      let splittedPath: string[];
+      if (file instanceof File) {
+        splittedPath = file.webkitRelativePath.replaceAll("\\", "/").split("/");
+      } else {
+        splittedPath = file.path.replaceAll("\\", "/").split("/");
+      }
 
       // get file name
       const fileName = splittedPath[splittedPath.length - 1];
@@ -179,13 +225,18 @@ export class OccurenceBuilder {
         switch (foundPosition) {
           case "front":
             separatedShorts.timestampVideo[currentDuration].front =
-              videoElement;
+              sourceElement;
             break;
 
           case "back":
+            // TODO: back video can be missing
+            // make currentDuration calculation more robust
+            //
+            // Save the time and compare based in the file name
+
             currentDuration = separatedShorts.duration;
             separatedShorts.timestampVideo[currentDuration] = {
-              back: videoElement,
+              back: sourceElement,
             };
 
             separatedShorts.duration += videoElement.duration;
@@ -193,12 +244,12 @@ export class OccurenceBuilder {
 
           case "left_repeater":
             separatedShorts.timestampVideo[currentDuration].left_repeater =
-              videoElement;
+              sourceElement;
             break;
 
           case "right_repeater":
             separatedShorts.timestampVideo[currentDuration].right_repeater =
-              videoElement;
+              sourceElement;
             break;
 
           default:
@@ -209,14 +260,35 @@ export class OccurenceBuilder {
 
     return separatedShorts;
   }
+  private async _createSourceElement(
+    file: File | FileEntry
+  ): Promise<HTMLSourceElement> {
+    // let notFile = "";
+    // if (!(file instanceof File)) {
+    //   notFile = await normalize(file.path);
+    // }
 
-  private async _createVideoElement(file: File): Promise<HTMLVideoElement> {
+    const srcElement = document.createElement("source");
+
+    if (file instanceof File) {
+      srcElement.src = URL.createObjectURL(file);
+    } else {
+      srcElement.src = convertFileSrc(file.path, "asset");
+    }
+
+    return srcElement;
+  }
+
+  private async _createVideoElement(
+    sourceElement: HTMLSourceElement
+  ): Promise<HTMLVideoElement> {
+    // let notFile = "";
+    // if (!(file instanceof File)) {
+    //   notFile = await normalize(file.path);
+    // }
+
     return new Promise((resolve, reject) => {
       const videoElement = document.createElement("video");
-      const srcElement = document.createElement("source");
-      srcElement.src = URL.createObjectURL(file);
-      srcElement.type = file.type;
-      videoElement.appendChild(srcElement);
 
       videoElement.onloadedmetadata = () => {
         // videoElement.onerror = null;
@@ -227,6 +299,8 @@ export class OccurenceBuilder {
         console.error(`Error with the video ${file.name}`);
         reject(videoElement);
       };
+
+      videoElement.appendChild(sourceElement);
     });
   }
 
@@ -236,14 +310,20 @@ export class OccurenceBuilder {
     }
 
     const thumbnailFile = this.files.find((file) => {
-      return file.type.startsWith("image/");
+      return file.name && file.name.endsWith(".png");
     });
 
     if (!thumbnailFile) {
       return;
     }
 
-    const thumbnailString = await getBase64(thumbnailFile);
+    let thumbnailString;
+
+    if (thumbnailFile instanceof File) {
+      thumbnailString = await getBase64(thumbnailFile);
+    } else {
+      thumbnailString = convertFileSrc(thumbnailFile.path, "asset");
+    }
 
     if (!thumbnailString) {
       return;

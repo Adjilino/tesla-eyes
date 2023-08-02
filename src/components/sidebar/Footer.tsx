@@ -1,3 +1,5 @@
+import { open } from "@tauri-apps/api/dialog";
+import { FileEntry, readDir } from "@tauri-apps/api/fs";
 import { Show } from "solid-js";
 import { MultipleOccurenceBuilder } from "../../builders";
 import {
@@ -22,31 +24,70 @@ function createFolderInput() {
 
     const files = (event.target as HTMLInputElement).files;
 
-    if (!files) return;
-
-    const multipleOccurrences = await new MultipleOccurenceBuilder()
-      .addFileList(files)
-      .build();
-
-    if (multipleOccurrences) {
-      setOccurences((occurences) => [...occurences, ...multipleOccurrences]);
-    }
-
-    LoadingOccurrences.pop();
-
-    if (LoadingOccurrences.length === 0) {
-      setIsLoadingOccurrences(false);
-    }
+    createMultipleOccurence(files);
   });
 
   return input;
 }
 
+async function createMultipleOccurence(files: FileList | FileEntry[] | null) {
+  if (!files) {return;}
+
+  const multipleOccurrences = await new MultipleOccurenceBuilder()
+    .addFileList(files)
+    .build();
+
+  if (multipleOccurrences) {
+    setOccurences((occurences) => [...occurences, ...multipleOccurrences]);
+  }
+
+  LoadingOccurrences.pop();
+
+  if (LoadingOccurrences.length === 0) {
+    setIsLoadingOccurrences(false);
+  }
+}
+
 export function SidebarFooter() {
   const addFolderInput = createFolderInput();
 
-  function addFolder() {
-    addFolderInput.click();
+  async function addFolder() {
+    if (!window?.__TAURI__?.tauri) {
+      addFolderInput.click();
+      return;
+    }
+    let folder: string | string[] | null = null;
+
+    folder = await open({
+      directory: true,
+    });
+
+    if (!folder || Array.isArray(folder)) {
+      return;
+    }
+
+    const entries = await readDir(folder, { recursive: true });
+    
+    LoadingOccurrences.push(true);
+    setIsLoadingOccurrences(true);
+
+    const files = getFiles(entries);
+
+    createMultipleOccurence(files);
+  }
+
+  function getFiles(fileEntries: FileEntry[]): FileEntry[] {
+    let files: FileEntry[] = [];
+
+    for (const entry of fileEntries) {
+      if (!entry.children) {
+        files.push(entry);
+      } else {
+        files = [...files, ...getFiles(entry.children)];
+      }
+    }
+
+    return files;
   }
 
   return (

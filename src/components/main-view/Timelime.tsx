@@ -1,10 +1,15 @@
-import { createMemo, createSignal } from "solid-js";
+import { confirm } from "@tauri-apps/api/dialog";
+import { removeDir } from "@tauri-apps/api/fs";
+import { Show, createMemo, createSignal } from "solid-js";
+import { Occurence } from "../../models";
 import {
   currentTime,
   isPlaying,
   selectedOccurence,
   setChangeCurrentTime,
   setIsPlaying,
+  setOccurences,
+  setSelectedOccurence,
 } from "../../stores";
 import { Button } from "../../ui";
 import timelineStyles from "./Timelime.module.css";
@@ -46,14 +51,18 @@ export function Timeline() {
 
   const maxTime = createMemo(() => {
     const occurence = selectedOccurence();
-    if (!occurence) return 0;
+    if (!occurence) {
+      return 0;
+    }
 
     return occurence.duration || 0;
   });
 
   const occuredAt = createMemo(() => {
     const occurence = selectedOccurence();
-    if (!occurence) return 0;
+    if (!occurence) {
+      return 0;
+    }
 
     const playerStartPoint = occurence.playerStartPoint || 0;
 
@@ -76,7 +85,9 @@ export function Timeline() {
   const getPercent = (e: MouseEvent) => {
     const timelineElement = document.getElementById("timeline");
 
-    if (!timelineElement) return null;
+    if (!timelineElement) {
+      return null;
+    }
 
     const rect = timelineElement.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -87,11 +98,15 @@ export function Timeline() {
   };
 
   const onMouseMove = (e: MouseEvent) => {
-    if (!isMouseDown()) return;
+    if (!isMouseDown()) {
+      return;
+    }
 
     const percent = getPercent(e);
 
-    if (percent === null) return;
+    if (percent === null) {
+      return;
+    }
 
     setMouseDownTimeline(percent);
   };
@@ -102,31 +117,62 @@ export function Timeline() {
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("mouseup", onMouseUp);
 
-    window.addEventListener("dragover", onMouseMove)
-    window.addEventListener("dragend", onMouseUp)
+    window.addEventListener("dragover", onMouseMove);
+    window.addEventListener("dragend", onMouseUp);
 
     const percent = getPercent(e);
 
-    if (percent === null) return;
+    if (percent === null) {
+      return;
+    }
 
     setMouseDownTimeline(percent);
   };
 
   const onMouseUp = (e: MouseEvent) => {
-    if (!isMouseDown()) return;
+    if (!isMouseDown()) {
+      return;
+    }
 
     window.removeEventListener("mousemove", onMouseMove);
     window.removeEventListener("mouseup", onMouseUp);
 
-    window.removeEventListener("dragover", onMouseMove)
-    window.removeEventListener("dragend", onMouseUp)
+    window.removeEventListener("dragover", onMouseMove);
+    window.removeEventListener("dragend", onMouseUp);
 
     const percent = getPercent(e);
 
-    if (percent === null) return;
+    if (percent === null) {
+      return;
+    }
 
     setChangeCurrentTime(percent * maxTime());
     setIsMouseDown(false);
+  };
+
+  const removeOccurence = async (occurence: Occurence | null) => {
+    if (!occurence || !occurence.directory || !window["__TAURI__"]?.tauri) {
+      return;
+    }
+
+    const confirmed = await confirm(
+      `Are you sure do you want to remove the occurence "${occurence.directory}"?`,
+      { title: "Delete Occurence", type: "warning" }
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setIsPlaying(false);
+    setOccurences((occurences) => {
+      return occurences.filter((o) => o.directory !== occurence.directory);
+    });
+    setSelectedOccurence(null);
+
+    removeDir(occurence.directory, {
+      recursive: true,
+    });
   };
 
   return (
@@ -140,10 +186,7 @@ export function Timeline() {
           />
         </Button>
       </div>
-      <div
-        class="flex-grow overflow-hidden relative"
-        onMouseDown={onMouseDown}
-      >
+      <div class="flex-grow overflow-hidden relative" onMouseDown={onMouseDown}>
         <div
           id="timeline"
           class={`absolute ${timelineStyles.absoluteVerticalCenter} w-full h-1 bg-slate-400`}
@@ -153,7 +196,9 @@ export function Timeline() {
             absolute ${timelineStyles.absoluteVerticalCenter} w-3 h-3 bg-red-600 
             rounded-full transition-all duration-100
           `}
-          style={occuredAt() ? { left: `${(occuredAt() / maxTime()) * 100}%` } : {}}
+          style={
+            occuredAt() ? { left: `${(occuredAt() / maxTime()) * 100}%` } : {}
+          }
         />
         <div
           class={`absolute ${timelineStyles.absoluteVerticalCenter} w-full h-1 bg-slate-600 transition-all duration-100`}
@@ -192,6 +237,13 @@ export function Timeline() {
           /> 
         </div> */}
       </div>
+      <Show when={window["__TAURI__"] && selectedOccurence()?.directory}>
+        <div class="flex">
+          <Button onClick={() => removeOccurence(selectedOccurence())}>
+            <i class={"mx-2 fa-solid fa-fw fa-trash"} />
+          </Button>
+        </div>
+      </Show>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 {
-  "name": "vite-template-solid",
-  "version": "0.0.0",
+  "name": "tesla-eyes",
+  "version": "0.5.1",
   "description": "",
   "scripts": {
     "start": "vite",
@@ -9,10 +9,12 @@
     "build": "vite build",
     "serve": "vite preview",
     "eslint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "fix": "eslint --fix . --ext .js,.jsx,.ts,.tsx"
+    "fix": "eslint --fix . --ext .js,.jsx,.ts,.tsx",
+    "tauri": "tauri"
   },
   "license": "MIT",
   "devDependencies": {
+    "@tauri-apps/cli": "^1.4.0",
     "@typescript-eslint/eslint-plugin": "^5.49.0",
     "@typescript-eslint/parser": "^5.49.0",
     "autoprefixer": "^10.4.13",
@@ -26,6 +28,7 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.4.0",
+    "@tauri-apps/api": "^1.4.0",
     "solid-js": "^1.7.5"
   }
 }

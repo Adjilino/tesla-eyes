@@ -38,9 +38,10 @@ export const [selectedTimestampIndex, setSelectedTimestampIndex] = createSignal<
 
 let videos: TimestampVideo | null = null;
 
-const [startAt, setStartAt] = createSignal<number>(0);
+export const [startAt, setStartAt] = createSignal<number>(0);
 export const selectedVideos = createMemo<TimestampVideo | null>(() => {
   const _selectedTimestampIndex = selectedTimestampIndex();
+
   if (
     !_selectedTimestampIndex ||
     !Array.isArray(_selectedTimestampIndex) ||
@@ -79,33 +80,37 @@ createEffect(() => {
   }
 
   // Remove event listeners from previous video
-  if (videos) {
-    removeVideosEvents(videos);
-  }
+  // if (videos) {
+  //   removeVideosEvents(videos);
+  // }
 
   videos = _selectedVideos;
 
-  const _videoCameras = Object.values(_selectedVideos);
-  if (_videoCameras.length === 0) {
-    return;
-  }
+  // const _videoCameras = Object.values(_selectedVideos);
+  // if (_videoCameras.length === 0) {
+  //   return;
+  // }
 
-  for (const [i, element] of _videoCameras.entries()) {
-    // is first element
-    if (i === 0) {
-      element.onended = endVideoEvent;
-      element.ontimeupdate = ontimeupdate(element);
-    }
-  }
+  // for (const [i, element] of _videoCameras.entries()) {
+  //   // is first element
+  //   if (i === 0) {
+  //     element.onended = endVideoEvent;
+  //     element.ontimeupdate = ontimeupdate(element);
+  //   }
+  // }
 });
 
 createEffect(() => {
   const _startAt = startAt() || 0;
 
-  if (!videos) return;
+  if (!videos) {
+    return;
+  }
 
   const videoCameras = Object.values(videos);
-  if (videoCameras.length === 0) return;
+  if (videoCameras.length === 0) {
+    return;
+  }
 
   for (const element of videoCameras) {
     element.currentTime = _startAt;
@@ -127,9 +132,13 @@ export const [changeCurrentTime, setChangeCurrentTime] = createSignal<
 
 createEffect(() => {
   const _changeCurrentTime = changeCurrentTime();
-  if (_changeCurrentTime == null) return;
+  if (_changeCurrentTime == null) {
+    return;
+  }
 
-  if (!videosPerTime) return;
+  if (!videosPerTime) {
+    return;
+  }
 
   const { index, startAt } = getVideosPerTimeIndex(
     videosPerTime,
@@ -169,20 +178,24 @@ function getVideosPerTimeIndex(
 
 function setVideoPlaying(timestampVideo: TimestampVideo, isPlaying: boolean) {
   for (const videoElement of Object.values(timestampVideo)) {
-    if (!videoElement) return;
-
-    if (isPlaying) {
-      videoElement.play();
-    } else {
-      videoElement.pause();
+    if (!videoElement) {
+      return;
     }
+
+    // if (isPlaying) {
+    //   videoElement.play();
+    // } else {
+    //   videoElement.pause();
+    // }
   }
 }
 
 // Remove all event listeners from videos
 function removeVideosEvents(timestampVideo: TimestampVideo) {
   for (const videoElement of Object.values(timestampVideo)) {
-    if (!videoElement) return;
+    if (!videoElement) {
+      return;
+    }
     removeVideoEventListeners(videoElement);
   }
 }
@@ -197,16 +210,22 @@ function removeVideoEventListeners(videoElement: HTMLVideoElement) {
   videoElement.pause();
 }
 
-function endVideoEvent() {
+export function endVideoEvent() {
   setSelectedTimestampIndex((timestamp) => {
-    if (timestamp === null) return null;
+    if (timestamp === null) {
+      return null;
+    }
 
     return [(timestamp[0] += 1), 0];
   });
 }
 
-function ontimeupdate(element: HTMLVideoElement) {
+export function ontimeupdate(element: HTMLVideoElement) {
   return () => {
     setCurrentTime(videoKey + element.currentTime);
   };
+}
+
+export function ontimeupdateEvent(element: HTMLVideoElement) {
+  setCurrentTime(videoKey + element.currentTime);
 }
