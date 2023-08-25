@@ -3,6 +3,7 @@ import { OccurenceFiles } from "../../models/occurence-files";
 import {
   fileByOccurence,
   isSidebarOpen,
+  setIsPlaying,
   setIsSidebarOpen,
   setSelectedOccurence,
 } from "../../stores";
@@ -18,7 +19,7 @@ export function Sidebar(props: { class: string }) {
     return occurenceFiles.getConfig()?.getCity() || "";
   }
   async function onClickOccurence(occurenceFiles: OccurenceFiles) {
-    setSelectedOccurence(null);
+    setIsPlaying(false);
     setIsSidebarOpen(false);
 
     try {

@@ -44,21 +44,26 @@ async function createMultipleOccurence(files: FileList | FileEntry[] | null) {
 
     const files = separatedFilesByFolder[folder];
 
-    const occurenceFiles = await new OccurenceFilesBuilder()
-      .addFiles(files)
-      .build();
+    try {
+      const occurenceFiles = await new OccurenceFilesBuilder()
+        .addFiles(files)
+        .build();
 
-    if (!occurenceFiles) {
-      continue;
+      loadingOccurrences.pop();
+
+      if (!occurenceFiles) {
+        console.error(`Failed to create OccurenceFiles ${folder}`);
+        continue;
+      }
+
+      setFilesByOccurences((oF) => [...oF, occurenceFiles]);
+    } catch (error) {
+      console.error("Ops");
     }
+  }
 
-    setFilesByOccurences((oF) => [...oF, occurenceFiles]);
-
-    loadingOccurrences.pop();
-
-    if (loadingOccurrences.length === 0) {
-      setIsLoadingOccurrences(false);
-    }
+  if (loadingOccurrences.length === 0) {
+    setIsLoadingOccurrences(false);
   }
 }
 
@@ -79,14 +84,14 @@ export function SidebarFooter() {
     if (!folder || Array.isArray(folder)) {
       return;
     }
-
-    const entries = await readDir(folder, { recursive: true });
-
     loadingOccurrences.push(true);
     setIsLoadingOccurrences(true);
 
+    const entries = await readDir(folder, { recursive: true });
+
     const files = getFiles(entries);
 
+    loadingOccurrences.pop();
     createMultipleOccurence(files);
   }
 

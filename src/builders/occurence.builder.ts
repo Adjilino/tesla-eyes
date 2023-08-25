@@ -289,7 +289,7 @@ export class OccurenceBuilder {
         }
       }
     }
-    console.log(separatedShorts);
+
     return separatedShorts;
   }
   private async _createSourceElement(
