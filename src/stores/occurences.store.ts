@@ -7,14 +7,6 @@ export const [fileByOccurence, setFilesByOccurences] = createSignal<
   Array<OccurenceFiles>
 >([]);
 
-createEffect(() => {
-  const _fileByOccurence = fileByOccurence();
-
-  console.log("fileByOccurence", _fileByOccurence);
-});
-
-export const [occurences, setOccurences] = createSignal<Occurence[]>([]);
-
 export const [selectedOccurence, setSelectedOccurence] =
   createSignal<Occurence | null>(null);
 

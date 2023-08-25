@@ -2,16 +2,15 @@ import { open } from "@tauri-apps/api/dialog";
 import { FileEntry, readDir } from "@tauri-apps/api/fs";
 import { Show } from "solid-js";
 import { MultipleOccurenceBuilder } from "../../builders";
+import { OccurenceFilesBuilder } from "../../builders/occurence-files.builders";
 import {
   isLoadingOccurrences,
   setFilesByOccurences,
   setIsLoadingOccurrences,
-  setOccurences,
 } from "../../stores";
 import { Button } from "../../ui";
-import { OccurenceFilesBuilder } from "../../builders/occurence-files.builders";
 
-const LoadingOccurrences: boolean[] = [];
+const loadingOccurrences: boolean[] = [];
 
 function createFolderInput() {
   const input = document.createElement("input");
@@ -41,7 +40,7 @@ async function createMultipleOccurence(files: FileList | FileEntry[] | null) {
     .separateFilesByFolders();
 
   for (const folder in separatedFilesByFolder) {
-    LoadingOccurrences.push(true);
+    loadingOccurrences.push(true);
 
     const files = separatedFilesByFolder[folder];
 
@@ -53,22 +52,14 @@ async function createMultipleOccurence(files: FileList | FileEntry[] | null) {
       continue;
     }
 
-    setFilesByOccurences((a) => [...a, occurenceFiles]);
+    setFilesByOccurences((oF) => [...oF, occurenceFiles]);
 
-    LoadingOccurrences.pop();
+    loadingOccurrences.pop();
 
-    if (LoadingOccurrences.length === 0) {
+    if (loadingOccurrences.length === 0) {
       setIsLoadingOccurrences(false);
     }
   }
-
-  // const multipleOccurrences = await new MultipleOccurenceBuilder()
-  //   .addFileList(files)
-  //   .build();
-
-  // if (multipleOccurrences) {
-  //   setOccurences((occurences) => [...occurences, ...multipleOccurrences]);
-  // }
 }
 
 export function SidebarFooter() {
@@ -91,7 +82,7 @@ export function SidebarFooter() {
 
     const entries = await readDir(folder, { recursive: true });
 
-    LoadingOccurrences.push(true);
+    loadingOccurrences.push(true);
     setIsLoadingOccurrences(true);
 
     const files = getFiles(entries);
