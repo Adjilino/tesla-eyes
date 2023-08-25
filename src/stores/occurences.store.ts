@@ -1,6 +1,17 @@
 import { createEffect, createMemo, createSignal } from "solid-js";
 import { TimestampVideo } from "../interfaces";
 import { Occurence } from "../models";
+import { OccurenceFiles } from "../models/occurence-files";
+
+export const [fileByOccurence, setFilesByOccurences] = createSignal<
+  Array<OccurenceFiles>
+>([]);
+
+createEffect(() => {
+  const _fileByOccurence = fileByOccurence();
+
+  console.log("fileByOccurence", _fileByOccurence);
+});
 
 export const [occurences, setOccurences] = createSignal<Occurence[]>([]);
 

@@ -4,10 +4,12 @@ import { Show } from "solid-js";
 import { MultipleOccurenceBuilder } from "../../builders";
 import {
   isLoadingOccurrences,
+  setFilesByOccurences,
   setIsLoadingOccurrences,
   setOccurences,
 } from "../../stores";
 import { Button } from "../../ui";
+import { OccurenceFilesBuilder } from "../../builders/occurence-files.builders";
 
 const LoadingOccurrences: boolean[] = [];
 
@@ -19,7 +21,6 @@ function createFolderInput() {
   input.webkitdirectory = true;
 
   input.addEventListener("change", async (event) => {
-    LoadingOccurrences.push(true);
     setIsLoadingOccurrences(true);
 
     const files = (event.target as HTMLInputElement).files;
@@ -31,21 +32,43 @@ function createFolderInput() {
 }
 
 async function createMultipleOccurence(files: FileList | FileEntry[] | null) {
-  if (!files) {return;}
+  if (!files) {
+    return;
+  }
 
-  const multipleOccurrences = await new MultipleOccurenceBuilder()
+  const separatedFilesByFolder = new MultipleOccurenceBuilder()
     .addFileList(files)
-    .build();
+    .separateFilesByFolders();
 
-  if (multipleOccurrences) {
-    setOccurences((occurences) => [...occurences, ...multipleOccurrences]);
+  for (const folder in separatedFilesByFolder) {
+    LoadingOccurrences.push(true);
+
+    const files = separatedFilesByFolder[folder];
+
+    const occurenceFiles = await new OccurenceFilesBuilder()
+      .addFiles(files)
+      .build();
+
+    if (!occurenceFiles) {
+      continue;
+    }
+
+    setFilesByOccurences((a) => [...a, occurenceFiles]);
+
+    LoadingOccurrences.pop();
+
+    if (LoadingOccurrences.length === 0) {
+      setIsLoadingOccurrences(false);
+    }
   }
 
-  LoadingOccurrences.pop();
+  // const multipleOccurrences = await new MultipleOccurenceBuilder()
+  //   .addFileList(files)
+  //   .build();
 
-  if (LoadingOccurrences.length === 0) {
-    setIsLoadingOccurrences(false);
-  }
+  // if (multipleOccurrences) {
+  //   setOccurences((occurences) => [...occurences, ...multipleOccurrences]);
+  // }
 }
 
 export function SidebarFooter() {
@@ -67,7 +90,7 @@ export function SidebarFooter() {
     }
 
     const entries = await readDir(folder, { recursive: true });
-    
+
     LoadingOccurrences.push(true);
     setIsLoadingOccurrences(true);
 

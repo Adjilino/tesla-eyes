@@ -1,8 +1,8 @@
 import { For, Show } from "solid-js";
-import { Occurence } from "../../models";
+import { OccurenceFiles } from "../../models/occurence-files";
 import {
+  fileByOccurence,
   isSidebarOpen,
-  occurences,
   setIsSidebarOpen,
   setSelectedOccurence,
 } from "../../stores";
@@ -11,18 +11,38 @@ import SidebarHeader from "./Header";
 import styles from "./Sidebar.module.css";
 
 export function Sidebar(props: { class: string }) {
-  function getOccurrenceDateTime(occurence: Occurence) {
+  function _getOccurrenceDateTime(occurence: OccurenceFiles) {
     return occurence.getConfig()?.getDateTime()?.toLocaleString() || "";
   }
-
-  function getOccurrenceLocation(occurence: Occurence) {
+  function _getOccurrenceLocation(occurence: OccurenceFiles) {
     return occurence.getConfig()?.getCity() || "";
   }
+  async function _onClickOccurence(occurence: OccurenceFiles) {
+    setSelectedOccurence(null);
 
-  function onClickOccurence(occurence: Occurence) {
-    setSelectedOccurence(occurence);
+    const o = await occurence.toOccurence();
+
+    if (!o) {
+      console.error("Failed to convert OccurenceFiles to Occurence");
+      return;
+    }
+    
+    setSelectedOccurence(o);
     setIsSidebarOpen(false);
   }
+
+  // function getOccurrenceDateTime(occurence: Occurence) {
+  //   return occurence.getConfig()?.getDateTime()?.toLocaleString() || "";
+  // }
+
+  // function getOccurrenceLocation(occurence: Occurence) {
+  //   return occurence.getConfig()?.getCity() || "";
+  // }
+
+  // function onClickOccurence(occurence: Occurence) {
+  //   setSelectedOccurence(occurence);
+  //   setIsSidebarOpen(false);
+  // }
 
   return (
     <div
@@ -48,7 +68,7 @@ export function Sidebar(props: { class: string }) {
           styles.sidebarWidth
         }
       >
-        <For each={occurences()}>
+        <For each={fileByOccurence()}>
           {(occurence) => (
             <a
               class={[
@@ -59,18 +79,16 @@ export function Sidebar(props: { class: string }) {
                 "flex gap-2 rounded-md shadow-md p-2 w-full h-24",
                 "cursor-pointer",
               ].join(" ")}
-              onClick={() => onClickOccurence(occurence)}
+              onClick={() => _onClickOccurence(occurence)}
             >
               <Show
                 when={occurence.getThumbnail()}
                 fallback={
                   <div
-                    class={
-                      [
-                        "flex items-center justify-center text-ellipsis italic",
-                        styles.thumbnail
-                      ].join(" ")
-                    }
+                    class={[
+                      "flex items-center justify-center text-ellipsis italic",
+                      styles.thumbnail,
+                    ].join(" ")}
                   >
                     <i class="fa-solid fa-image" />
                   </div>
@@ -93,7 +111,7 @@ export function Sidebar(props: { class: string }) {
                     "font-bold",
                   ].join(" ")}
                 >
-                  {getOccurrenceLocation(occurence) || "Unknown location"}
+                  {_getOccurrenceLocation(occurence) || "Unknown location"}
                 </span>
                 <span
                   class={[
@@ -101,7 +119,7 @@ export function Sidebar(props: { class: string }) {
                     "overflow-hidden whitespace-nowrap text-ellipsis",
                   ].join(" ")}
                 >
-                  {getOccurrenceDateTime(occurence) || "Unknown date"}
+                  {_getOccurrenceDateTime(occurence) || "Unknown date"}
                 </span>
               </div>
             </a>
