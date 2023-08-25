@@ -167,10 +167,10 @@ export class OccurenceBuilder {
 
   private async getOccurenceTimestamp(): Promise<
     | {
-      duration: number;
-      videosStartAt: Date | undefined;
-      timestampVideo: Record<number, TimestampVideo>;
-    }
+        duration: number;
+        videosStartAt: Date | undefined;
+        timestampVideo: Record<number, TimestampVideo>;
+      }
     | undefined
   > {
     if (!this.files || this.files.length === 0) {
@@ -222,34 +222,66 @@ export class OccurenceBuilder {
       );
 
       if (foundPosition) {
+        if (!separatedShorts.timestampVideo[currentDuration]) {
+          separatedShorts.timestampVideo[currentDuration] = {};
+          separatedShorts.duration += videoElement.duration;
+        }
+
         switch (foundPosition) {
           case "front":
-            separatedShorts.timestampVideo[currentDuration].front =
-              sourceElement;
+            if (!separatedShorts.timestampVideo[currentDuration].front) {
+              separatedShorts.timestampVideo[currentDuration].front =
+                sourceElement;
+            } else {
+              currentDuration = separatedShorts.duration;
+              separatedShorts.timestampVideo[currentDuration] = {
+                front: sourceElement,
+              };
+              separatedShorts.duration += videoElement.duration;
+            }
             break;
 
           case "back":
-            // TODO: back video can be missing
-            // make currentDuration calculation more robust
-            //
-            // Save the time and compare based in the file name
-
-            currentDuration = separatedShorts.duration;
-            separatedShorts.timestampVideo[currentDuration] = {
-              back: sourceElement,
-            };
-
-            separatedShorts.duration += videoElement.duration;
+            if (!separatedShorts.timestampVideo[currentDuration].back) {
+              separatedShorts.timestampVideo[currentDuration].back =
+                sourceElement;
+            } else {
+              currentDuration = separatedShorts.duration;
+              separatedShorts.timestampVideo[currentDuration] = {
+                back: sourceElement,
+              };
+              separatedShorts.duration += videoElement.duration;
+            }
             break;
 
           case "left_repeater":
-            separatedShorts.timestampVideo[currentDuration].left_repeater =
-              sourceElement;
+            if (
+              !separatedShorts.timestampVideo[currentDuration].left_repeater
+            ) {
+              separatedShorts.timestampVideo[currentDuration].left_repeater =
+                sourceElement;
+            } else {
+              currentDuration = separatedShorts.duration;
+              separatedShorts.timestampVideo[currentDuration] = {
+                left_repeater: sourceElement,
+              };
+              separatedShorts.duration += videoElement.duration;
+            }
             break;
 
           case "right_repeater":
-            separatedShorts.timestampVideo[currentDuration].right_repeater =
-              sourceElement;
+            if (
+              !separatedShorts.timestampVideo[currentDuration].right_repeater
+            ) {
+              separatedShorts.timestampVideo[currentDuration].right_repeater =
+                sourceElement;
+            } else {
+              currentDuration = separatedShorts.duration;
+              separatedShorts.timestampVideo[currentDuration] = {
+                right_repeater: sourceElement,
+              };
+              separatedShorts.duration += videoElement.duration;
+            }
             break;
 
           default:
@@ -257,7 +289,7 @@ export class OccurenceBuilder {
         }
       }
     }
-
+    console.log(separatedShorts);
     return separatedShorts;
   }
   private async _createSourceElement(
@@ -295,8 +327,8 @@ export class OccurenceBuilder {
         resolve(videoElement);
       };
 
-      videoElement.onerror = () => {
-        console.error(`Error with the video ${file.name}`);
+      videoElement.onerror = (e) => {
+        console.error(`Error with the video ${sourceElement.src}`, e);
         reject(videoElement);
       };
 
