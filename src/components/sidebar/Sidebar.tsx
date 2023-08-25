@@ -1,8 +1,9 @@
 import { For, Show } from "solid-js";
-import { Occurence } from "../../models";
+import { OccurenceFiles } from "../../models/occurence-files";
 import {
+  fileByOccurence,
   isSidebarOpen,
-  occurences,
+  setIsPlaying,
   setIsSidebarOpen,
   setSelectedOccurence,
 } from "../../stores";
@@ -11,17 +12,29 @@ import SidebarHeader from "./Header";
 import styles from "./Sidebar.module.css";
 
 export function Sidebar(props: { class: string }) {
-  function getOccurrenceDateTime(occurence: Occurence) {
-    return occurence.getConfig()?.getDateTime()?.toLocaleString() || "";
+  function getOccurrenceDateTime(occurenceFiles: OccurenceFiles) {
+    return occurenceFiles.getConfig()?.getDateTime()?.toLocaleString() || "";
   }
-
-  function getOccurrenceLocation(occurence: Occurence) {
-    return occurence.getConfig()?.getCity() || "";
+  function getOccurrenceLocation(occurenceFiles: OccurenceFiles) {
+    return occurenceFiles.getConfig()?.getCity() || "";
   }
-
-  function onClickOccurence(occurence: Occurence) {
-    setSelectedOccurence(occurence);
+  async function onClickOccurence(occurenceFiles: OccurenceFiles) {
+    setIsPlaying(false);
     setIsSidebarOpen(false);
+
+    try {
+      const occurence = await occurenceFiles.toOccurence();
+
+      if (!occurence) {
+        console.error("Failed to convert OccurenceFiles to Occurence");
+        return;
+      }
+
+      setSelectedOccurence(occurence);
+    } catch (error) {
+      console.error(error);
+      return;
+    }
   }
 
   return (
@@ -48,7 +61,7 @@ export function Sidebar(props: { class: string }) {
           styles.sidebarWidth
         }
       >
-        <For each={occurences()}>
+        <For each={fileByOccurence()}>
           {(occurence) => (
             <a
               class={[
@@ -65,12 +78,10 @@ export function Sidebar(props: { class: string }) {
                 when={occurence.getThumbnail()}
                 fallback={
                   <div
-                    class={
-                      [
-                        "flex items-center justify-center text-ellipsis italic",
-                        styles.thumbnail
-                      ].join(" ")
-                    }
+                    class={[
+                      "flex items-center justify-center text-ellipsis italic",
+                      styles.thumbnail,
+                    ].join(" ")}
                   >
                     <i class="fa-solid fa-image" />
                   </div>

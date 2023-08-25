@@ -2,14 +2,15 @@ import { open } from "@tauri-apps/api/dialog";
 import { FileEntry, readDir } from "@tauri-apps/api/fs";
 import { Show } from "solid-js";
 import { MultipleOccurenceBuilder } from "../../builders";
+import { OccurenceFilesBuilder } from "../../builders/occurence-files.builders";
 import {
   isLoadingOccurrences,
+  setFilesByOccurences,
   setIsLoadingOccurrences,
-  setOccurences,
 } from "../../stores";
 import { Button } from "../../ui";
 
-const LoadingOccurrences: boolean[] = [];
+const loadingOccurrences: boolean[] = [];
 
 function createFolderInput() {
   const input = document.createElement("input");
@@ -19,7 +20,6 @@ function createFolderInput() {
   input.webkitdirectory = true;
 
   input.addEventListener("change", async (event) => {
-    LoadingOccurrences.push(true);
     setIsLoadingOccurrences(true);
 
     const files = (event.target as HTMLInputElement).files;
@@ -31,19 +31,38 @@ function createFolderInput() {
 }
 
 async function createMultipleOccurence(files: FileList | FileEntry[] | null) {
-  if (!files) {return;}
-
-  const multipleOccurrences = await new MultipleOccurenceBuilder()
-    .addFileList(files)
-    .build();
-
-  if (multipleOccurrences) {
-    setOccurences((occurences) => [...occurences, ...multipleOccurrences]);
+  if (!files) {
+    return;
   }
 
-  LoadingOccurrences.pop();
+  const separatedFilesByFolder = new MultipleOccurenceBuilder()
+    .addFileList(files)
+    .separateFilesByFolders();
 
-  if (LoadingOccurrences.length === 0) {
+  for (const folder in separatedFilesByFolder) {
+    loadingOccurrences.push(true);
+
+    const files = separatedFilesByFolder[folder];
+
+    try {
+      const occurenceFiles = await new OccurenceFilesBuilder()
+        .addFiles(files)
+        .build();
+
+      loadingOccurrences.pop();
+
+      if (!occurenceFiles) {
+        console.error(`Failed to create OccurenceFiles ${folder}`);
+        continue;
+      }
+
+      setFilesByOccurences((oF) => [...oF, occurenceFiles]);
+    } catch (error) {
+      console.error("Ops");
+    }
+  }
+
+  if (loadingOccurrences.length === 0) {
     setIsLoadingOccurrences(false);
   }
 }
@@ -65,14 +84,14 @@ export function SidebarFooter() {
     if (!folder || Array.isArray(folder)) {
       return;
     }
+    loadingOccurrences.push(true);
+    setIsLoadingOccurrences(true);
 
     const entries = await readDir(folder, { recursive: true });
-    
-    LoadingOccurrences.push(true);
-    setIsLoadingOccurrences(true);
 
     const files = getFiles(entries);
 
+    loadingOccurrences.pop();
     createMultipleOccurence(files);
   }
 

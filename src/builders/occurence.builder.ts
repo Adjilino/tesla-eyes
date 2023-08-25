@@ -136,7 +136,7 @@ export class OccurenceBuilder {
     return this.stringToDateTime(dateString);
   }
 
-  private async getOccurenceConfig(): Promise<Config | undefined> {
+  async getOccurenceConfig(): Promise<Config | undefined> {
     if (!this.files || this.files.length === 0) {
       return;
     }
@@ -289,7 +289,7 @@ export class OccurenceBuilder {
         }
       }
     }
-    console.log(separatedShorts);
+
     return separatedShorts;
   }
   private async _createSourceElement(
@@ -336,7 +336,7 @@ export class OccurenceBuilder {
     });
   }
 
-  private async getOccurenceThumbnail(): Promise<string | undefined> {
+  async getOccurenceThumbnail(): Promise<string | undefined> {
     if (!this.files || this.files.length === 0) {
       return;
     }

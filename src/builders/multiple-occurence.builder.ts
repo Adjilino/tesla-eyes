@@ -28,7 +28,7 @@ export class MultipleOccurenceBuilder {
       return;
     }
 
-    const filesByFolder = this._separateFilesByFolders();
+    const filesByFolder = this.separateFilesByFolders();
 
     if (!filesByFolder) {
       return;
@@ -41,9 +41,7 @@ export class MultipleOccurenceBuilder {
     return occurences;
   }
 
-  private _separateFilesByFolders():
-    | Record<string, (File | FileEntry)[]>
-    | undefined {
+  separateFilesByFolders(): Record<string, (File | FileEntry)[]> | undefined {
     if (!this.files || this.files.length === 0) {
       return;
     }
@@ -54,6 +52,7 @@ export class MultipleOccurenceBuilder {
     for (let i = 0; i < this.files.length; i++) {
       const file: File | FileEntry = this.files[i];
       let folder: string[] = [];
+
       if (file instanceof File) {
         folder = file.webkitRelativePath.replaceAll("\\", "/").split("/");
       } else {

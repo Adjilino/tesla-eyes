@@ -8,8 +8,7 @@ import {
   selectedOccurence,
   setChangeCurrentTime,
   setIsPlaying,
-  setOccurences,
-  setSelectedOccurence,
+  setSelectedOccurence
 } from "../../stores";
 import { Button } from "../../ui";
 import timelineStyles from "./Timelime.module.css";
@@ -165,9 +164,6 @@ export function Timeline() {
     }
 
     setIsPlaying(false);
-    setOccurences((occurences) => {
-      return occurences.filter((o) => o.directory !== occurence.directory);
-    });
     setSelectedOccurence(null);
 
     removeDir(occurence.directory, {
