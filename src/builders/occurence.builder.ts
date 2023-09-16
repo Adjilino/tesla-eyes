@@ -3,7 +3,7 @@ import { convertFileSrc } from "@tauri-apps/api/tauri";
 import { TimestampVideo } from "../interfaces";
 import {
   Config,
-  Occurence,
+  Occurrence,
   PlayerStartPoint,
   VideosByCameraPosition,
 } from "../models";
@@ -23,33 +23,44 @@ export class OccurenceBuilder {
     return this;
   }
 
-  async build(): Promise<Occurence | undefined> {
+  async build(): Promise<Occurrence | undefined> {
     // build the files
     if (!this.files || this.files.length === 0) {
       return;
     }
 
-    const occurence = new Occurence();
+    const occurence = new Occurrence();
 
     occurence.directory = this.getOccurenceDirectory();
+    console.log("occurrence directory", occurence.directory);
 
     const occurenceDateTime = this.getOccurenceDateTime();
     occurence.setDateTime(occurenceDateTime);
+    console.log("occurrence date time", occurenceDateTime);
 
     const config = await this.getOccurenceConfig();
     occurence.setConfig(config);
+    console.log("occurrence config", config);
 
     const thumbnail = await this.getOccurenceThumbnail();
     occurence.setThumbnail(thumbnail);
+    console.log("occurrence thumbnail", thumbnail);
 
     const timestamp = await this.getOccurenceTimestamp();
+    console.log("occurrence timestamp", timestamp);
+    if (!timestamp) {
+      return;
+    }
+
     occurence.videosPerTime = timestamp?.timestampVideo || {};
     occurence.videosStartAt = timestamp?.videosStartAt || new Date();
     occurence.duration = timestamp?.duration || 0;
 
+
     // get the player config
     const playerStartPoint = await this.getPlayerStartPoint(occurence);
     occurence.playerStartPoint = playerStartPoint;
+    console.log("occurrence player start point", playerStartPoint);
 
     return occurence;
   }
@@ -365,7 +376,7 @@ export class OccurenceBuilder {
   }
 
   private async getPlayerStartPoint(
-    occurence: Occurence
+    occurence: Occurrence
   ): Promise<PlayerStartPoint> {
     const playerStartPoint = new PlayerStartPoint();
 

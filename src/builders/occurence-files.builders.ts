@@ -1,5 +1,5 @@
 import { FileEntry } from "@tauri-apps/api/fs";
-import { OccurenceFiles } from "../models/occurence-files";
+import { OccurrenceFiles } from "../models/occurence-files";
 import { OccurenceBuilder } from "./occurence.builder";
 
 export class OccurenceFilesBuilder {
@@ -16,13 +16,17 @@ export class OccurenceFilesBuilder {
     return this;
   }
 
-  async build(): Promise<OccurenceFiles | undefined> {
+  async build(): Promise<OccurrenceFiles | undefined> {
     // build the files
     if (!this.files || this.files.length === 0) {
       return undefined;
     }
 
-    const occurenceFiles = new OccurenceFiles();
+    if (!this.files.find(file => file.name?.endsWith(".mp4"))) {
+      return undefined;
+    }
+
+    const occurenceFiles = new OccurrenceFiles();
 
     occurenceFiles.setFiles(this.files);
 

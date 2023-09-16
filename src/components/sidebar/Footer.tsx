@@ -5,7 +5,7 @@ import { MultipleOccurenceBuilder } from "../../builders";
 import { OccurenceFilesBuilder } from "../../builders/occurence-files.builders";
 import {
   isLoadingOccurrences,
-  setFilesByOccurences,
+  setFilesByOccurrences,
   setIsLoadingOccurrences,
 } from "../../stores";
 import { Button } from "../../ui";
@@ -48,7 +48,7 @@ async function createMultipleOccurence(files: FileList | FileEntry[] | null) {
       const occurenceFiles = await new OccurenceFilesBuilder()
         .addFiles(files)
         .build();
-
+      console.log('OccurrenceFiles',occurenceFiles);
       loadingOccurrences.pop();
 
       if (!occurenceFiles) {
@@ -56,7 +56,7 @@ async function createMultipleOccurence(files: FileList | FileEntry[] | null) {
         continue;
       }
 
-      setFilesByOccurences((oF) => [...oF, occurenceFiles]);
+      setFilesByOccurrences((oF) => [...oF, occurenceFiles]);
     } catch (error) {
       console.error("Ops");
     }

@@ -1,9 +1,9 @@
 import { FileEntry } from "@tauri-apps/api/fs";
 import { OccurenceBuilder } from "../builders/occurence.builder";
 import { Config } from "./config";
-import { Occurence } from "./occurence";
+import { Occurrence } from "./occurence";
 
-export class OccurenceFiles {
+export class OccurrenceFiles {
   files: Array<File | FileEntry> = [];
   config?: Config = undefined;
   thumbnail?: string | undefined = undefined;
@@ -29,7 +29,7 @@ export class OccurenceFiles {
     return this.files;
   }
 
-  toOccurence(): Promise<Occurence | undefined> {
+  toOccurrence(): Promise<Occurrence | undefined> {
     return new OccurenceBuilder().addFiles(this.files).build();
   }
 }
