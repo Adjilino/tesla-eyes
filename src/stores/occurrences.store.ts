@@ -78,8 +78,6 @@ export const [selectedTimestampIndex, setSelectedTimestampIndex] = createSignal<
     number[] | null
 >(null);
 
-let videos: TimestampVideo | null = null;
-
 export const [startAt, setStartAt] = createSignal<number>(0);
 export const selectedVideos = createMemo<TimestampVideo | null>(() => {
     const _selectedTimestampIndex = selectedTimestampIndex();
@@ -111,34 +109,6 @@ export const selectedVideos = createMemo<TimestampVideo | null>(() => {
     return _videosPerTime[videoKey];
 });
 
-// On select timestamp video
-createEffect(() => {
-    // Verify if selected timestamp video is not null
-    const _selectedVideos = selectedVideos();
-    if (!_selectedVideos) {
-        return;
-    }
-
-    videos = _selectedVideos;
-});
-
-createEffect(() => {
-    const _startAt = startAt() || 0;
-
-    if (!videos) {
-        return;
-    }
-
-    const videoCameras = Object.values(videos);
-    if (videoCameras.length === 0) {
-        return;
-    }
-
-    for (const element of videoCameras) {
-        element.currentTime = _startAt;
-    }
-});
-
 export const [changeCurrentTime, setChangeCurrentTime] = createSignal<
     number | null
 >(null);
@@ -159,8 +129,6 @@ createEffect(() => {
     );
 
     setSelectedTimestampIndex([index, startAt]);
-    // Prevent unnexpected run if selected occurence is changed
-    // setChangeCurrentTime(null);
 });
 
 function getVideosPerTimeIndex(

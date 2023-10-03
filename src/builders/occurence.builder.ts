@@ -56,7 +56,6 @@ export class OccurenceBuilder {
     occurence.videosStartAt = timestamp?.videosStartAt || new Date();
     occurence.duration = timestamp?.duration || 0;
 
-
     // get the player config
     const playerStartPoint = await this.getPlayerStartPoint(occurence);
     occurence.playerStartPoint = playerStartPoint;
@@ -213,8 +212,8 @@ export class OccurenceBuilder {
     let currentDuration = 0;
 
     for (const file of videoFilesSorted) {
-      const sourceElement = await this._createSourceElement(file);
-      const videoElement = await this._createVideoElement(sourceElement);
+      const sourceString = await this._createSourceString(file);
+      const videoElement = await this._createVideoElement(sourceString);
 
       let splittedPath: string[];
       if (file instanceof File) {
@@ -242,11 +241,11 @@ export class OccurenceBuilder {
           case "front":
             if (!separatedShorts.timestampVideo[currentDuration].front) {
               separatedShorts.timestampVideo[currentDuration].front =
-                sourceElement;
+                sourceString;
             } else {
               currentDuration = separatedShorts.duration;
               separatedShorts.timestampVideo[currentDuration] = {
-                front: sourceElement,
+                front: sourceString,
               };
               separatedShorts.duration += videoElement.duration;
             }
@@ -255,11 +254,11 @@ export class OccurenceBuilder {
           case "back":
             if (!separatedShorts.timestampVideo[currentDuration].back) {
               separatedShorts.timestampVideo[currentDuration].back =
-                sourceElement;
+                sourceString;
             } else {
               currentDuration = separatedShorts.duration;
               separatedShorts.timestampVideo[currentDuration] = {
-                back: sourceElement,
+                back: sourceString,
               };
               separatedShorts.duration += videoElement.duration;
             }
@@ -270,11 +269,11 @@ export class OccurenceBuilder {
               !separatedShorts.timestampVideo[currentDuration].left_repeater
             ) {
               separatedShorts.timestampVideo[currentDuration].left_repeater =
-                sourceElement;
+                sourceString;
             } else {
               currentDuration = separatedShorts.duration;
               separatedShorts.timestampVideo[currentDuration] = {
-                left_repeater: sourceElement,
+                left_repeater: sourceString,
               };
               separatedShorts.duration += videoElement.duration;
             }
@@ -285,11 +284,11 @@ export class OccurenceBuilder {
               !separatedShorts.timestampVideo[currentDuration].right_repeater
             ) {
               separatedShorts.timestampVideo[currentDuration].right_repeater =
-                sourceElement;
+                sourceString;
             } else {
               currentDuration = separatedShorts.duration;
               separatedShorts.timestampVideo[currentDuration] = {
-                right_repeater: sourceElement,
+                right_repeater: sourceString,
               };
               separatedShorts.duration += videoElement.duration;
             }
@@ -303,27 +302,18 @@ export class OccurenceBuilder {
 
     return separatedShorts;
   }
-  private async _createSourceElement(
+  private async _createSourceString(
     file: File | FileEntry
-  ): Promise<HTMLSourceElement> {
-    // let notFile = "";
-    // if (!(file instanceof File)) {
-    //   notFile = await normalize(file.path);
-    // }
-
-    const srcElement = document.createElement("source");
-
+  ): Promise<string> {
     if (file instanceof File) {
-      srcElement.src = URL.createObjectURL(file);
+      return URL.createObjectURL(file);
     } else {
-      srcElement.src = convertFileSrc(file.path, "asset");
+      return convertFileSrc(file.path, "asset");
     }
-
-    return srcElement;
   }
 
   private async _createVideoElement(
-    sourceElement: HTMLSourceElement
+    sourceString: string
   ): Promise<HTMLVideoElement> {
     // let notFile = "";
     // if (!(file instanceof File)) {
@@ -339,11 +329,11 @@ export class OccurenceBuilder {
       };
 
       videoElement.onerror = (e) => {
-        console.error(`Error with the video ${sourceElement.src}`, e);
+        console.error(`Error with the video ${sourceString}`, e);
         reject(videoElement);
       };
 
-      videoElement.appendChild(sourceElement);
+      videoElement.src = sourceString;
     });
   }
 

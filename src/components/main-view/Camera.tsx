@@ -1,4 +1,4 @@
-import { createEffect, Accessor, For } from "solid-js";
+import { Accessor, createEffect } from "solid-js";
 import {
     endVideoEvent,
     isPlaying,
@@ -13,30 +13,15 @@ export function Camera(props: CameraProps) {
     createEffect(() => {
         const source = props.source();
 
-        const videoElement = document.getElementById(
-            props.id
-        ) as HTMLVideoElement;
+        // const videoElement = document.getElementById(
+        //     props.id
+        // ) as HTMLVideoElement;
 
-        // while (videoElement.lastChild) {
-        //     videoElement.lastChild.remove();
-        // }
+        // videoElement.pause();
 
-        if (source) {
-            videoElement.src = source.src;
-            console.log("source.src", source.src);
-            // videoElement.appendChild(source);
-            // videoElement.load();
-            // videoElement.addEventListener("change", () => {
-            //     console.log("change");
-            // });
-
-            if (isEnded) {
-                isEnded = false;
-                setIsPlaying(true);
-            }
-        } else {
-            // No source for current selected time
-            videoElement.src = "";
+        if (source && isEnded) {
+            isEnded = false;
+            setIsPlaying(true);
         }
     });
 
@@ -47,22 +32,29 @@ export function Camera(props: CameraProps) {
             props.id
         ) as HTMLVideoElement;
 
+        if (!videoElement) {
+            return;
+        }
+
         if (_isPlaying) {
-            videoElement.autoplay = true;
             videoElement.play();
         } else {
-            console.log("pause", props.id);
-            videoElement.autoplay = false;
             videoElement.pause();
         }
     });
 
     createEffect(() => {
+        const _startAt =  startAt();
+
         const videoElement = document.getElementById(
             props.id
         ) as HTMLVideoElement;
 
-        videoElement.currentTime = startAt();
+        if (!videoElement || !videoElement.src) {
+            return;
+        }
+
+        videoElement.currentTime = _startAt
     });
 
     // const handlePause = () => {
@@ -97,23 +89,23 @@ export function Camera(props: CameraProps) {
         >
             <video
                 id={props.id}
+                src={props.source()}
+                muted
+                autoplay
                 onTimeUpdate={(event) =>
                     ontimeupdateEvent(event.target as HTMLVideoElement)
                 }
                 // onPlay={handlePlay}
                 // onPause={handlePause}
-                onEnded={() => (props.id ? handleEnded : null)}
-            >
-                <For each={props.sourcesList}>{(source) => source}</For>
-            </video>
+                onEnded={() => (props.id ? handleEnded() : null)}
+            />
         </a>
     );
 }
 
 interface CameraProps {
     id: string;
-    sourcesList: HTMLSourceElement[];
-    source: Accessor<HTMLSourceElement | undefined>;
+    source: Accessor<string | undefined>;
     isActive: boolean;
     onClick: () => void;
     class: string;
