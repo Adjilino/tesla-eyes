@@ -213,31 +213,6 @@ export function Timeline() {
             `}
                     />
                 </div>
-
-                {/* <div class="flex align-center w-full relative">
-          <div class="absolute w-full h-1 bg-slate-400" />
-          <div
-            class="absolute top-1 w-full h-1 bg-slate-600 transition-all duration-100"
-            style={{ width: `${(currentTime() / maxTime()) * 100}%` }}
-          />
-          <div
-            class="
-              absolute w-3 h-3 bg-slate-600 
-              rounded-full transition-all duration-100
-            "
-            style={{
-              left: `calc(${(currentTime() / maxTime()) * 100}% - 12px)`,
-            }}
-          />
-          <input
-            class="absolute w-full opacity-0 cursor-pointer"
-            type="range"
-            min="0"
-            max={maxTime()}
-            value={1 || currentTime()}
-            onChange={changeTime}
-          /> 
-        </div> */}
             </div>
             <Show when={window["__TAURI__"] && selectedOccurrence()?.directory}>
                 <div class="flex">

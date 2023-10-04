@@ -44,7 +44,7 @@ export function Camera(props: CameraProps) {
     });
 
     createEffect(() => {
-        const _startAt =  startAt();
+        const _startAt = startAt();
 
         const videoElement = document.getElementById(
             props.id
@@ -54,7 +54,7 @@ export function Camera(props: CameraProps) {
             return;
         }
 
-        videoElement.currentTime = _startAt
+        videoElement.currentTime = _startAt;
     });
 
     // const handlePause = () => {
@@ -90,11 +90,14 @@ export function Camera(props: CameraProps) {
             <video
                 id={props.id}
                 src={props.source()}
-                muted
+                muted={props.id === "frontElement" ? false : true}
+                playsinline
                 autoplay
-                onTimeUpdate={(event) =>
-                    ontimeupdateEvent(event.target as HTMLVideoElement)
-                }
+                onTimeUpdate={(event) => {
+                    if (props.id === "frontElement") {
+                        ontimeupdateEvent(event.target as HTMLVideoElement);
+                    }
+                }}
                 // onPlay={handlePlay}
                 // onPause={handlePause}
                 onEnded={() => (props.id ? handleEnded() : null)}

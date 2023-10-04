@@ -158,9 +158,7 @@ function getVideosPerTimeIndex(
 }
 
 export function endVideoEvent() {
-    console.log("endVideoEvent");
     setSelectedTimestampIndex((timestamp) => {
-        console.log("endVideoEvent timestamp", timestamp);
         if (timestamp === null) {
             return null;
         }

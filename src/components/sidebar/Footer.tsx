@@ -121,17 +121,6 @@ export function SidebarFooter() {
           <span class="truncate">Add folder</span>
         </Button>
       </div>
-
-      <div class="flex items-center justify-items-center">
-        <a
-          class="px-2 font-semibold hover:cursor-pointer hover:underline"
-          href="https://ko-fi.com/adjilino"
-          target="_blank"
-        >
-          <i class="mr-2 fa-solid fa-fw fa-mug-hot" />
-          <span class="truncate">Donate</span>
-        </a>
-      </div>
     </div>
   );
 }
