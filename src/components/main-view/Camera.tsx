@@ -12,12 +12,22 @@ export function Camera(props: CameraProps) {
 
     createEffect(() => {
         const source = props.source();
+        const _startAt = startAt();
 
-        // const videoElement = document.getElementById(
-        //     props.id
-        // ) as HTMLVideoElement;
+        const videoElement = document.getElementById(
+            props.id
+        ) as HTMLVideoElement;
 
         // videoElement.pause();
+
+        if (source && videoElement.src !== source) {
+            videoElement.onloadedmetadata = () => {
+                videoElement.currentTime = _startAt;
+                videoElement.onloadedmetadata = null;
+            }
+        } else {
+            videoElement.currentTime = _startAt;
+        }
 
         if (source && isEnded) {
             isEnded = false;
@@ -41,20 +51,6 @@ export function Camera(props: CameraProps) {
         } else {
             videoElement.pause();
         }
-    });
-
-    createEffect(() => {
-        const _startAt = startAt();
-
-        const videoElement = document.getElementById(
-            props.id
-        ) as HTMLVideoElement;
-
-        if (!videoElement || !videoElement.src) {
-            return;
-        }
-
-        videoElement.currentTime = _startAt;
     });
 
     // const handlePause = () => {
