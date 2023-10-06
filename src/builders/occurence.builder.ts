@@ -217,7 +217,6 @@ export class OccurenceBuilder {
             const sourceString = await this._createSourceString(file);
             const duration = await this._getVideoDuration(sourceString);
 
-            console.log("duration", duration);
             if (!duration) {
                 continue;
             }

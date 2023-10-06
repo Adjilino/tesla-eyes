@@ -9,6 +9,7 @@ import {
 
 export function Camera(props: CameraProps) {
     let isEnded = false;
+    let lastStartAt: number | null = null;
 
     createEffect(() => {
         const source = props.source();
@@ -18,15 +19,18 @@ export function Camera(props: CameraProps) {
             props.id
         ) as HTMLVideoElement;
 
-        // videoElement.pause();
+        videoElement.pause();
 
         if (source && videoElement.src !== source) {
             videoElement.onloadedmetadata = () => {
                 videoElement.currentTime = _startAt;
                 videoElement.onloadedmetadata = null;
-            }
-        } else {
+            };
+            lastStartAt = _startAt;
+            videoElement.src = source;
+        } else if (_startAt !== lastStartAt) {
             videoElement.currentTime = _startAt;
+            lastStartAt = _startAt;
         }
 
         if (source && isEnded) {
@@ -85,7 +89,6 @@ export function Camera(props: CameraProps) {
         >
             <video
                 id={props.id}
-                src={props.source()}
                 muted={props.id === "frontElement" ? false : true}
                 playsinline
                 autoplay
