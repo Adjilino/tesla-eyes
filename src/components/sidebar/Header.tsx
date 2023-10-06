@@ -18,7 +18,7 @@ export function SidebarHeader() {
       <div class="flex items-center justify-items-center">
         <a
           class="px-2 font-semibold hover:cursor-pointer hover:underline"
-          href="https://github.com/Adjilino/tesla-eyes-app/issues"
+          href="https://github.com/Adjilino/tesla-eyes/issues"
           target="_blank"
         >
           <i class="mr-2 fa-solid fa-fw fa-bug" />
