@@ -10,9 +10,12 @@ import {
 import { getBase64 } from "../utils";
 
 export class OccurenceBuilder {
+    videoElement = document.createElement("video");
+
     files: (File | FileEntry)[] = [];
 
     constructor() {
+        this.videoElement.muted = true;
         return this;
     }
 
@@ -327,29 +330,25 @@ export class OccurenceBuilder {
         }
     }
 
-    private async _getVideoDuration(
-        sourceString: string
-    ): Promise<number> {
+    private async _getVideoDuration(sourceString: string): Promise<number> {
         // let notFile = "";
         // if (!(file instanceof File)) {
         //   notFile = await normalize(file.path);
         // }
 
         return new Promise((resolve, reject) => {
-            const videoElement = document.createElement("video");
-            videoElement.muted = true;
-
-            videoElement.onloadedmetadata = () => {
-                // videoElement.onerror = null;
-                resolve(videoElement.duration);
+            this.videoElement.onloadedmetadata = () => {
+                this.videoElement.onloadedmetadata = null;
+                resolve(this.videoElement.duration);
             };
 
-            videoElement.onerror = (e) => {
+            this.videoElement.onerror = (e) => {
                 console.error(`Error with the video ${sourceString}`, e);
+                this.videoElement.onerror = null;
                 reject();
             };
 
-            videoElement.src = sourceString;
+            this.videoElement.src = sourceString;
         });
     }
 
