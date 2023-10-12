@@ -19,8 +19,6 @@ export function Camera(props: CameraProps) {
             props.id
         ) as HTMLVideoElement;
 
-        videoElement.pause();
-
         if (source && videoElement.src !== source) {
             videoElement.onloadedmetadata = () => {
                 videoElement.currentTime = _startAt;
