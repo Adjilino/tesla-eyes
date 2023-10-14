@@ -1,7 +1,7 @@
 [package]
-name = "tesla-eyes"
+name = "app"
 version = "0.1.0"
-description = "Tesla Eyes app. Sentry Mode and Dashcam viewer"
+description = "Tesla eyes app. Sentry Mode and Dashcam viewer"
 authors = ["adjilino"]
 license = ""
 repository = ""
