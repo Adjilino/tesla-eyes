@@ -1,8 +1,8 @@
 [package]
-name = "app"
+name = "Tesla Eyes"
 version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
+description = "Tesla Eyes app. Sentry Mode and Dashcam viewer"
+authors = ["adjilino"]
 license = ""
 repository = ""
 default-run = "app"
