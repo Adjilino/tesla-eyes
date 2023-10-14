@@ -1,5 +1,5 @@
 [package]
-name = "Tesla Eyes"
+name = "tesla-eyes"
 version = "0.1.0"
 description = "Tesla Eyes app. Sentry Mode and Dashcam viewer"
 authors = ["adjilino"]
