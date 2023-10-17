@@ -2,7 +2,8 @@ import { TimestampVideo } from "../interfaces";
 import { Config } from "./config";
 import { PlayerStartPoint } from "./player-start-point";
 
-export class Occurence {
+export class Occurrence {
+  directory?: string;
   // information
   private dateTime?: Date;
   private config?: Config;

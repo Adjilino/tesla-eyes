@@ -1,121 +1,93 @@
-import { createEffect, createSignal } from "solid-js";
-import { selectedVideos, setIsPlaying } from "../../stores";
+import { createMemo, createSignal } from "solid-js";
+import { selectedVideos } from "../../stores";
 import { Camera } from "./Camera";
 import { Timeline } from "./Timelime";
 
 export function MainView() {
-  const [selectedCamera, setSelectedCamera] = createSignal("front");
+    const [selectedCamera, setSelectedCamera] = createSignal("front");
 
-  createEffect(() => {
-    const _selectedTimestampVideo = selectedVideos();
-    if (!_selectedTimestampVideo) {
-      return;
-    }
+    const frontSourceString = createMemo(() => {
+        const _selectedTimestampVideo = selectedVideos();
+        if (!_selectedTimestampVideo) {
+            return;
+        }
 
-    setVideo("frontElement", _selectedTimestampVideo.front);
-    setVideo("backElement", _selectedTimestampVideo.back);
-    setVideo("leftRepeaterElement", _selectedTimestampVideo.left_repeater);
-    setVideo("rightRepeaterElement", _selectedTimestampVideo.right_repeater);
-    setIsPlaying(true);
-  });
+        return _selectedTimestampVideo.front;
+    });
 
-  const setVideo = (
-    element: string,
-    video?: HTMLVideoElement,
-    isPLaying = true
-  ) => {
-    const positionElement = document.getElementById(element);
+    const backSourceString = createMemo(() => {
+        const _selectedTimestampVideo = selectedVideos();
+        if (!_selectedTimestampVideo) {
+            return;
+        }
 
-    if (!positionElement) {
-      return;
-    }
+        return _selectedTimestampVideo.back;
+    });
 
-    // Remove all children
-    for (let i = 0; i < positionElement.children.length; i++) {
-      positionElement.removeChild(positionElement.children[i]);
-    }
+    const leftSourceString = createMemo(() => {
+        const _selectedTimestampVideo = selectedVideos();
+        if (!_selectedTimestampVideo) {
+            return;
+        }
 
-    if (!video) {
-      return;
-    }
+        return _selectedTimestampVideo.left_repeater;
+    });
 
-    positionElement?.appendChild(video);
+    const rightSourceString = createMemo(() => {
+        const _selectedTimestampVideo = selectedVideos();
+        if (!_selectedTimestampVideo) {
+            return;
+        }
 
-    if (video.error) {
-      const divWarning = createWarning();
-      positionElement?.appendChild(divWarning);
-    } else {
-      video.onerror = () => {
-        console.error(
-          `Error with the video`,
-          `At ${video.currentTime} seconds`,
-          `This error is probably due to a corrupted video file.`
-        );
+        return _selectedTimestampVideo.right_repeater;
+    });
 
-        const divWarning = createWarning();
-        positionElement?.appendChild(divWarning);
-      };
-    }
+    const selectCamera = (camera: string) => {
+        setSelectedCamera(camera);
+    };
 
-    if (isPLaying) {
-      video.play();
-    }
-  };
+    return (
+        <>
+            <div class="flex w-full h-full flex-col">
+                <div class="flex-grow flex overflow-hidden relative">
+                    <Camera
+                        id="frontElement"
+                        source={frontSourceString}
+                        isActive={selectedCamera() === "front"}
+                        onClick={() => selectCamera("front")}
+                        class="top-2 left-2"
+                    />
 
-  const createWarning = () => {
-    const divWarning = document.createElement("div.warning");
-    divWarning.style.position = "absolute";
-    divWarning.style.top = "2px";
-    divWarning.style.left = "2px";
-    divWarning.style.color = "yellow";
-    divWarning.title = "This video is corrupted";
-    divWarning.innerHTML = "&#9888;";
+                    <Camera
+                        id="backElement"
+                        source={backSourceString}
+                        isActive={selectedCamera() === "back"}
+                        onClick={() => selectCamera("back")}
+                        class="top-2 right-2"
+                    />
 
-    return divWarning;
-  }
+                    <Camera
+                        id="leftRepeaterElement"
+                        source={leftSourceString}
+                        isActive={selectedCamera() === "left_repeater"}
+                        onClick={() => selectCamera("left_repeater")}
+                        class="bottom-2 left-2"
+                    />
 
-  const selectCamera = (camera: string) => {
-    setSelectedCamera(camera);
-  };
-
-  return (
-    <>
-      <div class="flex w-full h-full flex-col">
-        <div class="flex-grow flex overflow-hidden relative">
-          <Camera
-            id="frontElement"
-            isActive={selectedCamera() === "front"}
-            onClick={() => selectCamera("front")}
-            class="top-2 left-2"
-          />
-
-          <Camera
-            id="backElement"
-            isActive={selectedCamera() === "back"}
-            onClick={() => selectCamera("back")}
-            class="top-2 right-2"
-          />
-
-          <Camera
-            id="leftRepeaterElement"
-            isActive={selectedCamera() === "left_repeater"}
-            onClick={() => selectCamera("left_repeater")}
-            class="bottom-2 left-2"
-          />
-
-          <Camera
-            id="rightRepeaterElement"
-            isActive={selectedCamera() === "right_repeater"}
-            onClick={() => selectCamera("right_repeater")}
-            class="bottom-2 right-2"
-          />
-        </div>
-        <div class="flex">
-          <Timeline />
-        </div>
-      </div>
-    </>
-  );
+                    <Camera
+                        id="rightRepeaterElement"
+                        source={rightSourceString}
+                        isActive={selectedCamera() === "right_repeater"}
+                        onClick={() => selectCamera("right_repeater")}
+                        class="bottom-2 right-2"
+                    />
+                </div>
+                <div class="flex">
+                    <Timeline />
+                </div>
+            </div>
+        </>
+    );
 }
 
 export default MainView;

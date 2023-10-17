@@ -1,13 +1,16 @@
+import { open } from "@tauri-apps/api/dialog";
+import { FileEntry, readDir } from "@tauri-apps/api/fs";
 import { Show } from "solid-js";
 import { MultipleOccurenceBuilder } from "../../builders";
+import { OccurenceFilesBuilder } from "../../builders/occurence-files.builders";
 import {
   isLoadingOccurrences,
+  setFilesByOccurrences,
   setIsLoadingOccurrences,
-  setOccurences,
 } from "../../stores";
 import { Button } from "../../ui";
 
-const LoadingOccurrences: boolean[] = [];
+const loadingOccurrences: boolean[] = [];
 
 function createFolderInput() {
   const input = document.createElement("input");
@@ -17,36 +20,93 @@ function createFolderInput() {
   input.webkitdirectory = true;
 
   input.addEventListener("change", async (event) => {
-    LoadingOccurrences.push(true);
     setIsLoadingOccurrences(true);
 
     const files = (event.target as HTMLInputElement).files;
 
-    if (!files) return;
-
-    const multipleOccurrences = await new MultipleOccurenceBuilder()
-      .addFileList(files)
-      .build();
-
-    if (multipleOccurrences) {
-      setOccurences((occurences) => [...occurences, ...multipleOccurrences]);
-    }
-
-    LoadingOccurrences.pop();
-
-    if (LoadingOccurrences.length === 0) {
-      setIsLoadingOccurrences(false);
-    }
+    createMultipleOccurence(files);
   });
 
   return input;
 }
 
+async function createMultipleOccurence(files: FileList | FileEntry[] | null) {
+  if (!files) {
+    return;
+  }
+
+  const separatedFilesByFolder = new MultipleOccurenceBuilder()
+    .addFileList(files)
+    .separateFilesByFolders();
+
+  for (const folder in separatedFilesByFolder) {
+    loadingOccurrences.push(true);
+
+    const files = separatedFilesByFolder[folder];
+
+    try {
+      const occurenceFiles = await new OccurenceFilesBuilder()
+        .addFiles(files)
+        .build();
+      console.log('OccurrenceFiles',occurenceFiles);
+      loadingOccurrences.pop();
+
+      if (!occurenceFiles) {
+        console.error(`Failed to create OccurenceFiles ${folder}`);
+        continue;
+      }
+
+      setFilesByOccurrences((oF) => [...oF, occurenceFiles]);
+    } catch (error) {
+      console.error("Ops");
+    }
+  }
+
+  if (loadingOccurrences.length === 0) {
+    setIsLoadingOccurrences(false);
+  }
+}
+
 export function SidebarFooter() {
   const addFolderInput = createFolderInput();
 
-  function addFolder() {
-    addFolderInput.click();
+  async function addFolder() {
+    if (!window?.__TAURI__?.tauri) {
+      addFolderInput.click();
+      return;
+    }
+    let folder: string | string[] | null = null;
+
+    folder = await open({
+      directory: true,
+    });
+
+    if (!folder || Array.isArray(folder)) {
+      return;
+    }
+    loadingOccurrences.push(true);
+    setIsLoadingOccurrences(true);
+
+    const entries = await readDir(folder, { recursive: true });
+
+    const files = getFiles(entries);
+
+    loadingOccurrences.pop();
+    createMultipleOccurence(files);
+  }
+
+  function getFiles(fileEntries: FileEntry[]): FileEntry[] {
+    let files: FileEntry[] = [];
+
+    for (const entry of fileEntries) {
+      if (!entry.children) {
+        files.push(entry);
+      } else {
+        files = [...files, ...getFiles(entry.children)];
+      }
+    }
+
+    return files;
   }
 
   return (
@@ -60,17 +120,6 @@ export function SidebarFooter() {
           </Show>
           <span class="truncate">Add folder</span>
         </Button>
-      </div>
-
-      <div class="flex items-center justify-items-center">
-        <a
-          class="px-2 font-semibold hover:cursor-pointer hover:underline"
-          href="https://ko-fi.com/adjilino"
-          target="_blank"
-        >
-          <i class="mr-2 fa-solid fa-fw fa-mug-hot" />
-          <span class="truncate">Donate</span>
-        </a>
       </div>
     </div>
   );

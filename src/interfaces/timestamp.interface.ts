@@ -5,8 +5,8 @@ export interface Timestamp {
 }
 
 export interface TimestampVideo {
-  front?: HTMLVideoElement;
-  left_repeater?: HTMLVideoElement;
-  right_repeater?: HTMLVideoElement;
-  back?: HTMLVideoElement;
+  front?: string;
+  left_repeater?: string;
+  right_repeater?: string;
+  back?: string;
 }
