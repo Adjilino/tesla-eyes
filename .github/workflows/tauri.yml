@@ -2,7 +2,7 @@ name: 'Tauri Build'
 on:
   push:
     branches:
-      - desktop-release
+      - main
 
 jobs:
   publish-tauri:
