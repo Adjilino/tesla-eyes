@@ -1,5 +1,7 @@
 import { Component, Show } from "solid-js";
 import { isLoadingSelectedOccurrence } from "../../stores";
+import { tauri } from "../../utils";
+import { open } from "@tauri-apps/api/shell";
 
 const LoadingOccurrence: Component = () => {
     return (
@@ -13,6 +15,16 @@ const LoadingOccurrence: Component = () => {
 };
 
 const NoOccurenceSelect: Component = () => {
+    const sampleUrl = "https://mega.nz/folder/4MARkZKY#7gc5e3ZqoAKrnL4E56oS0Q";
+
+    const openSample = () => {
+        if (tauri) {
+            open(sampleUrl);
+        } else {
+            window.open(sampleUrl);
+        }
+    };
+
     return (
         <Show
             when={!isLoadingSelectedOccurrence()}
@@ -42,9 +54,8 @@ const NoOccurenceSelect: Component = () => {
                 <p class="text-xl text-gray-600 dark:text-gray-400 mt-2">
                     You can try it with the example folder.&nbsp;
                     <a
-                        class="underline underline-offset-2"
-                        href="https://mega.nz/folder/4MARkZKY#7gc5e3ZqoAKrnL4E56oS0Q"
-                        target="_blank"
+                        class="underline underline-offset-2 cursor-pointer"
+                        onClick={() => openSample()}
                     >
                         Click here to download it.
                     </a>

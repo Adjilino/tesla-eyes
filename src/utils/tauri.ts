@@ -1,2 +1,2 @@
-export const tauri = window.__TAURI__;
+export const tauri = window.__TAURI__ as any;
 

@@ -1,14 +1,25 @@
+.sidebarContainer {
+  width: 0;
+}
+
 .sidebarWidth {
-  --sidebar-width: 100%;
+  --sidebar-width: 480px;
   width: var(--sidebar-width);
   transition: all 0.25s ease-out;
 }
 
-.sidebarWidth.sidebarOpen {
+.sidebarContainer.sidebarOpen {
+  width: 100%;
+}
+.sidebarContainer.sidebarOpen .sidebarWidth {
   max-width: var(--sidebar-width);
 }
 
-.sidebarWidth.sidebarClosed {
+.sidebarContainer.sidebarClosed {
+  width: 0;
+  transition-delay: 0.25s;
+}
+.sidebarContainer.sidebarClosed .sidebarWidth {
   max-width: 0;
 }
 
