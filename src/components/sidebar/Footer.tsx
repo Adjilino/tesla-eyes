@@ -9,6 +9,7 @@ import {
   setIsLoadingOccurrences,
 } from "../../stores";
 import { Button } from "../../ui";
+import { tauri } from "../../utils";
 
 const loadingOccurrences: boolean[] = [];
 
@@ -71,7 +72,7 @@ export function SidebarFooter() {
   const addFolderInput = createFolderInput();
 
   async function addFolder() {
-    if (!window?.__TAURI__?.tauri) {
+    if (!tauri?.tauri) {
       addFolderInput.click();
       return;
     }

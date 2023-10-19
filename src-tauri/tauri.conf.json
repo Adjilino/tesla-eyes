@@ -9,7 +9,7 @@
   },
   "package": {
     "productName": "Tesla eyes",
-    "version": "0.8.0"
+    "version": "0.8.1"
   },
   "tauri": {
     "allowlist": {
@@ -17,6 +17,10 @@
       "dialog": {
         "all": false,
         "confirm": true,
+        "open": true
+      },
+      "shell": {
+        "all": false,
         "open": true
       },
       "fs": {
