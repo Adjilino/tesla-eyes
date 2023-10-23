@@ -4,14 +4,18 @@ import { Show, createMemo, createSignal } from "solid-js";
 import { Occurrence } from "../../models";
 import {
     currentTime,
+    fileByOccurrence,
     isPlaying,
     selectedOccurrence,
+    selectedOccurrenceFiles,
     setChangeCurrentTime,
+    setFilesByOccurrences,
     setIsPlaying,
     setSelectedOccurrence,
 } from "../../stores";
 import { Button } from "../../ui";
 import timelineStyles from "./Timelime.module.css";
+import { tauri } from "../../utils";
 
 function addVideoShortcutControls() {
     window.addEventListener("keydown", (event) => {
@@ -150,7 +154,7 @@ export function Timeline() {
     };
 
     const removeOccurence = async (occurence: Occurrence | null) => {
-        if (!occurence || !occurence.directory || !window["__TAURI__"]?.tauri) {
+        if (!occurence || !occurence.directory || !tauri?.tauri) {
             return;
         }
 
@@ -169,6 +173,16 @@ export function Timeline() {
         removeDir(occurence.directory, {
             recursive: true,
         });
+
+        const _fileByOccurence = fileByOccurrence();
+        const _selectedOccurrenceFile = selectedOccurrenceFiles();
+        if (_fileByOccurence && _selectedOccurrenceFile) {
+            setFilesByOccurrences(
+                _fileByOccurence.filter(
+                    (file) => file.getId() !== _selectedOccurrenceFile.getId()
+                )
+            );
+        }
     };
 
     return (
