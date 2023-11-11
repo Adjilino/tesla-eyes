@@ -8,4 +8,4 @@ export enum Filter {
     Dashcam = "dashcam",
 }
 
-export const [currentFilter, setCurrentFilter] = createSignal<string>(Filter.All);
+export const [currentFilter, setCurrentFilter] = createSignal(Filter.All);
