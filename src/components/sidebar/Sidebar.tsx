@@ -1,6 +1,8 @@
-import { For, Show } from "solid-js";
+import { For, Show, createMemo } from "solid-js";
 import { OccurrenceFiles } from "../../models/occurence-files";
 import {
+    Filter,
+    currentFilter,
     fileByOccurrence,
     isSidebarOpen,
     setIsSidebarOpen,
@@ -32,7 +34,24 @@ export function Sidebar(props: { class: string }) {
             setIsSidebarOpen(false);
         }
     };
-    
+
+    const filteredFilesByOcurrence = createMemo(() => {
+        const _fileByOccurrence = fileByOccurrence();
+        const _filter = currentFilter();
+
+        if (_filter === Filter.All) {
+            return _fileByOccurrence;
+        }
+
+        return _fileByOccurrence.filter((occurrence) => {
+            if (!occurrence.config) {
+                return false;
+            }
+
+            return occurrence.config?.getReason()?.includes(_filter);
+        });
+    });
+
     return (
         <div
             id="sidebar-container"
@@ -73,7 +92,7 @@ export function Sidebar(props: { class: string }) {
                         styles.sidebarWidth
                     }
                 >
-                    <For each={fileByOccurrence()}>
+                    <For each={filteredFilesByOcurrence()}>
                         {(occurence) => (
                             <a
                                 class={[
