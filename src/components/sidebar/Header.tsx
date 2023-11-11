@@ -9,8 +9,6 @@ import { Button } from "../../ui";
 
 export function SidebarHeader() {
     function toggleSidebar() {
-        console.log(Object.keys(Filter));
-
         setIsSidebarOpen((o) => !o);
     }
 
