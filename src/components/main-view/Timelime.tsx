@@ -9,6 +9,7 @@ import {
     selectedOccurrence,
     selectedOccurrenceFiles,
     setChangeCurrentTime,
+    setPlaybackRate,
     setFilesByOccurrences,
     setIsPlaying,
     setSelectedOccurrence,
@@ -196,6 +197,20 @@ export function Timeline() {
                         }
                     />
                 </Button>
+            </div>
+            <div class="flex">
+                <select
+                    value={1}
+                    class="bg-transparent"
+                    onChange={(e) => setPlaybackRate(Number(e.target.value))}
+                >
+                    <option value={0.5}>0.5</option>
+                    <option value={0.75}>0.75</option>
+                    <option value={1}>1</option>
+                    <option value={1.25}>1.25</option>
+                    <option value={1.5}>1.5</option>
+                    <option value={2}>2</option>
+                </select>
             </div>
             <div
                 class="flex-grow overflow-hidden relative"
