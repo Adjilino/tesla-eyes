@@ -13,8 +13,9 @@ import {
     setFilesByOccurrences,
     setIsPlaying,
     setSelectedOccurrence,
+    playbackRate,
 } from "../../stores";
-import { Button } from "../../ui";
+import { Button, Dropdown } from "../../ui";
 import timelineStyles from "./Timelime.module.css";
 import { tauri } from "../../utils";
 
@@ -199,18 +200,21 @@ export function Timeline() {
                 </Button>
             </div>
             <div class="flex">
-                <select
-                    value={1}
-                    class="bg-transparent"
-                    onChange={(e) => setPlaybackRate(Number(e.target.value))}
-                >
-                    <option value={0.5}>0.5</option>
-                    <option value={0.75}>0.75</option>
-                    <option value={1}>1</option>
-                    <option value={1.25}>1.25</option>
-                    <option value={1.5}>1.5</option>
-                    <option value={2}>2</option>
-                </select>
+                <Dropdown
+                    options={[
+                        { label: "x0.5", value: "0.5" },
+                        { label: "x0.75", value: "0.75" },
+                        { label: "x1", value: "1" },
+                        { label: "x1.25", value: "1.25" },
+                        { label: "x1.5", value: "1.5" },
+                        { label: "x2", value: "2" },
+                        { label: "x4", value: "4" },
+                    ]}
+                    value={String(playbackRate())}
+                    onSelect={(value) =>
+                        setPlaybackRate(parseFloat(value.value))
+                    }
+                />
             </div>
             <div
                 class="flex-grow overflow-hidden relative"

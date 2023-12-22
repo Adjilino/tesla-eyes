@@ -20,7 +20,8 @@ export function Button(props: ButtonProps) {
         "hover:bg-slate-300 " +
         "dark:hover:bg-slate-600 " +
         "focus:outline-none focus:bg-slate-400 active:bg-slate-400 " +
-        "dark:focus:bg-slate-500 dark:active:bg-slate-500 "
+        "dark:focus:bg-slate-500 dark:active:bg-slate-500 " +
+        props.class || ""
       }
       onClick={onClick}
     >
