@@ -15,7 +15,7 @@ export function SidebarHeader() {
     return (
         <div class="flex w-full truncate">
             <div class="flex grow items-center">
-                <Button onClick={toggleSidebar} class="dark:bg-white">
+                <Button onClick={toggleSidebar} class="bg-transparent dark:bg-transparent">
                     <i class="mx-2 fa-solid fa-fw fa-bars" />
                 </Button>
             </div>

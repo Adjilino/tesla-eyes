@@ -21,7 +21,7 @@ export function Navbar() {
 
     return (
         <div class="h-16 p-2 flex w-full items-center gap-2">
-            <Button onClick={toggleSidebar}>
+            <Button onClick={toggleSidebar} class="bg-transparent dark:bg-transparent">
                 <i class="mx-2 fa-solid fa-fw fa-bars" />
             </Button>
             <div class="flex">

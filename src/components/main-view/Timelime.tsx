@@ -190,7 +190,10 @@ export function Timeline() {
     return (
         <div class="h-16 p-2 flex w-full gap-2">
             <div class="flex">
-                <Button onClick={() => setIsPlaying((playing) => !playing)}>
+                <Button
+                    onClick={() => setIsPlaying((playing) => !playing)}
+                    class="bg-transparent dark:bg-transparent"
+                >
                     <i
                         class={
                             "mx-2 fa-solid fa-fw " +
@@ -201,6 +204,7 @@ export function Timeline() {
             </div>
             <div class="flex">
                 <Dropdown
+                    class="bg-transparent dark:bg-transparent"
                     options={[
                         { label: "x0.5", value: "0.5" },
                         { label: "x0.75", value: "0.75" },

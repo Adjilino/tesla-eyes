@@ -36,7 +36,7 @@ export function Dropdown(props: DropdownProps) {
 
     return (
         <>
-            <Button class="relative w-14">
+            <Button class={"relative w-14 " + props.class || ""}>
                 {selected()?.label ||
                     props.value ||
                     props.placeholder ||
