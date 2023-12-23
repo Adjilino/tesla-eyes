@@ -3,6 +3,7 @@ import {
     endVideoEvent,
     isPlaying,
     ontimeupdateEvent,
+    playbackRate,
     setIsPlaying,
     startAt,
 } from "../../stores";
@@ -53,6 +54,21 @@ export function Camera(props: CameraProps) {
         } else {
             videoElement.pause();
         }
+    });
+
+    createEffect(() => {
+        const _playbackRate = playbackRate();
+
+        const videoElement = document.getElementById(
+            props.id
+        ) as HTMLVideoElement;
+
+        if (!videoElement) {
+            return;
+        }
+
+        videoElement.defaultPlaybackRate = _playbackRate;
+        videoElement.playbackRate = _playbackRate;
     });
 
     // const handlePause = () => {

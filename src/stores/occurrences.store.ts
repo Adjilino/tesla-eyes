@@ -51,6 +51,8 @@ export const [selectedOccurrence, setSelectedOccurrence] =
 
 export const [currentTime, setCurrentTime] = createSignal<number>(0);
 export const [isPlaying, setIsPlaying] = createSignal<boolean>(false);
+export const [playbackRate, setPlaybackRate] =
+    createSignal<number>(1);
 
 createEffect(() => {
     // on select occurence auto play the video
