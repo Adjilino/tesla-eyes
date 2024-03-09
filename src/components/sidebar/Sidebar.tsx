@@ -59,7 +59,7 @@ export function Sidebar(props: { class: string }) {
                 props.class,
                 "bg-gray-900 bg-opacity-50 dark:bg-opacity-50",
                 "absolute top-0 left-0",
-                "flex w-full h-screen overflow-x-hidden",
+                "flex w-full h-[calc(100dvh)]",
                 styles.sidebarContainer,
             ].join(" ")}
             classList={{
@@ -74,7 +74,7 @@ export function Sidebar(props: { class: string }) {
                     "bg-slate-50 dark:bg-slate-900",
                     "absolute top-0 left-0",
                     "flex flex-col",
-                    "rounded-md shadow-lg h-screen overflow-x-hidden",
+                    "rounded-md shadow-lg h-[calc(100dvh)]",
                     styles.sidebarWidth,
                 ].join(" ")}
             >
