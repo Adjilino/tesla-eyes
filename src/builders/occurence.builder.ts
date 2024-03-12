@@ -35,22 +35,17 @@ export class OccurenceBuilder {
         const occurence = new Occurrence();
 
         occurence.directory = this.getOccurenceDirectory();
-        console.log("occurrence directory", occurence.directory);
 
         const occurenceDateTime = this.getOccurenceDateTime();
         occurence.setDateTime(occurenceDateTime);
-        console.log("occurrence date time", occurenceDateTime);
 
         const config = await this.getOccurenceConfig();
         occurence.setConfig(config);
-        console.log("occurrence config", config);
 
         const thumbnail = await this.getOccurenceThumbnail();
         occurence.setThumbnail(thumbnail);
-        console.log("occurrence thumbnail", thumbnail);
 
         const timestamp = await this.getOccurenceTimestamp();
-        console.log("occurrence timestamp", timestamp);
         if (!timestamp) {
             return;
         }
@@ -62,7 +57,6 @@ export class OccurenceBuilder {
         // get the player config
         const playerStartPoint = await this.getPlayerStartPoint(occurence);
         occurence.playerStartPoint = playerStartPoint;
-        console.log("occurrence player start point", playerStartPoint);
 
         return occurence;
     }

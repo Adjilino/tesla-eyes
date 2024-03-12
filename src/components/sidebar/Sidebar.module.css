@@ -18,6 +18,7 @@
 .sidebarContainer.sidebarClosed {
     width: 0;
     transition-delay: 0.25s;
+    overflow-y: hidden;
 }
 .sidebarContainer.sidebarClosed .sidebarWidth {
     max-width: 0;
