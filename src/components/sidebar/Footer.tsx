@@ -49,7 +49,6 @@ async function createMultipleOccurence(files: FileList | FileEntry[] | null) {
     );
 
     for (const folder of folders) {
-        console.log("folder", folder);
         loadingOccurrences.push(true);
 
         const files = separatedFilesByFolder[folder];
@@ -58,7 +57,6 @@ async function createMultipleOccurence(files: FileList | FileEntry[] | null) {
             const occurenceFiles = await new OccurenceFilesBuilder()
                 .addFiles(files)
                 .build();
-            console.log("OccurrenceFiles", occurenceFiles);
             loadingOccurrences.pop();
 
             if (!occurenceFiles) {

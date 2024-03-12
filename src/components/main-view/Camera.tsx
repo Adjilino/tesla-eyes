@@ -72,14 +72,12 @@ export function Camera(props: CameraProps) {
     });
 
     // const handlePause = () => {
-    //   console.log("pause");
     //   if (isPlaying()) {
     //     setIsPlaying(false);
     //   }
     // };
 
     // const handlePlay = () => {
-    //   console.log("play");
     //   if (!isPlaying()) {
     //     setIsPlaying(true);
     //   }
