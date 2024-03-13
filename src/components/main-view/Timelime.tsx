@@ -214,7 +214,7 @@ export function Timeline() {
                         { label: "x2", value: "2" },
                         { label: "x4", value: "4" },
                     ]}
-                    value={String(playbackRate())}
+                    value={"x" + String(playbackRate())}
                     onSelect={(value) =>
                         setPlaybackRate(parseFloat(value.value))
                     }

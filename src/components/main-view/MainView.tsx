@@ -1,5 +1,5 @@
 import { createMemo, createSignal } from "solid-js";
-import { selectedVideos } from "../../stores";
+import { ontimeupdateEvent, selectedVideos } from "../../stores";
 import { Camera } from "./Camera";
 import { Timeline } from "./Timelime";
 
@@ -42,6 +42,28 @@ export function MainView() {
         return _selectedTimestampVideo.right_repeater;
     });
 
+    const getUpdateTime = (id: string) => {
+        if (frontSourceString()) {
+            if (id == "front") {
+                return ontimeupdateEvent;
+            }
+        } else if (backSourceString()) {
+            if (id == "back") {
+                return ontimeupdateEvent;
+            }
+        } else if (leftSourceString()) {
+            if (id == "left") {
+                return ontimeupdateEvent;
+            }
+        } else if (rightSourceString()) {
+            if ((id == "right")) {
+                return ontimeupdateEvent;
+            }
+        }
+
+        return;
+    };
+
     const selectCamera = (camera: string) => {
         setSelectedCamera(camera);
     };
@@ -56,6 +78,7 @@ export function MainView() {
                         isActive={selectedCamera() === "front"}
                         onClick={() => selectCamera("front")}
                         class="top-2 left-2"
+                        onTimeUpdate={getUpdateTime("front")}
                     />
 
                     <Camera
@@ -64,6 +87,7 @@ export function MainView() {
                         isActive={selectedCamera() === "back"}
                         onClick={() => selectCamera("back")}
                         class="top-2 right-2"
+                        onTimeUpdate={getUpdateTime("back")}
                     />
 
                     <Camera
@@ -72,6 +96,7 @@ export function MainView() {
                         isActive={selectedCamera() === "left_repeater"}
                         onClick={() => selectCamera("left_repeater")}
                         class="bottom-2 left-2"
+                        onTimeUpdate={getUpdateTime("left")}
                     />
 
                     <Camera
@@ -80,6 +105,7 @@ export function MainView() {
                         isActive={selectedCamera() === "right_repeater"}
                         onClick={() => selectCamera("right_repeater")}
                         class="bottom-2 right-2"
+                        onTimeUpdate={getUpdateTime("right")}
                     />
                 </div>
                 <div class="flex">

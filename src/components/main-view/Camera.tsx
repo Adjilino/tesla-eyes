@@ -2,10 +2,9 @@ import { Accessor, createEffect } from "solid-js";
 import {
     endVideoEvent,
     isPlaying,
-    ontimeupdateEvent,
     playbackRate,
     setIsPlaying,
-    startAt,
+    startAt
 } from "../../stores";
 
 export function Camera(props: CameraProps) {
@@ -45,7 +44,7 @@ export function Camera(props: CameraProps) {
             props.id
         ) as HTMLVideoElement;
 
-        if (!videoElement) {
+        if (!videoElement || !videoElement.src) {
             return;
         }
 
@@ -101,12 +100,12 @@ export function Camera(props: CameraProps) {
         >
             <video
                 id={props.id}
-                muted={props.id === "frontElement" ? false : true}
+                muted
                 playsinline
                 autoplay
                 onTimeUpdate={(event) => {
-                    if (props.id === "frontElement") {
-                        ontimeupdateEvent(event.target as HTMLVideoElement);
+                    if (props.onTimeUpdate) {
+                        props.onTimeUpdate(event.target as HTMLVideoElement);
                     }
                 }}
                 // onPlay={handlePlay}
@@ -123,4 +122,5 @@ interface CameraProps {
     isActive: boolean;
     onClick: () => void;
     class: string;
+    onTimeUpdate?: (element: HTMLVideoElement) => void;
 }
