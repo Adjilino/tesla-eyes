@@ -1,7 +1,8 @@
+import { open } from "@tauri-apps/api/shell";
 import { Component, Show } from "solid-js";
 import { isLoadingSelectedOccurrence } from "../../stores";
 import { tauri } from "../../utils";
-import { open } from "@tauri-apps/api/shell";
+import { AddFolderButton } from "../add-folder-button";
 
 const LoadingOccurrence: Component = () => {
     return (
@@ -31,9 +32,14 @@ const NoOccurenceSelect: Component = () => {
             fallback={<LoadingOccurrence />}
         >
             <div class="flex flex-col">
-                <p class="text-2xl mb-2 text-gray-600 dark:text-gray-400">
-                    Nothing selected
-                </p>
+                <div class="flex flex-row justify-items-center align-middle mb-2">
+                    <div class="text-2xl text-gray-600 dark:text-gray-400">
+                        Nothing selected
+                    </div>
+                    <div class="flex ml-2">
+                        <AddFolderButton triggerSideBar={true} />
+                    </div>
+                </div>
                 <p class="text-xl text-gray-600 dark:text-gray-400">
                     1. Open sidebar
                     <i class="mx-2 fa-solid fa-fw fa-xs fa-bars" />
