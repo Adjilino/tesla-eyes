@@ -1,4 +1,4 @@
-import { Accessor, createEffect } from "solid-js";
+import { Accessor, Component, createEffect } from "solid-js";
 import {
     endVideoEvent,
     isPlaying,
@@ -8,7 +8,7 @@ import {
     startAt,
 } from "../../stores";
 
-export function Camera(props: CameraProps) {
+export const Camera: Component<CameraProps> = (props: CameraProps) => {
     let isEnded = false;
     let lastStartAt: number | null = null;
 
@@ -115,7 +115,7 @@ export function Camera(props: CameraProps) {
             />
         </a>
     );
-}
+};
 
 interface CameraProps {
     id: string;

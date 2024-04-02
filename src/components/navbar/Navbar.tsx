@@ -1,8 +1,8 @@
-import { createMemo } from "solid-js";
+import { Component, createMemo } from "solid-js";
 import { selectedOccurrence, setIsSidebarOpen } from "../../stores";
 import Button from "../../ui/Button";
 
-export function Navbar() {
+export const Navbar: Component = () => {
     const toggleSidebar = () => {
         setIsSidebarOpen((o) => !o);
     };
@@ -21,7 +21,10 @@ export function Navbar() {
 
     return (
         <div class="h-16 p-2 flex w-full items-center gap-2">
-            <Button onClick={toggleSidebar} class="bg-transparent dark:bg-transparent">
+            <Button
+                onClick={toggleSidebar}
+                class="bg-transparent dark:bg-transparent"
+            >
                 <i class="mx-2 fa-solid fa-fw fa-bars" />
             </Button>
             <div class="flex">
@@ -30,6 +33,6 @@ export function Navbar() {
             <div class="flex-grow flex justify-center">{dateTitle()}</div>
         </div>
     );
-}
+};
 
 export default Navbar;

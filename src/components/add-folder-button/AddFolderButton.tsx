@@ -1,4 +1,4 @@
-import { Show } from "solid-js";
+import { Component, Show } from "solid-js";
 import { isLoadingOccurrences, setIsSidebarOpen } from "../../stores";
 import { Button } from "../../ui";
 import { addFolder } from "../../utils";
@@ -7,7 +7,9 @@ export interface AddFolderButtonProps {
     triggerSideBar?: boolean;
 }
 
-export function AddFolderButton(props: AddFolderButtonProps) {
+export const AddFolderButton: Component<AddFolderButtonProps> = (
+    props: AddFolderButtonProps
+) => {
     const addFolderClick = () => {
         if (props.triggerSideBar) {
             setIsSidebarOpen(true);
@@ -26,4 +28,4 @@ export function AddFolderButton(props: AddFolderButtonProps) {
             <span class="truncate">Add folder</span>
         </Button>
     );
-}
+};

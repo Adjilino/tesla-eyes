@@ -1,6 +1,6 @@
 import { confirm } from "@tauri-apps/api/dialog";
 import { removeDir } from "@tauri-apps/api/fs";
-import { Show, createMemo, createSignal } from "solid-js";
+import { Component, Show, createMemo, createSignal } from "solid-js";
 import { Occurrence } from "../../models";
 import {
     currentTime,
@@ -51,7 +51,7 @@ function addVideoShortcutControls() {
     });
 }
 
-export function Timeline() {
+export const Timeline: Component = () => {
     addVideoShortcutControls();
 
     const maxTime = createMemo(() => {
@@ -262,4 +262,4 @@ export function Timeline() {
             </Show>
         </div>
     );
-}
+};

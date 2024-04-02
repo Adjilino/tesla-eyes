@@ -1,4 +1,4 @@
-import { For, Show, createMemo } from "solid-js";
+import { Component, For, Show, createMemo } from "solid-js";
 import { OccurrenceFiles } from "../../models/occurence-files";
 import {
     Filter,
@@ -12,7 +12,11 @@ import SidebarFooter from "./Footer";
 import SidebarHeader from "./Header";
 import styles from "./Sidebar.module.css";
 
-export function Sidebar(props: { class: string }) {
+export interface SidebarProps {
+    class: string;
+}
+
+export const Sidebar: Component<SidebarProps> = (props: SidebarProps) => {
     function getOccurrenceDateTime(occurenceFiles: OccurrenceFiles) {
         return (
             occurenceFiles.getConfig()?.getDateTime()?.toLocaleString() || ""
@@ -166,6 +170,6 @@ export function Sidebar(props: { class: string }) {
             </div>
         </div>
     );
-}
+};
 
 export default Sidebar;

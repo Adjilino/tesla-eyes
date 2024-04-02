@@ -11,24 +11,26 @@ const App: Component = () => {
     });
 
     return (
-        <div
-            class={
-                "bg-white dark:bg-slate-800 text-gray-900 dark:text-white " +
-                "h-[calc(100dvh)] w-full relative flex flex-col"
-            }
-        >
-            <Sidebar class="z-30" />
-            <Navbar />
+        <>
+            <div
+                class={
+                    "bg-white dark:bg-slate-800 text-gray-900 dark:text-white " +
+                    "h-[calc(100dvh)] w-full relative flex flex-col"
+                }
+            >
+                <Sidebar class="z-30" />
+                <Navbar />
 
-            <div class="flex-grow flex overflow-hidden justify-center items-center">
-                <Show
-                    when={!!selectedOccurrence()}
-                    fallback={<NoOccurenceSelect />}
-                >
-                    <MainView />
-                </Show>
+                <div class="flex-grow flex overflow-hidden justify-center items-center">
+                    <Show
+                        when={!!selectedOccurrence()}
+                        fallback={<NoOccurenceSelect />}
+                    >
+                        <MainView />
+                    </Show>
+                </div>
             </div>
-        </div>
+        </>
     );
 };
 

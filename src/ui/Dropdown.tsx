@@ -1,4 +1,4 @@
-import { For, createSignal } from "solid-js";
+import { Component, For, createSignal } from "solid-js";
 import { uuidv4 } from "../utils";
 import Button from "./Button";
 
@@ -15,7 +15,7 @@ interface DropdownProps {
     onSelect?: (value: Option) => void;
 }
 
-export function Dropdown(props: DropdownProps) {
+export const Dropdown: Component<DropdownProps> = (props: DropdownProps) => {
     const uuid = uuidv4();
 
     const [selected, setSelected] = createSignal<Option | undefined>(undefined);
@@ -56,6 +56,6 @@ export function Dropdown(props: DropdownProps) {
             </Button>
         </>
     );
-}
+};
 
 export default Dropdown;

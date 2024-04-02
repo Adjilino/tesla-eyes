@@ -1,4 +1,4 @@
-import { For } from "solid-js";
+import { Component, For } from "solid-js";
 import {
     Filter,
     currentFilter,
@@ -7,7 +7,7 @@ import {
 } from "../../stores";
 import { Button } from "../../ui";
 
-export function SidebarHeader() {
+export const SidebarHeader: Component = () => {
     function toggleSidebar() {
         setIsSidebarOpen((o) => !o);
     }
@@ -15,7 +15,10 @@ export function SidebarHeader() {
     return (
         <div class="flex w-full truncate">
             <div class="flex grow items-center">
-                <Button onClick={toggleSidebar} class="bg-transparent dark:bg-transparent">
+                <Button
+                    onClick={toggleSidebar}
+                    class="bg-transparent dark:bg-transparent"
+                >
                     <i class="mx-2 fa-solid fa-fw fa-bars" />
                 </Button>
             </div>
@@ -49,6 +52,6 @@ export function SidebarHeader() {
             </div>
         </div>
     );
-}
+};
 
 export default SidebarHeader;

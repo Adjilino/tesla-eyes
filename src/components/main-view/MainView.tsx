@@ -1,9 +1,9 @@
-import { createMemo, createSignal } from "solid-js";
+import { Component, createMemo, createSignal } from "solid-js";
 import { selectedVideos } from "../../stores";
 import { Camera } from "./Camera";
 import { Timeline } from "./Timelime";
 
-export function MainView() {
+export const MainView: Component = () => {
     const [selectedCamera, setSelectedCamera] = createSignal("front");
 
     const frontSourceString = createMemo(() => {
