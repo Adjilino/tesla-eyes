@@ -89,6 +89,7 @@ export async function addFolder() {
         addFolderInput.click();
         return;
     }
+
     let folder: string | string[] | null = null;
 
     folder = await open({
@@ -98,6 +99,7 @@ export async function addFolder() {
     if (!folder || Array.isArray(folder)) {
         return;
     }
+
     loadingOccurrences.push(true);
     // setIsLoadingOccurrences(true);
 

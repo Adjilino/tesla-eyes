@@ -3,15 +3,20 @@ import { Component, Show } from "solid-js";
 
 import { MainView, Navbar, Sidebar } from "./components";
 import NoOccurenceSelect from "./components/main-view/NoOccurenceSelect";
-import { selectedOccurrence, setIsDesktop } from "./stores";
+import { AppProvider, useApp } from "./contexts";
+import { selectedOccurrence } from "./stores";
 
 const App: Component = () => {
+    const app = useApp();
+
     invoke("is_desktop").then((response) => {
-        setIsDesktop(!!response);
+        if (app) {
+            app.platform.setIsDesktop(!!response);
+        }
     });
 
     return (
-        <>
+        <AppProvider>
             <div
                 class={
                     "bg-white dark:bg-slate-800 text-gray-900 dark:text-white " +
@@ -30,7 +35,7 @@ const App: Component = () => {
                     </Show>
                 </div>
             </div>
-        </>
+        </AppProvider>
     );
 };
 
