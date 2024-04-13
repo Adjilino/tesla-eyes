@@ -1,22 +1,18 @@
 import { Component, For, Show, createMemo } from "solid-js";
 import { OccurrenceFiles } from "../../models/occurence-files";
-import {
-    Filter,
-    currentFilter,
-    fileByOccurrence,
-    isSidebarOpen,
-    setIsSidebarOpen,
-    setSelectedOccurrenceFiles,
-} from "../../stores";
+import { Filter, currentFilter } from "../../stores";
 import SidebarFooter from "./Footer";
 import SidebarHeader from "./Header";
 import styles from "./Sidebar.module.css";
+import { useApp } from "../../contexts";
 
 export interface SidebarProps {
     class: string;
 }
 
 export const Sidebar: Component<SidebarProps> = (props: SidebarProps) => {
+    const app = useApp();
+
     function getOccurrenceDateTime(occurenceFiles: OccurrenceFiles) {
         return (
             occurenceFiles.getConfig()?.getDateTime()?.toLocaleString() || ""
@@ -26,7 +22,9 @@ export const Sidebar: Component<SidebarProps> = (props: SidebarProps) => {
         return occurenceFiles.getConfig()?.getCity() || "";
     }
     async function onClickOccurence(occurrenceFiles: OccurrenceFiles) {
-        setSelectedOccurrenceFiles(occurrenceFiles);
+        if (app) {
+            app.fileByOccurrence.setSelected(occurrenceFiles);
+        }
     }
 
     const clickOutsideSidebar = (event: MouseEvent) => {
@@ -34,13 +32,17 @@ export const Sidebar: Component<SidebarProps> = (props: SidebarProps) => {
             "sidebar-container"
         ) as HTMLElement;
 
-        if (event.target === sidebarContainer) {
-            setIsSidebarOpen(false);
+        if (event.target === sidebarContainer && app) {
+            app.sidebar.setIsOpen(false);
         }
     };
 
     const filteredFilesByOcurrence = createMemo(() => {
-        const _fileByOccurrence = fileByOccurrence();
+        if (!app) {
+            return;
+        }
+
+        const _fileByOccurrence = app.fileByOccurrence.get();
         const _filter = currentFilter();
 
         if (_filter === Filter.All) {
@@ -54,6 +56,14 @@ export const Sidebar: Component<SidebarProps> = (props: SidebarProps) => {
 
             return occurrence.config?.getReason()?.includes(_filter);
         });
+    });
+
+    const isSidebarOpen = createMemo(() => {
+        if (app) {
+            return app.sidebar.isOpen();
+        }
+
+        return false;
     });
 
     return (

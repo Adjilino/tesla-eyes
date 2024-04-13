@@ -1,58 +1,16 @@
 import { createEffect, createMemo, createSignal } from "solid-js";
 import { TimestampVideo } from "../interfaces";
 import { Occurrence } from "../models";
-import { OccurrenceFiles } from "../models/occurence-files";
-import { setIsSidebarOpen } from "./sidebar.store";
-
-export const [fileByOccurrence, setFilesByOccurrences] = createSignal<
-    Array<OccurrenceFiles>
->([]);
-
-export const [selectedOccurrenceFiles, setSelectedOccurrenceFiles] =
-    createSignal<OccurrenceFiles | null>(null);
 
 export const [isLoadingSelectedOccurrence, setIsLoadingSelectedOccurrence] =
     createSignal<boolean>(false);
-
-createEffect(() => {
-    const _selectedOccurrenceFiles = selectedOccurrenceFiles();
-
-    if (!_selectedOccurrenceFiles) {
-        return;
-    }
-
-    setSelectedOccurrence(null);
-    setIsLoadingSelectedOccurrence(true);
-    setIsPlaying(false);
-    setIsSidebarOpen(false);
-
-    _selectedOccurrenceFiles
-        .toOccurrence()
-        .then((occurrence) => {
-            if (!occurrence) {
-                console.error("Failed to convert OccurenceFiles to Occurence");
-                return;
-            }
-
-            setIsLoadingSelectedOccurrence(false);
-            setSelectedOccurrence(occurrence);
-        })
-        .catch((error) => {
-            setIsLoadingSelectedOccurrence(false);
-            console.error(
-                "Error converting occurrenceFiles to Occurrence",
-                error
-            );
-        });
-});
 
 export const [selectedOccurrence, setSelectedOccurrence] =
     createSignal<Occurrence | null>(null);
 
 export const [currentTime, setCurrentTime] = createSignal<number>(0);
 export const [isPlaying, setIsPlaying] = createSignal<boolean>(false);
-export const [playbackRate, setPlaybackRate] =
-    createSignal<number>(1);
+export const [playbackRate, setPlaybackRate] = createSignal<number>(1);
 
 createEffect(() => {
     // on select occurence auto play the video

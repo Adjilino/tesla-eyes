@@ -3,13 +3,18 @@ import {
     Filter,
     currentFilter,
     setCurrentFilter,
-    setIsSidebarOpen,
 } from "../../stores";
 import { Button } from "../../ui";
+import { useApp } from "../../contexts";
 
 export const SidebarHeader: Component = () => {
+    const app = useApp();
+
     function toggleSidebar() {
-        setIsSidebarOpen((o) => !o);
+        if (app) {
+            app.sidebar.setIsOpen((o) => !o);
+        }
+
     }
 
     return (

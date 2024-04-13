@@ -1,10 +1,16 @@
 import { Component, createMemo } from "solid-js";
-import { selectedOccurrence, setIsSidebarOpen } from "../../stores";
+import { selectedOccurrence } from "../../stores";
 import Button from "../../ui/Button";
+import { useApp } from "../../contexts";
 
 export const Navbar: Component = () => {
+    const app = useApp();
+
     const toggleSidebar = () => {
-        setIsSidebarOpen((o) => !o);
+        if (app) {
+            app.sidebar.setIsOpen((o) => !o);
+        }
+
     };
 
     const dateTitle = createMemo(() => {

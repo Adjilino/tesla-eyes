@@ -4,13 +4,10 @@ import { Component, Show, createMemo, createSignal } from "solid-js";
 import { Occurrence } from "../../models";
 import {
     currentTime,
-    fileByOccurrence,
     isPlaying,
     selectedOccurrence,
-    selectedOccurrenceFiles,
     setChangeCurrentTime,
     setPlaybackRate,
-    setFilesByOccurrences,
     setIsPlaying,
     setSelectedOccurrence,
     playbackRate,
@@ -18,6 +15,7 @@ import {
 import { Button, Dropdown } from "../../ui";
 import timelineStyles from "./Timelime.module.css";
 import { tauri } from "../../utils";
+import { useApp } from "../../contexts";
 
 function addVideoShortcutControls() {
     window.addEventListener("keydown", (event) => {
@@ -52,6 +50,8 @@ function addVideoShortcutControls() {
 }
 
 export const Timeline: Component = () => {
+    const app = useApp();
+
     addVideoShortcutControls();
 
     const maxTime = createMemo(() => {
@@ -176,14 +176,17 @@ export const Timeline: Component = () => {
             recursive: true,
         });
 
-        const _fileByOccurence = fileByOccurrence();
-        const _selectedOccurrenceFile = selectedOccurrenceFiles();
-        if (_fileByOccurence && _selectedOccurrenceFile) {
-            setFilesByOccurrences(
-                _fileByOccurence.filter(
-                    (file) => file.getId() !== _selectedOccurrenceFile.getId()
-                )
-            );
+        if (app) {
+            const _fileByOccurence = app.fileByOccurrence.get();
+            const _selectedOccurrenceFile = app.fileByOccurrence.getSelected();
+            if (_fileByOccurence && _selectedOccurrenceFile) {
+                app.fileByOccurrence.set(
+                    _fileByOccurence.filter(
+                        (file) =>
+                            file.getId() !== _selectedOccurrenceFile.getId()
+                    )
+                );
+            }
         }
     };
 
