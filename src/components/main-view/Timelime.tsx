@@ -5,11 +5,9 @@ import { Occurrence } from "../../models";
 import {
     currentTime,
     isPlaying,
-    selectedOccurrence,
     setChangeCurrentTime,
     setPlaybackRate,
     setIsPlaying,
-    setSelectedOccurrence,
     playbackRate,
 } from "../../stores";
 import { Button, Dropdown } from "../../ui";
@@ -52,10 +50,14 @@ function addVideoShortcutControls() {
 export const Timeline: Component = () => {
     const app = useApp();
 
+    if (!app) {
+        return;
+    }
+
     addVideoShortcutControls();
 
     const maxTime = createMemo(() => {
-        const occurence = selectedOccurrence();
+        const occurence = app.selectedOccurrence.get();
         if (!occurence) {
             return 0;
         }
@@ -64,7 +66,7 @@ export const Timeline: Component = () => {
     });
 
     const occuredAt = createMemo(() => {
-        const occurence = selectedOccurrence();
+        const occurence = app.selectedOccurrence.get();
         if (!occurence) {
             return 0;
         }
@@ -170,7 +172,7 @@ export const Timeline: Component = () => {
         }
 
         setIsPlaying(false);
-        setSelectedOccurrence(null);
+        app.selectedOccurrence.set(null);
 
         removeDir(occurence.directory, {
             recursive: true,
@@ -254,10 +256,17 @@ export const Timeline: Component = () => {
                     />
                 </div>
             </div>
-            <Show when={window["__TAURI__"] && selectedOccurrence()?.directory}>
+            <Show
+                when={
+                    window["__TAURI__"] &&
+                    app.selectedOccurrence.get()?.directory
+                }
+            >
                 <div class="flex">
                     <Button
-                        onClick={() => removeOccurence(selectedOccurrence())}
+                        onClick={() =>
+                            removeOccurence(app.selectedOccurrence.get())
+                        }
                     >
                         <i class={"mx-2 fa-solid fa-fw fa-trash"} />
                     </Button>

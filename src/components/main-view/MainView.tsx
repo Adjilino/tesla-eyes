@@ -1,13 +1,25 @@
-import { Component, createMemo, createSignal } from "solid-js";
-import { selectedVideos } from "../../stores";
+import { Component, createEffect, createMemo, createSignal } from "solid-js";
 import { Camera } from "./Camera";
 import { Timeline } from "./Timelime";
+import { useApp, useMainView } from "../../contexts";
 
 export const MainView: Component = () => {
+    const app = useApp();
+
+    if (!app) {
+        return;
+    }
+
+    const mainViewContext = useMainView();
+
+    if (!mainViewContext) {
+        return;
+    }
+
     const [selectedCamera, setSelectedCamera] = createSignal("front");
 
     const frontSourceString = createMemo(() => {
-        const _selectedTimestampVideo = selectedVideos();
+        const _selectedTimestampVideo = mainViewContext.selectedVideos();
         if (!_selectedTimestampVideo) {
             return;
         }
@@ -16,7 +28,7 @@ export const MainView: Component = () => {
     });
 
     const backSourceString = createMemo(() => {
-        const _selectedTimestampVideo = selectedVideos();
+        const _selectedTimestampVideo = mainViewContext.selectedVideos();
         if (!_selectedTimestampVideo) {
             return;
         }
@@ -25,7 +37,7 @@ export const MainView: Component = () => {
     });
 
     const leftSourceString = createMemo(() => {
-        const _selectedTimestampVideo = selectedVideos();
+        const _selectedTimestampVideo = mainViewContext.selectedVideos();
         if (!_selectedTimestampVideo) {
             return;
         }
@@ -34,7 +46,7 @@ export const MainView: Component = () => {
     });
 
     const rightSourceString = createMemo(() => {
-        const _selectedTimestampVideo = selectedVideos();
+        const _selectedTimestampVideo = mainViewContext.selectedVideos();
         if (!_selectedTimestampVideo) {
             return;
         }
@@ -88,6 +100,6 @@ export const MainView: Component = () => {
             </div>
         </>
     );
-}
+};
 
 export default MainView;

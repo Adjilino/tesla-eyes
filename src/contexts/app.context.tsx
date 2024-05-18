@@ -7,11 +7,9 @@ import {
     createSignal,
     useContext,
 } from "solid-js";
-import { OccurrenceFiles } from "../models";
+import { Occurrence, OccurrenceFiles } from "../models";
 import {
-    setIsLoadingSelectedOccurrence,
     setIsPlaying,
-    setSelectedOccurrence,
 } from "../stores";
 
 export interface AppContextInterface {
@@ -29,6 +27,12 @@ export interface AppContextInterface {
         getSelected: Accessor<OccurrenceFiles | null>;
         setSelected: Setter<OccurrenceFiles | null>;
     };
+    selectedOccurrence: {
+        get: Accessor<Occurrence | null>;
+        set: Setter<Occurrence | null>;
+        isLoading: Accessor<boolean>;
+        setIsLoading: Setter<boolean>;
+    }
 }
 
 const AppContext = createContext<AppContextInterface>();
@@ -47,6 +51,13 @@ export const AppProvider = (props: AppProviderInterface) => {
     const [selectedOccurrenceFiles, setSelectedOccurrenceFiles] =
         createSignal<OccurrenceFiles | null>(null);
 
+    const [isLoadingSelectedOccurrence, setIsLoadingSelectedOccurrence] =
+        createSignal<boolean>(false);
+
+    const [selectedOccurrence, setSelectedOccurrence] =
+        createSignal<Occurrence | null>(null);
+
+
     createEffect(() => {
         const _selectedOccurrenceFiles = selectedOccurrenceFiles();
 
@@ -57,28 +68,30 @@ export const AppProvider = (props: AppProviderInterface) => {
         setSelectedOccurrence(null);
         setIsLoadingSelectedOccurrence(true);
         setIsPlaying(false);
-        // TODO: close
-        // setIsSidebarOpen(false);
+        setIsSidebarOpen(false);
 
         _selectedOccurrenceFiles
             .toOccurrence()
             .then((occurrence) => {
+                setIsLoadingSelectedOccurrence(false);
+
                 if (!occurrence) {
                     console.error(
-                        "Failed to convert OccurenceFiles to Occurence"
+                        "Failed to convert OccurenceFiles to Occurence",
                     );
+                    alert("Failed to convert OccurenceFiles to Occurence");
                     return;
                 }
 
-                setIsLoadingSelectedOccurrence(false);
                 setSelectedOccurrence(occurrence);
             })
             .catch((error) => {
                 setIsLoadingSelectedOccurrence(false);
                 console.error(
                     "Error converting occurrenceFiles to Occurrence",
-                    error
+                    error,
                 );
+                alert("Error converting preloading occurrence");
             });
     });
 
@@ -95,8 +108,14 @@ export const AppProvider = (props: AppProviderInterface) => {
             get: fileByOccurrence,
             set: setFilesByOccurrences,
             getSelected: selectedOccurrenceFiles,
-            setSelected: setSelectedOccurrenceFiles,
+            setSelected: setSelectedOccurrenceFiles
         },
+        selectedOccurrence: {
+            get: selectedOccurrence,
+            set: setSelectedOccurrence,
+            isLoading: isLoadingSelectedOccurrence,
+            setIsLoading: setIsLoadingSelectedOccurrence,
+        }
     };
 
     return (

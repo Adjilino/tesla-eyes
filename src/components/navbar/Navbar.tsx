@@ -1,10 +1,13 @@
 import { Component, createMemo } from "solid-js";
-import { selectedOccurrence } from "../../stores";
 import Button from "../../ui/Button";
 import { useApp } from "../../contexts";
 
 export const Navbar: Component = () => {
     const app = useApp();
+
+    if (!app) {
+        return;
+    }
 
     const toggleSidebar = () => {
         if (app) {
@@ -14,11 +17,12 @@ export const Navbar: Component = () => {
     };
 
     const dateTitle = createMemo(() => {
-        if (selectedOccurrence() && selectedOccurrence()?.getDateTime()) {
+        const _selectedOccurrence = app.selectedOccurrence.get();
+        if (_selectedOccurrence && _selectedOccurrence?.getDateTime()) {
             return (
-                selectedOccurrence()?.getDateTime()?.toDateString() +
+                _selectedOccurrence?.getDateTime()?.toDateString() +
                 ", " +
-                selectedOccurrence()?.getDateTime()?.toLocaleTimeString()
+                _selectedOccurrence?.getDateTime()?.toLocaleTimeString()
             );
         }
 

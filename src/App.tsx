@@ -4,10 +4,13 @@ import { Component, Show } from "solid-js";
 import { MainView, Navbar, Sidebar } from "./components";
 import NoOccurenceSelect from "./components/main-view/NoOccurenceSelect";
 import { AppProvider, useApp } from "./contexts";
-import { selectedOccurrence } from "./stores";
 
 const App: Component = () => {
     const app = useApp();
+
+    if (!app) {
+        return;
+    }
 
     invoke("is_desktop").then((response) => {
         if (app) {
@@ -28,7 +31,7 @@ const App: Component = () => {
 
                 <div class="flex-grow flex overflow-hidden justify-center items-center">
                     <Show
-                        when={!!selectedOccurrence()}
+                        when={!!app.selectedOccurrence.get()}
                         fallback={<NoOccurenceSelect />}
                     >
                         <MainView />
