@@ -1,18 +1,28 @@
-import { createMemo } from "solid-js";
-import { selectedOccurrence, setIsSidebarOpen } from "../../stores";
+import { Component, createMemo } from "solid-js";
 import Button from "../../ui/Button";
+import { useApp } from "../../contexts";
 
-export function Navbar() {
+export const Navbar: Component = () => {
+    const app = useApp();
+
+    if (!app) {
+        return;
+    }
+
     const toggleSidebar = () => {
-        setIsSidebarOpen((o) => !o);
+        if (app) {
+            app.sidebar.setIsOpen((o) => !o);
+        }
+
     };
 
     const dateTitle = createMemo(() => {
-        if (selectedOccurrence() && selectedOccurrence()?.getDateTime()) {
+        const _selectedOccurrence = app.selectedOccurrence.get();
+        if (_selectedOccurrence && _selectedOccurrence?.getDateTime()) {
             return (
-                selectedOccurrence()?.getDateTime()?.toDateString() +
+                _selectedOccurrence?.getDateTime()?.toDateString() +
                 ", " +
-                selectedOccurrence()?.getDateTime()?.toLocaleTimeString()
+                _selectedOccurrence?.getDateTime()?.toLocaleTimeString()
             );
         }
 
@@ -21,7 +31,10 @@ export function Navbar() {
 
     return (
         <div class="h-16 p-2 flex w-full items-center gap-2">
-            <Button onClick={toggleSidebar} class="bg-transparent dark:bg-transparent">
+            <Button
+                onClick={toggleSidebar}
+                class="bg-transparent dark:bg-transparent"
+            >
                 <i class="mx-2 fa-solid fa-fw fa-bars" />
             </Button>
             <div class="flex">
@@ -30,6 +43,6 @@ export function Navbar() {
             <div class="flex-grow flex justify-center">{dateTitle()}</div>
         </div>
     );
-}
+};
 
 export default Navbar;

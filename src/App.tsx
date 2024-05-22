@@ -3,11 +3,19 @@ import { Component, Show } from "solid-js";
 
 import { MainView, Navbar, Sidebar } from "./components";
 import NoOccurenceSelect from "./components/main-view/NoOccurenceSelect";
-import { selectedOccurrence, setIsDesktop } from "./stores";
+import { MainViewProvider, useApp } from "./contexts";
 
 const App: Component = () => {
+    const app = useApp();
+
+    if (!app) {
+        return;
+    }
+
     invoke("is_desktop").then((response) => {
-        setIsDesktop(!!response);
+        if (app) {
+            app.platform.setIsDesktop(!!response);
+        }
     });
 
     return (
@@ -22,10 +30,12 @@ const App: Component = () => {
 
             <div class="flex-grow flex overflow-hidden justify-center items-center">
                 <Show
-                    when={!!selectedOccurrence()}
+                    when={!!app.selectedOccurrence.get()}
                     fallback={<NoOccurenceSelect />}
                 >
-                    <MainView />
+                    <MainViewProvider>
+                        <MainView />
+                    </MainViewProvider>
                 </Show>
             </div>
         </div>

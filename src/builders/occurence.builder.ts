@@ -16,6 +16,7 @@ export class OccurenceBuilder {
 
     constructor() {
         this.videoElement.muted = true;
+        this.videoElement.preload = "metadata";
         return this;
     }
 
@@ -212,10 +213,12 @@ export class OccurenceBuilder {
 
         for (const file of videoFilesSorted) {
             const sourceString = await this._createSourceString(file);
-            const duration = await this._getVideoDuration(sourceString);
+            let duration = 0;
 
-            if (!duration) {
-                continue;
+            try {
+                duration = await this._getVideoDuration(sourceString);
+            } catch (error) {
+                console.warn(`Video ${file.name} is corrupted`);
             }
 
             let splittedPath: string[];

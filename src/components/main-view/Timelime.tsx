@@ -1,61 +1,24 @@
 import { confirm } from "@tauri-apps/api/dialog";
 import { removeDir } from "@tauri-apps/api/fs";
-import { Show, createMemo, createSignal } from "solid-js";
+import { Component, Show, createMemo, createSignal } from "solid-js";
 import { Occurrence } from "../../models";
-import {
-    currentTime,
-    fileByOccurrence,
-    isPlaying,
-    selectedOccurrence,
-    selectedOccurrenceFiles,
-    setChangeCurrentTime,
-    setPlaybackRate,
-    setFilesByOccurrences,
-    setIsPlaying,
-    setSelectedOccurrence,
-    playbackRate,
-} from "../../stores";
 import { Button, Dropdown } from "../../ui";
 import timelineStyles from "./Timelime.module.css";
 import { tauri } from "../../utils";
+import { useApp, useMainView } from "../../contexts";
 
-function addVideoShortcutControls() {
-    window.addEventListener("keydown", (event) => {
-        if (event.target !== document.body || !event.key) {
-            return;
-        }
+export const Timeline: Component = () => {
+    const app = useApp();
+    const mainView = useMainView();
 
-        switch (event.key) {
-            case " ":
-                setIsPlaying((isPlaying) => !isPlaying);
-                break;
+    if (!app || !mainView) {
+        return;
+    }
 
-            case "ArrowLeft":
-                setTimeout(() => {
-                    setChangeCurrentTime(() => {
-                        const time = currentTime();
-                        return time > 5 ? time - 5 : 0;
-                    });
-                });
-                break;
-
-            case "ArrowRight":
-                setTimeout(() => {
-                    setChangeCurrentTime(() => {
-                        const time = currentTime();
-                        return (time || 0) + 5;
-                    });
-                });
-                break;
-        }
-    });
-}
-
-export function Timeline() {
     addVideoShortcutControls();
 
     const maxTime = createMemo(() => {
-        const occurence = selectedOccurrence();
+        const occurence = app.selectedOccurrence.get();
         if (!occurence) {
             return 0;
         }
@@ -64,7 +27,7 @@ export function Timeline() {
     });
 
     const occuredAt = createMemo(() => {
-        const occurence = selectedOccurrence();
+        const occurence = app.selectedOccurrence.get();
         if (!occurence) {
             return 0;
         }
@@ -78,7 +41,7 @@ export function Timeline() {
     const [mouseDownTimeline, setMouseDownTimeline] = createSignal(-1);
 
     const currentTimelineWidth = createMemo(() => {
-        const _currentTime = currentTime();
+        const _currentTime = mainView.currentTime.get();
 
         if (isMouseDown()) {
             return `${mouseDownTimeline() * 100}%`;
@@ -151,7 +114,7 @@ export function Timeline() {
             return;
         }
 
-        setChangeCurrentTime(percent * maxTime());
+        mainView.changeCurrentTime.set(percent * maxTime());
         setIsMouseDown(false);
     };
 
@@ -169,21 +132,24 @@ export function Timeline() {
             return;
         }
 
-        setIsPlaying(false);
-        setSelectedOccurrence(null);
+        app.isPlaying.set(false);
+        app.selectedOccurrence.set(null);
 
         removeDir(occurence.directory, {
             recursive: true,
         });
 
-        const _fileByOccurence = fileByOccurrence();
-        const _selectedOccurrenceFile = selectedOccurrenceFiles();
-        if (_fileByOccurence && _selectedOccurrenceFile) {
-            setFilesByOccurrences(
-                _fileByOccurence.filter(
-                    (file) => file.getId() !== _selectedOccurrenceFile.getId()
-                )
-            );
+        if (app) {
+            const _fileByOccurence = app.fileByOccurrence.get();
+            const _selectedOccurrenceFile = app.fileByOccurrence.getSelected();
+            if (_fileByOccurence && _selectedOccurrenceFile) {
+                app.fileByOccurrence.set(
+                    _fileByOccurence.filter(
+                        (file) =>
+                            file.getId() !== _selectedOccurrenceFile.getId()
+                    )
+                );
+            }
         }
     };
 
@@ -191,13 +157,15 @@ export function Timeline() {
         <div class="h-16 p-2 flex w-full gap-2">
             <div class="flex">
                 <Button
-                    onClick={() => setIsPlaying((playing) => !playing)}
+                    onClick={() =>
+                        app.isPlaying.set((playing: boolean) => !playing)
+                    }
                     class="bg-transparent dark:bg-transparent"
                 >
                     <i
                         class={
                             "mx-2 fa-solid fa-fw " +
-                            (isPlaying() ? "fa-pause" : "fa-play")
+                            (app.isPlaying.get() ? "fa-pause" : "fa-play")
                         }
                     />
                 </Button>
@@ -214,9 +182,9 @@ export function Timeline() {
                         { label: "x2", value: "2" },
                         { label: "x4", value: "4" },
                     ]}
-                    value={String(playbackRate())}
+                    value={String(mainView.playbackRate.get())}
                     onSelect={(value) =>
-                        setPlaybackRate(parseFloat(value.value))
+                        mainView.playbackRate.set(parseFloat(value.value))
                     }
                 />
             </div>
@@ -251,10 +219,17 @@ export function Timeline() {
                     />
                 </div>
             </div>
-            <Show when={window["__TAURI__"] && selectedOccurrence()?.directory}>
+            <Show
+                when={
+                    window["__TAURI__"] &&
+                    app.selectedOccurrence.get()?.directory
+                }
+            >
                 <div class="flex">
                     <Button
-                        onClick={() => removeOccurence(selectedOccurrence())}
+                        onClick={() =>
+                            removeOccurence(app.selectedOccurrence.get())
+                        }
                     >
                         <i class={"mx-2 fa-solid fa-fw fa-trash"} />
                     </Button>
@@ -262,4 +237,40 @@ export function Timeline() {
             </Show>
         </div>
     );
-}
+
+    function addVideoShortcutControls() {
+        if (!app || !mainView) {
+            return;
+        }
+
+        window.addEventListener("keydown", (event) => {
+            if (event.target !== document.body || !event.key) {
+                return;
+            }
+
+            switch (event.key) {
+                case " ":
+                    app.isPlaying.set((isPlaying) => !isPlaying);
+                    break;
+
+                case "ArrowLeft":
+                    setTimeout(() => {
+                        mainView.changeCurrentTime.set(() => {
+                            const time = mainView.changeCurrentTime.get() || 0;
+                            return time > 5 ? time - 5 : 0;
+                        });
+                    });
+                    break;
+
+                case "ArrowRight":
+                    setTimeout(() => {
+                        mainView.changeCurrentTime.set(() => {
+                            const time = mainView.currentTime.get();
+                            return (time || 0) + 5;
+                        });
+                    });
+                    break;
+            }
+        });
+    }
+};

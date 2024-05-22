@@ -1,20 +1,28 @@
-import { Accessor, createEffect } from "solid-js";
 import {
-    endVideoEvent,
-    isPlaying,
-    ontimeupdateEvent,
-    playbackRate,
-    setIsPlaying,
-    startAt,
-} from "../../stores";
+    Accessor,
+    Component,
+    Show,
+    createEffect,
+    createSignal,
+} from "solid-js";
+import { useApp, useMainView } from "../../contexts";
 
-export function Camera(props: CameraProps) {
+export const Camera: Component<CameraProps> = (props: CameraProps) => {
+    const app = useApp();
+    const mainView = useMainView();
+
+    if (!app || !mainView) {
+        return;
+    }
+
     let isEnded = false;
     let lastStartAt: number | null = null;
 
+    const [hasError, setHasError] = createSignal(false);
+
     createEffect(() => {
         const source = props.source();
-        const _startAt = startAt();
+        const _startAt = mainView.startAt.get();
 
         const videoElement = document.getElementById(
             props.id
@@ -25,8 +33,11 @@ export function Camera(props: CameraProps) {
                 videoElement.currentTime = _startAt;
                 videoElement.onloadedmetadata = null;
             };
+
             lastStartAt = _startAt;
             videoElement.src = source;
+
+            setHasError(false);
         } else if (_startAt !== lastStartAt) {
             videoElement.currentTime = _startAt;
             lastStartAt = _startAt;
@@ -34,18 +45,22 @@ export function Camera(props: CameraProps) {
 
         if (source && isEnded) {
             isEnded = false;
-            setIsPlaying(true);
+            app.isPlaying.set(true);
         }
     });
 
     createEffect(() => {
-        const _isPlaying = isPlaying();
+        const _isPlaying = app.isPlaying.get();
 
         const videoElement = document.getElementById(
             props.id
         ) as HTMLVideoElement;
 
         if (!videoElement) {
+            return;
+        }
+
+        if (hasError()) {
             return;
         }
 
@@ -57,7 +72,7 @@ export function Camera(props: CameraProps) {
     });
 
     createEffect(() => {
-        const _playbackRate = playbackRate();
+        const _playbackRate = mainView.playbackRate.get();
 
         const videoElement = document.getElementById(
             props.id
@@ -72,29 +87,28 @@ export function Camera(props: CameraProps) {
     });
 
     // const handlePause = () => {
-    //   if (isPlaying()) {
-    //     setIsPlaying(false);
+    //   if (app.isPlaying.get()) {
+    //     app.isPlaying.set(false);
     //   }
     // };
 
     // const handlePlay = () => {
-    //   if (!isPlaying()) {
-    //     setIsPlaying(true);
+    //   if (!app.isPlaying.get()) {
+    //     app.isPlaying.set(true);
     //   }
     // };
 
     const handleEnded = () => {
         isEnded = true;
 
-        endVideoEvent();
+        mainView.endVideoEvent();
     };
 
     return (
         <a
             class={[
-                "m-auto",
                 props.isActive
-                    ? "flex max-w-full max-h-full"
+                    ? "flex flex-grow max-w-full max-h-full"
                     : `${props.class} absolute z-10 w-32 h-24 rounded-lg overflow-hidden shadow cursor-pointer`,
             ].join(" ")}
             onClick={() => props.onClick()}
@@ -106,19 +120,31 @@ export function Camera(props: CameraProps) {
                 autoplay
                 onTimeUpdate={(event) => {
                     if (props.id === "frontElement") {
-                        ontimeupdateEvent(event.target as HTMLVideoElement);
+                        mainView.ontimeupdateEvent(
+                            event.target as HTMLVideoElement
+                        );
                     }
                 }}
                 // onPlay={handlePlay}
                 // onPause={handlePause}
                 onEnded={() => (props.id ? handleEnded() : null)}
+                onError={() => setHasError(true)}
             />
+            <Show when={!props.isActive}>
+                <div class="absolute bottom-0 pl-1">{props.name}</div>
+            </Show>
+            <Show when={hasError()}>
+                <div class="absolute top-0 flex w-full h-full items-center justify-center">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-300 shadow-2xl shadow-amber-200" />
+                </div>
+            </Show>
         </a>
     );
-}
+};
 
 interface CameraProps {
     id: string;
+    name: string;
     source: Accessor<string | undefined>;
     isActive: boolean;
     onClick: () => void;
