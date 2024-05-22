@@ -117,7 +117,7 @@ export const Camera: Component<CameraProps> = (props: CameraProps) => {
                 id={props.id}
                 muted={props.id === "frontElement" ? false : true}
                 playsinline
-                autoplay
+                autoplay={app.isPlaying.get()}
                 onTimeUpdate={(event) => {
                     if (props.id === "frontElement") {
                         mainView.ontimeupdateEvent(
