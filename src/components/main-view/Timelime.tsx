@@ -2,55 +2,16 @@ import { confirm } from "@tauri-apps/api/dialog";
 import { removeDir } from "@tauri-apps/api/fs";
 import { Component, Show, createMemo, createSignal } from "solid-js";
 import { Occurrence } from "../../models";
-import {
-    currentTime,
-    isPlaying,
-    setChangeCurrentTime,
-    setPlaybackRate,
-    setIsPlaying,
-    playbackRate,
-} from "../../stores";
 import { Button, Dropdown } from "../../ui";
 import timelineStyles from "./Timelime.module.css";
 import { tauri } from "../../utils";
-import { useApp } from "../../contexts";
-
-function addVideoShortcutControls() {
-    window.addEventListener("keydown", (event) => {
-        if (event.target !== document.body || !event.key) {
-            return;
-        }
-
-        switch (event.key) {
-            case " ":
-                setIsPlaying((isPlaying) => !isPlaying);
-                break;
-
-            case "ArrowLeft":
-                setTimeout(() => {
-                    setChangeCurrentTime(() => {
-                        const time = currentTime();
-                        return time > 5 ? time - 5 : 0;
-                    });
-                });
-                break;
-
-            case "ArrowRight":
-                setTimeout(() => {
-                    setChangeCurrentTime(() => {
-                        const time = currentTime();
-                        return (time || 0) + 5;
-                    });
-                });
-                break;
-        }
-    });
-}
+import { useApp, useMainView } from "../../contexts";
 
 export const Timeline: Component = () => {
     const app = useApp();
+    const mainView = useMainView();
 
-    if (!app) {
+    if (!app || !mainView) {
         return;
     }
 
@@ -80,7 +41,7 @@ export const Timeline: Component = () => {
     const [mouseDownTimeline, setMouseDownTimeline] = createSignal(-1);
 
     const currentTimelineWidth = createMemo(() => {
-        const _currentTime = currentTime();
+        const _currentTime = mainView.currentTime.get();
 
         if (isMouseDown()) {
             return `${mouseDownTimeline() * 100}%`;
@@ -153,7 +114,7 @@ export const Timeline: Component = () => {
             return;
         }
 
-        setChangeCurrentTime(percent * maxTime());
+        mainView.changeCurrentTime.set(percent * maxTime());
         setIsMouseDown(false);
     };
 
@@ -171,7 +132,7 @@ export const Timeline: Component = () => {
             return;
         }
 
-        setIsPlaying(false);
+        app.isPlaying.set(false);
         app.selectedOccurrence.set(null);
 
         removeDir(occurence.directory, {
@@ -196,13 +157,15 @@ export const Timeline: Component = () => {
         <div class="h-16 p-2 flex w-full gap-2">
             <div class="flex">
                 <Button
-                    onClick={() => setIsPlaying((playing) => !playing)}
+                    onClick={() =>
+                        app.isPlaying.set((playing: boolean) => !playing)
+                    }
                     class="bg-transparent dark:bg-transparent"
                 >
                     <i
                         class={
                             "mx-2 fa-solid fa-fw " +
-                            (isPlaying() ? "fa-pause" : "fa-play")
+                            (app.isPlaying.get() ? "fa-pause" : "fa-play")
                         }
                     />
                 </Button>
@@ -219,9 +182,9 @@ export const Timeline: Component = () => {
                         { label: "x2", value: "2" },
                         { label: "x4", value: "4" },
                     ]}
-                    value={String(playbackRate())}
+                    value={String(mainView.playbackRate.get())}
                     onSelect={(value) =>
-                        setPlaybackRate(parseFloat(value.value))
+                        mainView.playbackRate.set(parseFloat(value.value))
                     }
                 />
             </div>
@@ -274,4 +237,40 @@ export const Timeline: Component = () => {
             </Show>
         </div>
     );
+
+    function addVideoShortcutControls() {
+        if (!app || !mainView) {
+            return;
+        }
+
+        window.addEventListener("keydown", (event) => {
+            if (event.target !== document.body || !event.key) {
+                return;
+            }
+
+            switch (event.key) {
+                case " ":
+                    app.isPlaying.set((isPlaying) => !isPlaying);
+                    break;
+
+                case "ArrowLeft":
+                    setTimeout(() => {
+                        mainView.changeCurrentTime.set(() => {
+                            const time = mainView.changeCurrentTime.get() || 0;
+                            return time > 5 ? time - 5 : 0;
+                        });
+                    });
+                    break;
+
+                case "ArrowRight":
+                    setTimeout(() => {
+                        mainView.changeCurrentTime.set(() => {
+                            const time = mainView.currentTime.get();
+                            return (time || 0) + 5;
+                        });
+                    });
+                    break;
+            }
+        });
+    }
 };

@@ -8,9 +8,6 @@ import {
     useContext,
 } from "solid-js";
 import { Occurrence, OccurrenceFiles } from "../models";
-import {
-    setIsPlaying,
-} from "../stores";
 
 export interface AppContextInterface {
     platform: {
@@ -32,7 +29,11 @@ export interface AppContextInterface {
         set: Setter<Occurrence | null>;
         isLoading: Accessor<boolean>;
         setIsLoading: Setter<boolean>;
-    }
+    };
+    isPlaying: {
+        get: Accessor<boolean>;
+        set: Setter<boolean>;
+    };
 }
 
 const AppContext = createContext<AppContextInterface>();
@@ -57,6 +58,7 @@ export const AppProvider = (props: AppProviderInterface) => {
     const [selectedOccurrence, setSelectedOccurrence] =
         createSignal<Occurrence | null>(null);
 
+    const [isPlaying, setIsPlaying] = createSignal<boolean>(false);
 
     createEffect(() => {
         const _selectedOccurrenceFiles = selectedOccurrenceFiles();
@@ -115,7 +117,11 @@ export const AppProvider = (props: AppProviderInterface) => {
             set: setSelectedOccurrence,
             isLoading: isLoadingSelectedOccurrence,
             setIsLoading: setIsLoadingSelectedOccurrence,
-        }
+        },
+        isPlaying: {
+            get: isPlaying,
+            set: setIsPlaying,
+        },
     };
 
     return (

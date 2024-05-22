@@ -1,7 +1,15 @@
 /* @refresh reload */
-import { render } from 'solid-js/web';
+import { render } from "solid-js/web";
 
-import './index.css';
-import App from './App';
+import "./index.css";
+import App from "./App";
+import { AppProvider } from "./contexts";
 
-render(() => <App />, document.getElementById('root') as HTMLElement);
+render(
+    () => (
+        <AppProvider>
+            <App />
+        </AppProvider>
+    ),
+    document.getElementById("root") as HTMLElement
+);

@@ -1,20 +1,20 @@
 import { Accessor, Component, createEffect } from "solid-js";
-import {
-    endVideoEvent,
-    isPlaying,
-    ontimeupdateEvent,
-    playbackRate,
-    setIsPlaying,
-    startAt,
-} from "../../stores";
+import { useApp, useMainView } from "../../contexts";
 
 export const Camera: Component<CameraProps> = (props: CameraProps) => {
+    const app = useApp();
+    const mainView = useMainView();
+
+    if (!app || !mainView) {
+        return;
+    }
+
     let isEnded = false;
     let lastStartAt: number | null = null;
 
     createEffect(() => {
         const source = props.source();
-        const _startAt = startAt();
+        const _startAt = mainView.startAt.get();
 
         const videoElement = document.getElementById(
             props.id
@@ -34,12 +34,12 @@ export const Camera: Component<CameraProps> = (props: CameraProps) => {
 
         if (source && isEnded) {
             isEnded = false;
-            setIsPlaying(true);
+            app.isPlaying.set(true);
         }
     });
 
     createEffect(() => {
-        const _isPlaying = isPlaying();
+        const _isPlaying = app.isPlaying.get();
 
         const videoElement = document.getElementById(
             props.id
@@ -57,7 +57,7 @@ export const Camera: Component<CameraProps> = (props: CameraProps) => {
     });
 
     createEffect(() => {
-        const _playbackRate = playbackRate();
+        const _playbackRate = mainView.playbackRate.get();
 
         const videoElement = document.getElementById(
             props.id
@@ -86,7 +86,7 @@ export const Camera: Component<CameraProps> = (props: CameraProps) => {
     const handleEnded = () => {
         isEnded = true;
 
-        endVideoEvent();
+        mainView.endVideoEvent();
     };
 
     return (
@@ -106,7 +106,9 @@ export const Camera: Component<CameraProps> = (props: CameraProps) => {
                 autoplay
                 onTimeUpdate={(event) => {
                     if (props.id === "frontElement") {
-                        ontimeupdateEvent(event.target as HTMLVideoElement);
+                        mainView.ontimeupdateEvent(
+                            event.target as HTMLVideoElement
+                        );
                     }
                 }}
                 // onPlay={handlePlay}

@@ -17,10 +17,6 @@ export interface MainViewContextInterface {
         get: Accessor<number>;
         set: Setter<number>;
     };
-    isPlaying: {
-        get: Accessor<boolean>;
-        set: Setter<boolean>;
-    };
     currentTime: {
         get: Accessor<number>;
         set: Setter<number>;
@@ -29,6 +25,13 @@ export interface MainViewContextInterface {
         get: Accessor<number | null>;
         set: Setter<number | null>;
     };
+    playbackRate: {
+        get: Accessor<number>;
+        set: Setter<number>;
+    };
+    endVideoEvent: () => void;
+    ontimeupdate: (element: HTMLVideoElement) => () => void;
+    ontimeupdateEvent: (element: HTMLVideoElement) => void;
 }
 
 const MainViewContext = createContext<MainViewContextInterface>();
@@ -52,7 +55,6 @@ export const MainViewProvider = (props: MainViewProviderInterface) => {
     >(null);
 
     const [startAt, setStartAt] = createSignal<number>(0);
-    const [isPlaying, setIsPlaying] = createSignal<boolean>(false);
 
     const [changeCurrentTime, setChangeCurrentTime] = createSignal<
         number | null
@@ -63,7 +65,7 @@ export const MainViewProvider = (props: MainViewProviderInterface) => {
 
     createEffect(() => {
         // on select occurence auto play the video
-        setIsPlaying(true);
+        app.isPlaying.set(true);
 
         const _selectedOccurence = app.selectedOccurrence.get();
         if (!_selectedOccurence) {
@@ -152,10 +154,6 @@ export const MainViewProvider = (props: MainViewProviderInterface) => {
             get: startAt,
             set: setStartAt,
         },
-        isPlaying: {
-            get: isPlaying,
-            set: setIsPlaying,
-        },
         currentTime: {
             get: currentTime,
             set: setCurrentTime,
@@ -163,6 +161,27 @@ export const MainViewProvider = (props: MainViewProviderInterface) => {
         changeCurrentTime: {
             get: changeCurrentTime,
             set: setChangeCurrentTime,
+        },
+        playbackRate: {
+            get: playbackRate,
+            set: setPlaybackRate,
+        },
+        endVideoEvent: () => {
+            setSelectedTimestampIndex((timestamp) => {
+                if (timestamp === null) {
+                    return null;
+                }
+
+                return [(timestamp[0] += 1), 0];
+            });
+        },
+        ontimeupdate: (element: HTMLVideoElement) => {
+            return () => {
+                setCurrentTime(videoKey + element.currentTime);
+            };
+        },
+        ontimeupdateEvent: (element: HTMLVideoElement) => {
+            setCurrentTime(videoKey + element.currentTime);
         },
     };
 
