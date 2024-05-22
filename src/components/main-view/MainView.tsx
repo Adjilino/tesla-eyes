@@ -60,9 +60,10 @@ export const MainView: Component = () => {
 
     return (
         <div class="flex w-full h-full flex-col">
-            <div class="flex-grow flex overflow-hidden relative">
+            <div class="flex-grow flex overflow-hidden relative items-center justify-center">
                 <Camera
                     id="frontElement"
+                    name="Front"
                     source={frontSourceString}
                     isActive={selectedCamera() === "front"}
                     onClick={() => selectCamera("front")}
@@ -71,6 +72,7 @@ export const MainView: Component = () => {
 
                 <Camera
                     id="backElement"
+                    name="Back"
                     source={backSourceString}
                     isActive={selectedCamera() === "back"}
                     onClick={() => selectCamera("back")}
@@ -79,6 +81,7 @@ export const MainView: Component = () => {
 
                 <Camera
                     id="leftRepeaterElement"
+                    name="left"
                     source={leftSourceString}
                     isActive={selectedCamera() === "left_repeater"}
                     onClick={() => selectCamera("left_repeater")}
@@ -87,6 +90,7 @@ export const MainView: Component = () => {
 
                 <Camera
                     id="rightRepeaterElement"
+                    name="right"
                     source={rightSourceString}
                     isActive={selectedCamera() === "right_repeater"}
                     onClick={() => selectCamera("right_repeater")}

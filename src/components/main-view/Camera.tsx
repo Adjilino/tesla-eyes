@@ -1,4 +1,10 @@
-import { Accessor, Component, createEffect } from "solid-js";
+import {
+    Accessor,
+    Component,
+    Show,
+    createEffect,
+    createSignal,
+} from "solid-js";
 import { useApp, useMainView } from "../../contexts";
 
 export const Camera: Component<CameraProps> = (props: CameraProps) => {
@@ -11,6 +17,8 @@ export const Camera: Component<CameraProps> = (props: CameraProps) => {
 
     let isEnded = false;
     let lastStartAt: number | null = null;
+
+    const [hasError, setHasError] = createSignal(false);
 
     createEffect(() => {
         const source = props.source();
@@ -25,8 +33,11 @@ export const Camera: Component<CameraProps> = (props: CameraProps) => {
                 videoElement.currentTime = _startAt;
                 videoElement.onloadedmetadata = null;
             };
+
             lastStartAt = _startAt;
             videoElement.src = source;
+
+            setHasError(false);
         } else if (_startAt !== lastStartAt) {
             videoElement.currentTime = _startAt;
             lastStartAt = _startAt;
@@ -46,6 +57,10 @@ export const Camera: Component<CameraProps> = (props: CameraProps) => {
         ) as HTMLVideoElement;
 
         if (!videoElement) {
+            return;
+        }
+
+        if (hasError()) {
             return;
         }
 
@@ -72,14 +87,14 @@ export const Camera: Component<CameraProps> = (props: CameraProps) => {
     });
 
     // const handlePause = () => {
-    //   if (isPlaying()) {
-    //     setIsPlaying(false);
+    //   if (app.isPlaying.get()) {
+    //     app.isPlaying.set(false);
     //   }
     // };
 
     // const handlePlay = () => {
-    //   if (!isPlaying()) {
-    //     setIsPlaying(true);
+    //   if (!app.isPlaying.get()) {
+    //     app.isPlaying.set(true);
     //   }
     // };
 
@@ -92,9 +107,8 @@ export const Camera: Component<CameraProps> = (props: CameraProps) => {
     return (
         <a
             class={[
-                "m-auto",
                 props.isActive
-                    ? "flex max-w-full max-h-full"
+                    ? "flex flex-grow max-w-full max-h-full"
                     : `${props.class} absolute z-10 w-32 h-24 rounded-lg overflow-hidden shadow cursor-pointer`,
             ].join(" ")}
             onClick={() => props.onClick()}
@@ -114,13 +128,23 @@ export const Camera: Component<CameraProps> = (props: CameraProps) => {
                 // onPlay={handlePlay}
                 // onPause={handlePause}
                 onEnded={() => (props.id ? handleEnded() : null)}
+                onError={() => setHasError(true)}
             />
+            <Show when={!props.isActive}>
+                <div class="absolute bottom-0 pl-1">{props.name}</div>
+            </Show>
+            <Show when={hasError()}>
+                <div class="absolute top-0 flex w-full h-full items-center justify-center">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-300 shadow-2xl shadow-amber-200" />
+                </div>
+            </Show>
         </a>
     );
 };
 
 interface CameraProps {
     id: string;
+    name: string;
     source: Accessor<string | undefined>;
     isActive: boolean;
     onClick: () => void;
