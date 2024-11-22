@@ -3,7 +3,7 @@ import { Component, Show, createMemo, createSignal } from "solid-js";
 import { Occurrence } from "../../models";
 import { Button, Dropdown } from "../../ui";
 import timelineStyles from "./Timelime.module.css";
-import { tauri } from "../../utils";
+import { isTauri } from "../../utils";
 import { useApp, useMainView } from "../../contexts";
 import { remove } from "@tauri-apps/plugin-fs";
 
@@ -127,7 +127,7 @@ export const Timeline: Component = () => {
     };
 
     const removeOccurence = async (occurence: Occurrence | null) => {
-        if (!occurence || !occurence.directory || !tauri?.tauri || !app) {
+        if (!occurence || !occurence.directory || !isTauri || !app) {
             return;
         }
 
@@ -203,6 +203,7 @@ export const Timeline: Component = () => {
                 <div class="flex">
                     <Button
                         onClick={() =>
+                            app &&
                             app.isPlaying.set((playing: boolean) => !playing)
                         }
                         class="bg-transparent dark:bg-transparent"
@@ -210,7 +211,9 @@ export const Timeline: Component = () => {
                         <i
                             class={
                                 "mx-2 fa-solid fa-fw " +
-                                (app.isPlaying.get() ? "fa-pause" : "fa-play")
+                                (app && app.isPlaying.get()
+                                    ? "fa-pause"
+                                    : "fa-play")
                             }
                         />
                     </Button>
@@ -227,8 +230,9 @@ export const Timeline: Component = () => {
                             { label: "x2", value: "2" },
                             { label: "x4", value: "4" },
                         ]}
-                        value={String(mainView.playbackRate.get())}
+                        value={String(mainView && mainView.playbackRate.get())}
                         onSelect={(value) =>
+                            mainView &&
                             mainView.playbackRate.set(parseFloat(value.value))
                         }
                     />
@@ -270,13 +274,15 @@ export const Timeline: Component = () => {
                 </div>
                 <Show
                     when={
-                        window["__TAURI__"] &&
+                        isTauri &&
+                        app &&
                         app.selectedOccurrence.get()?.directory
                     }
                 >
                     <div class="flex">
                         <Button
                             onClick={() =>
+                                app &&
                                 removeOccurence(app.selectedOccurrence.get())
                             }
                         >

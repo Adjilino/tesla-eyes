@@ -4,7 +4,7 @@ import { open } from "@tauri-apps/plugin-dialog";
 import { DirEntry, readDir } from "@tauri-apps/plugin-fs";
 import { MultipleOccurenceBuilder } from "../../builders";
 import { OccurenceFilesBuilder } from "../../builders/occurence-files.builders";
-import { tauri } from "../../utils/tauri";
+import { isTauri } from "../../utils/tauri";
 import { useApp } from "../../contexts";
 
 export interface AddFolderButtonProps {
@@ -92,7 +92,7 @@ export const AddFolderButton: Component<AddFolderButtonProps> = (
         for (const entry of dirEntries) {
             const entryPath = currentPath + "/" + entry.name;
 
-            if (!entry.isFile) {
+            if (entry.isFile) {
                 files.push(entryPath);
             } else {
                 const _entries = await readDir(entryPath);
@@ -106,7 +106,7 @@ export const AddFolderButton: Component<AddFolderButtonProps> = (
     const addFolderInput = createFolderInput();
 
     async function addFolder() {
-        if (!tauri?.tauri) {
+        if (!isTauri) {
             addFolderInput.click();
             return;
         }

@@ -1,6 +1,6 @@
 import { open } from "@tauri-apps/plugin-shell";
 import { Component, Show } from "solid-js";
-import { tauri } from "../../utils";
+import { isTauri } from "../../utils";
 import { AddFolderButton } from "../add-folder-button";
 import { useApp } from "../../contexts";
 
@@ -20,7 +20,7 @@ const NoOccurenceSelect: Component = () => {
     const sampleUrl = "https://mega.nz/folder/4MARkZKY#7gc5e3ZqoAKrnL4E56oS0Q";
 
     const openSample = () => {
-        if (tauri) {
+        if (isTauri) {
             open(sampleUrl);
         } else {
             window.open(sampleUrl);
