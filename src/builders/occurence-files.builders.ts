@@ -1,43 +1,49 @@
-import { FileEntry } from "@tauri-apps/plugin-fs";
 import { OccurrenceFiles } from "../models/occurence-files";
 import { OccurenceBuilder } from "./occurence.builder";
 
 export class OccurenceFilesBuilder {
-  files: Array<File | FileEntry> = [];
+    files: Array<File | string> = [];
 
-  constructor() {
-    return this;
-  }
-
-  addFiles(files: Array<File | FileEntry>) {
-    // add files to the builder
-    this.files = files;
-
-    return this;
-  }
-
-  async build(): Promise<OccurrenceFiles | undefined> {
-    // build the files
-    if (!this.files || this.files.length === 0) {
-      return undefined;
+    constructor() {
+        return this;
     }
 
-    if (!this.files.find(file => file.name?.endsWith(".mp4"))) {
-      return undefined;
+    addFiles(files: Array<File | string>) {
+        // add files to the builder
+        this.files = files;
+
+        return this;
     }
 
-    const occurenceFiles = new OccurrenceFiles();
+    async build(): Promise<OccurrenceFiles | undefined> {
+        // build the files
+        if (!this.files || this.files.length === 0) {
+            return undefined;
+        }
 
-    occurenceFiles.setFiles(this.files);
+        const hasVideoFiles = this.files.find((file) => {
+            if (file instanceof File) {
+                return file.name?.endsWith(".mp4");
+            }
+            return file?.endsWith(".mp4");
+        });
 
-    const occurenceBuilder = new OccurenceBuilder().addFiles(this.files);
+        if (!hasVideoFiles) {
+            return undefined;
+        }
 
-    const config = await occurenceBuilder.getOccurenceConfig();
-    occurenceFiles.setConfig(config);
+        const occurenceFiles = new OccurrenceFiles();
 
-    const thumbnail = await occurenceBuilder.getOccurenceThumbnail();
-    occurenceFiles.setThumbnail(thumbnail);
+        occurenceFiles.setFiles(this.files);
 
-    return occurenceFiles;
-  }
+        const occurenceBuilder = new OccurenceBuilder().addFiles(this.files);
+
+        const config = await occurenceBuilder.getOccurenceConfig();
+        occurenceFiles.setConfig(config);
+
+        const thumbnail = await occurenceBuilder.getOccurenceThumbnail();
+        occurenceFiles.setThumbnail(thumbnail);
+
+        return occurenceFiles;
+    }
 }
