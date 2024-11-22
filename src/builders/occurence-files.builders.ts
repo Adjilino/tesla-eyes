@@ -1,4 +1,4 @@
-import { FileEntry } from "@tauri-apps/api/fs";
+import { FileEntry } from "@tauri-apps/plugin-fs";
 import { OccurrenceFiles } from "../models/occurence-files";
 import { OccurenceBuilder } from "./occurence.builder";
 

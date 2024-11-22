@@ -1,7 +1,7 @@
 import { Component, Show, createSignal } from "solid-js";
 import { Button } from "../../ui";
-import { open } from "@tauri-apps/api/dialog";
-import { FileEntry, readDir } from "@tauri-apps/api/fs";
+import { open } from "@tauri-apps/plugin-dialog";
+import { DirEntry, readDir } from "@tauri-apps/plugin-fs";
 import { MultipleOccurenceBuilder } from "../../builders";
 import { OccurenceFilesBuilder } from "../../builders/occurence-files.builders";
 import { tauri } from "../../utils/tauri";
@@ -20,9 +20,7 @@ export const AddFolderButton: Component<AddFolderButtonProps> = (
 
     const loadingOccurrences: boolean[] = [];
 
-    async function createMultipleOccurence(
-        files: FileList | FileEntry[] | null
-    ) {
+    async function createMultipleOccurence(files: FileList | string[] | null) {
         if (!files) {
             return;
         }
@@ -85,14 +83,20 @@ export const AddFolderButton: Component<AddFolderButtonProps> = (
         return input;
     }
 
-    function getFiles(fileEntries: FileEntry[]): FileEntry[] {
-        let files: FileEntry[] = [];
+    async function getFiles(
+        currentPath: string,
+        dirEntries: DirEntry[]
+    ): Promise<string[]> {
+        let files: string[] = [];
 
-        for (const entry of fileEntries) {
-            if (!entry.children) {
-                files.push(entry);
+        for (const entry of dirEntries) {
+            const entryPath = currentPath + "/" + entry.name;
+
+            if (!entry.isFile) {
+                files.push(entryPath);
             } else {
-                files = [...files, ...getFiles(entry.children)];
+                const _entries = await readDir(entryPath);
+                files = [...files, ...(await getFiles(entryPath, _entries))];
             }
         }
 
@@ -120,9 +124,9 @@ export const AddFolderButton: Component<AddFolderButtonProps> = (
         loadingOccurrences.push(true);
         // setIsLoadingOccurrences(true);
 
-        const entries = await readDir(folder, { recursive: true });
+        const entries = await readDir(folder);
 
-        const files = getFiles(entries);
+        const files = await getFiles(folder, entries);
 
         loadingOccurrences.pop();
         createMultipleOccurence(files);

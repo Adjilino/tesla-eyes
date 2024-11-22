@@ -1,5 +1,5 @@
-import { FileEntry, readTextFile } from "@tauri-apps/api/fs";
-import { convertFileSrc } from "@tauri-apps/api/tauri";
+import { convertFileSrc } from "@tauri-apps/api/core";
+import { readTextFile } from "@tauri-apps/plugin-fs";
 import { TimestampVideo } from "../interfaces";
 import {
     Config,
@@ -12,7 +12,7 @@ import { getBase64 } from "../utils";
 export class OccurenceBuilder {
     videoElement = document.createElement("video");
 
-    files: (File | FileEntry)[] = [];
+    files: (File | string)[] = [];
 
     constructor() {
         this.videoElement.muted = true;
@@ -20,7 +20,7 @@ export class OccurenceBuilder {
         return this;
     }
 
-    addFiles(files: (File | FileEntry)[]) {
+    addFiles(files: (File | string)[]) {
         // add files to the builder
         this.files = files;
 
@@ -72,7 +72,7 @@ export class OccurenceBuilder {
         if (this.files[0] instanceof File) {
             splittedPath = this.files[0].webkitRelativePath.split("/");
         } else {
-            splittedPath = this.files[0].path.split("/");
+            splittedPath = this.files[0].split("/");
         }
 
         if (splittedPath.length < 2) {
@@ -98,7 +98,7 @@ export class OccurenceBuilder {
                 .replaceAll("\\", "/")
                 .split("/");
         } else {
-            splittedPath = this.files[0].path.replaceAll("\\", "/").split("/");
+            splittedPath = this.files[0].replaceAll("\\", "/").split("/");
         }
 
         if (splittedPath.length < 2) {
@@ -150,7 +150,11 @@ export class OccurenceBuilder {
         }
 
         const configFile = this.files.find((file) => {
-            return file.name === "event.json";
+            if (file instanceof File) {
+                return file.name === "event.json";
+            }
+
+            return file.endsWith("event.json");
         });
 
         if (!configFile) {
@@ -163,7 +167,7 @@ export class OccurenceBuilder {
             const configArrayBuffer = await configFile.arrayBuffer();
             configString = new TextDecoder("utf-8").decode(configArrayBuffer);
         } else {
-            configString = await readTextFile(configFile.path);
+            configString = await readTextFile(configFile);
         }
 
         const configJson = JSON.parse(configString);
@@ -186,7 +190,11 @@ export class OccurenceBuilder {
         }
 
         const videoFiles = this.files.filter((file) => {
-            return file.name && file.name.endsWith(".mp4");
+            if (file instanceof File) {
+                return file.name && file.name.endsWith(".mp4");
+            }
+
+            return file.endsWith(".mp4");
         });
 
         if (!videoFiles || videoFiles.length === 0) {
@@ -194,18 +202,38 @@ export class OccurenceBuilder {
         }
 
         const videoFilesSorted = videoFiles.sort((a, b) => {
-            if (!a.name || !b.name) {
+            let aName: string;
+            let bName: string;
+
+            if (a instanceof File) {
+                aName = a.name;
+            } else {
+                aName = a;
+            }
+            if (b instanceof File) {
+                bName = b.name;
+            } else {
+                bName = b;
+            }
+
+            if (!aName || !bName) {
                 return 0;
             }
 
-            return a.name.localeCompare(b.name);
+            return aName.localeCompare(bName);
         });
+
+        let firstVideoFileName: string;
+
+        if (videoFilesSorted[0] instanceof File) {
+            firstVideoFileName = videoFilesSorted[0].name;
+        } else {
+            firstVideoFileName = videoFilesSorted[0];
+        }
 
         const separatedShorts = {
             duration: 0,
-            videosStartAt: this.folderNameToDateTime(
-                videoFilesSorted[0].name || ""
-            ),
+            videosStartAt: this.folderNameToDateTime(firstVideoFileName || ""),
             timestampVideo: {} as Record<number, TimestampVideo>,
         };
 
@@ -218,7 +246,7 @@ export class OccurenceBuilder {
             try {
                 duration = await this._getVideoDuration(sourceString);
             } catch (error) {
-                console.warn(`Video ${file.name} is corrupted`);
+                console.warn(`Video ${file} is corrupted`);
             }
 
             let splittedPath: string[];
@@ -227,7 +255,7 @@ export class OccurenceBuilder {
                     .replaceAll("\\", "/")
                     .split("/");
             } else {
-                splittedPath = file.path.replaceAll("\\", "/").split("/");
+                splittedPath = file.replaceAll("\\", "/").split("/");
             }
 
             // get file name
@@ -319,11 +347,11 @@ export class OccurenceBuilder {
 
         return separatedShorts;
     }
-    private async _createSourceString(file: File | FileEntry): Promise<string> {
+    private async _createSourceString(file: File | string): Promise<string> {
         if (file instanceof File) {
             return URL.createObjectURL(file);
         } else {
-            return convertFileSrc(file.path, "asset");
+            return convertFileSrc(file, "asset");
         }
     }
 
@@ -355,7 +383,11 @@ export class OccurenceBuilder {
         }
 
         const thumbnailFile = this.files.find((file) => {
-            return file.name && file.name.endsWith(".png");
+            if (file instanceof File) {
+                return file.name && file.name.endsWith(".png");
+            }
+
+            return file && file.endsWith(".png");
         });
 
         if (!thumbnailFile) {
@@ -367,7 +399,7 @@ export class OccurenceBuilder {
         if (thumbnailFile instanceof File) {
             thumbnailString = await getBase64(thumbnailFile);
         } else {
-            thumbnailString = convertFileSrc(thumbnailFile.path, "asset");
+            thumbnailString = convertFileSrc(thumbnailFile, "asset");
         }
 
         if (!thumbnailString) {

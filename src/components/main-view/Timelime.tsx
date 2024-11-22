@@ -1,23 +1,23 @@
-import { confirm } from "@tauri-apps/api/dialog";
-import { removeDir } from "@tauri-apps/api/fs";
+import { confirm } from "@tauri-apps/plugin-dialog";
 import { Component, Show, createMemo, createSignal } from "solid-js";
 import { Occurrence } from "../../models";
 import { Button, Dropdown } from "../../ui";
 import timelineStyles from "./Timelime.module.css";
 import { tauri } from "../../utils";
 import { useApp, useMainView } from "../../contexts";
+import { remove } from "@tauri-apps/plugin-fs";
 
 export const Timeline: Component = () => {
     const app = useApp();
     const mainView = useMainView();
 
-    if (!app || !mainView) {
-        return;
-    }
-
     addVideoShortcutControls();
 
     const maxTime = createMemo(() => {
+        if (!app) {
+            return 0;
+        }
+
         const occurence = app.selectedOccurrence.get();
         if (!occurence) {
             return 0;
@@ -27,6 +27,10 @@ export const Timeline: Component = () => {
     });
 
     const occuredAt = createMemo(() => {
+        if (!app) {
+            return 0;
+        }
+
         const occurence = app.selectedOccurrence.get();
         if (!occurence) {
             return 0;
@@ -41,6 +45,10 @@ export const Timeline: Component = () => {
     const [mouseDownTimeline, setMouseDownTimeline] = createSignal(-1);
 
     const currentTimelineWidth = createMemo(() => {
+        if (!mainView) {
+            return;
+        }
+
         const _currentTime = mainView.currentTime.get();
 
         if (isMouseDown()) {
@@ -98,7 +106,7 @@ export const Timeline: Component = () => {
     };
 
     const onMouseUp = (e: MouseEvent) => {
-        if (!isMouseDown()) {
+        if (!isMouseDown() || !mainView) {
             return;
         }
 
@@ -119,13 +127,13 @@ export const Timeline: Component = () => {
     };
 
     const removeOccurence = async (occurence: Occurrence | null) => {
-        if (!occurence || !occurence.directory || !tauri?.tauri) {
+        if (!occurence || !occurence.directory || !tauri?.tauri || !app) {
             return;
         }
 
         const confirmed = await confirm(
             `Are you sure do you want to remove the occurence "${occurence.directory}"?`,
-            { title: "Delete Occurence", type: "warning" }
+            { title: "Delete Occurence", kind: "warning" }
         );
 
         if (!confirmed) {
@@ -135,7 +143,7 @@ export const Timeline: Component = () => {
         app.isPlaying.set(false);
         app.selectedOccurrence.set(null);
 
-        removeDir(occurence.directory, {
+        remove(occurence.directory, {
             recursive: true,
         });
 
@@ -152,91 +160,6 @@ export const Timeline: Component = () => {
             }
         }
     };
-
-    return (
-        <div class="h-16 p-2 flex w-full gap-2">
-            <div class="flex">
-                <Button
-                    onClick={() =>
-                        app.isPlaying.set((playing: boolean) => !playing)
-                    }
-                    class="bg-transparent dark:bg-transparent"
-                >
-                    <i
-                        class={
-                            "mx-2 fa-solid fa-fw " +
-                            (app.isPlaying.get() ? "fa-pause" : "fa-play")
-                        }
-                    />
-                </Button>
-            </div>
-            <div class="flex">
-                <Dropdown
-                    class="bg-transparent dark:bg-transparent"
-                    options={[
-                        { label: "x0.5", value: "0.5" },
-                        { label: "x0.75", value: "0.75" },
-                        { label: "x1", value: "1" },
-                        { label: "x1.25", value: "1.25" },
-                        { label: "x1.5", value: "1.5" },
-                        { label: "x2", value: "2" },
-                        { label: "x4", value: "4" },
-                    ]}
-                    value={String(mainView.playbackRate.get())}
-                    onSelect={(value) =>
-                        mainView.playbackRate.set(parseFloat(value.value))
-                    }
-                />
-            </div>
-            <div
-                class="flex-grow overflow-hidden relative"
-                onMouseDown={onMouseDown}
-            >
-                <div
-                    id="timeline"
-                    class={`absolute ${timelineStyles.absoluteVerticalCenter} w-full h-1 bg-slate-400`}
-                />
-                <div
-                    class={`
-            absolute ${timelineStyles.absoluteVerticalCenter} w-3 h-3 bg-red-600 
-            rounded-full transition-all duration-100
-          `}
-                    style={
-                        occuredAt()
-                            ? { left: `${(occuredAt() / maxTime()) * 100}%` }
-                            : {}
-                    }
-                />
-                <div
-                    class={`absolute ${timelineStyles.absoluteVerticalCenter} w-full h-1 bg-slate-600 transition-all duration-100`}
-                    style={{ width: currentTimelineWidth() }}
-                >
-                    <div
-                        class={`
-              absolute ${timelineStyles.absoluteVerticalCenter} w-2 h-2 bg-slate-600 
-              rounded-full transition-all duration-100 -right-1
-            `}
-                    />
-                </div>
-            </div>
-            <Show
-                when={
-                    window["__TAURI__"] &&
-                    app.selectedOccurrence.get()?.directory
-                }
-            >
-                <div class="flex">
-                    <Button
-                        onClick={() =>
-                            removeOccurence(app.selectedOccurrence.get())
-                        }
-                    >
-                        <i class={"mx-2 fa-solid fa-fw fa-trash"} />
-                    </Button>
-                </div>
-            </Show>
-        </div>
-    );
 
     function addVideoShortcutControls() {
         if (!app || !mainView) {
@@ -273,4 +196,95 @@ export const Timeline: Component = () => {
             }
         });
     }
+
+    return (
+        <Show when={app}>
+            <div class="h-16 p-2 flex w-full gap-2">
+                <div class="flex">
+                    <Button
+                        onClick={() =>
+                            app.isPlaying.set((playing: boolean) => !playing)
+                        }
+                        class="bg-transparent dark:bg-transparent"
+                    >
+                        <i
+                            class={
+                                "mx-2 fa-solid fa-fw " +
+                                (app.isPlaying.get() ? "fa-pause" : "fa-play")
+                            }
+                        />
+                    </Button>
+                </div>
+                <div class="flex">
+                    <Dropdown
+                        class="bg-transparent dark:bg-transparent"
+                        options={[
+                            { label: "x0.5", value: "0.5" },
+                            { label: "x0.75", value: "0.75" },
+                            { label: "x1", value: "1" },
+                            { label: "x1.25", value: "1.25" },
+                            { label: "x1.5", value: "1.5" },
+                            { label: "x2", value: "2" },
+                            { label: "x4", value: "4" },
+                        ]}
+                        value={String(mainView.playbackRate.get())}
+                        onSelect={(value) =>
+                            mainView.playbackRate.set(parseFloat(value.value))
+                        }
+                    />
+                </div>
+                <div
+                    class="flex-grow overflow-hidden relative"
+                    onMouseDown={onMouseDown}
+                >
+                    <div
+                        id="timeline"
+                        class={`absolute ${timelineStyles.absoluteVerticalCenter} w-full h-1 bg-slate-400`}
+                    />
+                    <div
+                        class={`
+            absolute ${timelineStyles.absoluteVerticalCenter} w-3 h-3 bg-red-600 
+            rounded-full transition-all duration-100
+          `}
+                        style={
+                            occuredAt()
+                                ? {
+                                      left: `${
+                                          (occuredAt() / maxTime()) * 100
+                                      }%`,
+                                  }
+                                : {}
+                        }
+                    />
+                    <div
+                        class={`absolute ${timelineStyles.absoluteVerticalCenter} w-full h-1 bg-slate-600 transition-all duration-100`}
+                        style={{ width: currentTimelineWidth() }}
+                    >
+                        <div
+                            class={`
+              absolute ${timelineStyles.absoluteVerticalCenter} w-2 h-2 bg-slate-600 
+              rounded-full transition-all duration-100 -right-1
+            `}
+                        />
+                    </div>
+                </div>
+                <Show
+                    when={
+                        window["__TAURI__"] &&
+                        app.selectedOccurrence.get()?.directory
+                    }
+                >
+                    <div class="flex">
+                        <Button
+                            onClick={() =>
+                                removeOccurence(app.selectedOccurrence.get())
+                            }
+                        >
+                            <i class={"mx-2 fa-solid fa-fw fa-trash"} />
+                        </Button>
+                    </div>
+                </Show>
+            </div>
+        </Show>
+    );
 };

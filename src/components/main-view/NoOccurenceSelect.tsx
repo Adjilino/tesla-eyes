@@ -1,4 +1,4 @@
-import { open } from "@tauri-apps/api/shell";
+import { open } from "@tauri-apps/plugin-shell";
 import { Component, Show } from "solid-js";
 import { tauri } from "../../utils";
 import { AddFolderButton } from "../add-folder-button";
@@ -17,11 +17,6 @@ const LoadingOccurrence: Component = () => {
 
 const NoOccurenceSelect: Component = () => {
     const app = useApp();
-
-    if (!app) {
-        return;
-    }
-
     const sampleUrl = "https://mega.nz/folder/4MARkZKY#7gc5e3ZqoAKrnL4E56oS0Q";
 
     const openSample = () => {
@@ -34,7 +29,7 @@ const NoOccurenceSelect: Component = () => {
 
     return (
         <Show
-            when={!app.selectedOccurrence.isLoading()}
+            when={app && !app.selectedOccurrence.isLoading()}
             fallback={<LoadingOccurrence />}
         >
             <div class="flex flex-col">
