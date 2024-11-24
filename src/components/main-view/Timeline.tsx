@@ -2,7 +2,7 @@ import { confirm } from "@tauri-apps/plugin-dialog";
 import { Component, Show, createMemo, createSignal } from "solid-js";
 import { Occurrence } from "../../models";
 import { Button, Dropdown } from "../../ui";
-import timelineStyles from "./Timelime.module.css";
+import timelineStyles from "./Timeline.module.css";
 import { isTauri } from "../../utils";
 import { useApp, useMainView } from "../../contexts";
 import { remove } from "@tauri-apps/plugin-fs";
@@ -18,25 +18,27 @@ export const Timeline: Component = () => {
             return 0;
         }
 
-        const occurence = app.selectedOccurrence.get();
-        if (!occurence) {
+        const occurrence = app.selectedOccurrence.get();
+        if (!occurrence) {
             return 0;
         }
 
-        return occurence.duration || 0;
+        return occurrence.duration || 0;
     });
 
-    const occuredAt = createMemo(() => {
+    const occurredAt = createMemo(() => {
         if (!app) {
+            console.log('app not found');
             return 0;
         }
 
-        const occurence = app.selectedOccurrence.get();
-        if (!occurence) {
+        const occurrence = app.selectedOccurrence.get();
+        if (!occurrence) {
             return 0;
         }
 
-        const playerStartPoint = occurence.playerStartPoint || 0;
+        console.log(occurrence.playerStartPoint)
+        const playerStartPoint = occurrence.playerStartPoint || 0;
 
         return playerStartPoint.key + playerStartPoint.videoStartAt;
     });
@@ -126,14 +128,14 @@ export const Timeline: Component = () => {
         setIsMouseDown(false);
     };
 
-    const removeOccurence = async (occurence: Occurrence | null) => {
-        if (!occurence || !occurence.directory || !isTauri || !app) {
+    const removeOccurrence = async (occurrence: Occurrence | null) => {
+        if (!occurrence || !occurrence.directory || !isTauri || !app) {
             return;
         }
 
         const confirmed = await confirm(
-            `Are you sure do you want to remove the occurence "${occurence.directory}"?`,
-            { title: "Delete Occurence", kind: "warning" }
+            `Are you sure do you want to remove the occurrence "${occurrence.directory}"?`,
+            { title: "Delete Occurrence", kind: "warning" }
         );
 
         if (!confirmed) {
@@ -143,16 +145,16 @@ export const Timeline: Component = () => {
         app.isPlaying.set(false);
         app.selectedOccurrence.set(null);
 
-        remove(occurence.directory, {
+        remove(occurrence.directory, {
             recursive: true,
         });
 
         if (app) {
-            const _fileByOccurence = app.fileByOccurrence.get();
+            const _fileByOccurrence = app.fileByOccurrence.get();
             const _selectedOccurrenceFile = app.fileByOccurrence.getSelected();
-            if (_fileByOccurence && _selectedOccurrenceFile) {
+            if (_fileByOccurrence && _selectedOccurrenceFile) {
                 app.fileByOccurrence.set(
-                    _fileByOccurence.filter(
+                    _fileByOccurrence.filter(
                         (file) =>
                             file.getId() !== _selectedOccurrenceFile.getId()
                     )
@@ -251,10 +253,10 @@ export const Timeline: Component = () => {
             rounded-full transition-all duration-100
           `}
                         style={
-                            occuredAt()
+                            occurredAt()
                                 ? {
                                       left: `${
-                                          (occuredAt() / maxTime()) * 100
+                                          (occurredAt() / maxTime()) * 100
                                       }%`,
                                   }
                                 : {}
@@ -283,7 +285,7 @@ export const Timeline: Component = () => {
                         <Button
                             onClick={() =>
                                 app &&
-                                removeOccurence(app.selectedOccurrence.get())
+                                removeOccurrence(app.selectedOccurrence.get())
                             }
                         >
                             <i class={"mx-2 fa-solid fa-fw fa-trash"} />

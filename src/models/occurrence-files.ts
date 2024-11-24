@@ -1,10 +1,10 @@
-import { OccurenceBuilder } from "../builders/occurence.builder";
+import { OccurrenceBuilder } from "../builders/occurrence.builder";
 import { Config } from "./config";
-import { Occurrence } from "./occurence";
-import { uuidv4 } from "../utils";
+import { Occurrence } from "./occurrence";
+import { uuidV4 } from "../utils";
 
 export class OccurrenceFiles {
-    protected id: string = uuidv4();
+    protected id: string = uuidV4();
     files: Array<File | string> = [];
     config?: Config = undefined;
     thumbnail?: string | undefined = undefined;
@@ -35,6 +35,6 @@ export class OccurrenceFiles {
     }
 
     toOccurrence(): Promise<Occurrence | undefined> {
-        return new OccurenceBuilder().addFiles(this.files).build();
+        return new OccurrenceBuilder().addFiles(this.files).build();
     }
 }

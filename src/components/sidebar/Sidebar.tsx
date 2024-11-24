@@ -1,5 +1,5 @@
 import { Component, For, Show, createMemo } from "solid-js";
-import { OccurrenceFiles } from "../../models/occurence-files";
+import { OccurrenceFiles } from "../../models/occurrence-files";
 import { Filter, currentFilter } from "../../stores";
 import SidebarFooter from "./Footer";
 import SidebarHeader from "./Header";
@@ -13,15 +13,15 @@ export interface SidebarProps {
 export const Sidebar: Component<SidebarProps> = (props: SidebarProps) => {
     const app = useApp();
 
-    function getOccurrenceDateTime(occurenceFiles: OccurrenceFiles) {
+    function getOccurrenceDateTime(occurrenceFiles: OccurrenceFiles) {
         return (
-            occurenceFiles.getConfig()?.getDateTime()?.toLocaleString() || ""
+            occurrenceFiles.getConfig()?.getDateTime()?.toLocaleString() || ""
         );
     }
-    function getOccurrenceLocation(occurenceFiles: OccurrenceFiles) {
-        return occurenceFiles.getConfig()?.getCity() || "";
+    function getOccurrenceLocation(occurrenceFiles: OccurrenceFiles) {
+        return occurrenceFiles.getConfig()?.getCity() || "";
     }
-    async function onClickOccurence(occurrenceFiles: OccurrenceFiles) {
+    async function onClickOccurrence(occurrenceFiles: OccurrenceFiles) {
         if (app) {
             app.fileByOccurrence.setSelected(occurrenceFiles);
         }
@@ -37,7 +37,7 @@ export const Sidebar: Component<SidebarProps> = (props: SidebarProps) => {
         }
     };
 
-    const filteredFilesByOcurrence = createMemo(() => {
+    const filteredFilesByOccurrence = createMemo(() => {
         if (!app) {
             return;
         }
@@ -106,8 +106,8 @@ export const Sidebar: Component<SidebarProps> = (props: SidebarProps) => {
                         styles.sidebarWidth
                     }
                 >
-                    <For each={filteredFilesByOcurrence()}>
-                        {(occurence) => (
+                    <For each={filteredFilesByOccurrence()}>
+                        {(occurrence) => (
                             <a
                                 class={[
                                     "bg-white dark:bg-slate-800 text-gray-900 dark:text-white",
@@ -117,10 +117,10 @@ export const Sidebar: Component<SidebarProps> = (props: SidebarProps) => {
                                     "flex gap-2 rounded-md shadow-md p-2 w-full h-24",
                                     "cursor-pointer",
                                 ].join(" ")}
-                                onClick={() => onClickOccurence(occurence)}
+                                onClick={() => onClickOccurrence(occurrence)}
                             >
                                 <Show
-                                    when={occurence.getThumbnail()}
+                                    when={occurrence.getThumbnail()}
                                     fallback={
                                         <div
                                             class={[
@@ -137,7 +137,7 @@ export const Sidebar: Component<SidebarProps> = (props: SidebarProps) => {
                                             "rounded-md",
                                             styles.thumbnail,
                                         ].join(" ")}
-                                        src={occurence.getThumbnail() || ""}
+                                        src={occurrence.getThumbnail() || ""}
                                     />
                                 </Show>
                                 <div
@@ -152,7 +152,7 @@ export const Sidebar: Component<SidebarProps> = (props: SidebarProps) => {
                                             "font-bold",
                                         ].join(" ")}
                                     >
-                                        {getOccurrenceLocation(occurence) ||
+                                        {getOccurrenceLocation(occurrence) ||
                                             "Unknown location"}
                                     </span>
                                     <span
@@ -161,7 +161,7 @@ export const Sidebar: Component<SidebarProps> = (props: SidebarProps) => {
                                             "overflow-hidden whitespace-nowrap text-ellipsis",
                                         ].join(" ")}
                                     >
-                                        {getOccurrenceDateTime(occurence) ||
+                                        {getOccurrenceDateTime(occurrence) ||
                                             "Unknown date"}
                                     </span>
                                 </div>

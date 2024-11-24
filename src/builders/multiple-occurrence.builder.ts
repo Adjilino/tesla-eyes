@@ -1,7 +1,7 @@
 import { Occurrence } from "../models";
-import { OccurenceBuilder } from "./occurence.builder";
+import { OccurrenceBuilder as OccurrenceBuilder } from "./occurrence.builder";
 
-export class MultipleOccurenceBuilder {
+export class MultipleOccurrenceBuilder {
   files: (File | string)[] = [];
 
   constructor() {
@@ -33,11 +33,11 @@ export class MultipleOccurenceBuilder {
       return;
     }
 
-    const occurences: Occurrence[] | undefined = await this.getAllOccurence(
+    const occurrences: Occurrence[] | undefined = await this.getAllOccurrence(
       filesByFolder
     );
 
-    return occurences;
+    return occurrences;
   }
 
   separateFilesByFolders(): Record<string, (File | string)[]> | undefined {
@@ -71,7 +71,7 @@ export class MultipleOccurenceBuilder {
     return folders;
   }
 
-  private getAllOccurence(
+  private getAllOccurrence(
     filesByFolder: Record<string, (File | string)[]> | undefined
   ): Promise<Occurrence[] | undefined> {
     return new Promise((resolve) => {
@@ -84,30 +84,30 @@ export class MultipleOccurenceBuilder {
         resolve(undefined);
       }
 
-      const occurencesPromises: Promise<Occurrence | undefined>[] = [];
+      const occurrencesPromises: Promise<Occurrence | undefined>[] = [];
 
       for (const folderName in filesByFolder) {
         const files = filesByFolder[folderName];
 
-        // Create a new OccurenceBuilder for each folder
-        const occurence = new OccurenceBuilder().addFiles(files).build();
+        // Create a new OccurrenceBuilder for each folder
+        const occurrence = new OccurrenceBuilder().addFiles(files).build();
 
-        if (occurence) {
-          occurencesPromises.push(occurence);
+        if (occurrence) {
+          occurrencesPromises.push(occurrence);
         }
       }
 
-      Promise.all(occurencesPromises).then((occurencesBuilds) => {
-        const occurences = occurencesBuilds.filter((occurence) => {
+      Promise.all(occurrencesPromises).then((occurrencesBuilds) => {
+        const occurrences = occurrencesBuilds.filter((occurrence) => {
           return (
-            occurence &&
-            occurence instanceof Occurrence &&
-            occurence.duration &&
-            occurence.duration > 0
+            occurrence &&
+            occurrence instanceof Occurrence &&
+            occurrence.duration &&
+            occurrence.duration > 0
           );
         }) as Occurrence[];
 
-        resolve(occurences);
+        resolve(occurrences);
       });
     });
   }

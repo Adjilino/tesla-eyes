@@ -15,7 +15,7 @@ const LoadingOccurrence: Component = () => {
     );
 };
 
-const NoOccurenceSelect: Component = () => {
+const NoOccurrenceSelect: Component = () => {
     const app = useApp();
     const sampleUrl = "https://mega.nz/folder/4MARkZKY#7gc5e3ZqoAKrnL4E56oS0Q";
 
@@ -49,13 +49,13 @@ const NoOccurenceSelect: Component = () => {
                     2. Click 'Add folder'
                 </p>
                 <p class="text-xl text-gray-600 dark:text-gray-400">
-                    3. Select folder occurrence from your Telsa
+                    3. Select folder occurrence from your Tesla
                 </p>
                 <p class="text-xl text-gray-600 dark:text-gray-400">
-                    4. The occurence will be added to the sidebar
+                    4. The occurrence will be added to the sidebar
                 </p>
                 <p class="text-xl text-gray-600 dark:text-gray-400 mb-2">
-                    5. Select occurence from the sidebar and enjoy!
+                    5. Select occurrence from the sidebar and enjoy!
                 </p>
                 <hr />
                 <p class="text-xl text-gray-600 dark:text-gray-400 mt-2">
@@ -72,4 +72,4 @@ const NoOccurenceSelect: Component = () => {
     );
 };
 
-export default NoOccurenceSelect;
+export default NoOccurrenceSelect;

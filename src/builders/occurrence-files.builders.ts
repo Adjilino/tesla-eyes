@@ -1,7 +1,8 @@
-import { OccurrenceFiles } from "../models/occurence-files";
-import { OccurenceBuilder } from "./occurence.builder";
 
-export class OccurenceFilesBuilder {
+import { OccurrenceFiles } from "../models";
+import { OccurrenceBuilder as OccurrenceBuilder } from "./occurrence.builder";
+
+export class OccurrenceFilesBuilder {
     files: Array<File | string> = [];
 
     constructor() {
@@ -18,6 +19,7 @@ export class OccurenceFilesBuilder {
     async build(): Promise<OccurrenceFiles | undefined> {
         // build the files
         if (!this.files || this.files.length === 0) {
+            console.log('No files')
             return undefined;
         }
 
@@ -32,18 +34,18 @@ export class OccurenceFilesBuilder {
             return undefined;
         }
 
-        const occurenceFiles = new OccurrenceFiles();
+        const occurrenceFiles = new OccurrenceFiles();
 
-        occurenceFiles.setFiles(this.files);
+        occurrenceFiles.setFiles(this.files);
 
-        const occurenceBuilder = new OccurenceBuilder().addFiles(this.files);
+        const occurrenceBuilder = new OccurrenceBuilder().addFiles(this.files);
 
-        const config = await occurenceBuilder.getOccurenceConfig();
-        occurenceFiles.setConfig(config);
+        const config = await occurrenceBuilder.getOccurrenceConfig();
+        occurrenceFiles.setConfig(config);
 
-        const thumbnail = await occurenceBuilder.getOccurenceThumbnail();
-        occurenceFiles.setThumbnail(thumbnail);
+        const thumbnail = await occurrenceBuilder.getOccurrenceThumbnail();
+        occurrenceFiles.setThumbnail(thumbnail);
 
-        return occurenceFiles;
+        return occurrenceFiles;
     }
 }

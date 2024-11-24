@@ -1,5 +1,5 @@
 import { Component, For, createSignal } from "solid-js";
-import { uuidv4 } from "../utils";
+import { uuidV4 } from "../utils";
 import Button from "./Button";
 
 interface Option {
@@ -16,7 +16,7 @@ interface DropdownProps {
 }
 
 export const Dropdown: Component<DropdownProps> = (props: DropdownProps) => {
-    const uuid = uuidv4();
+    const uuid = uuidV4();
 
     const [selected, setSelected] = createSignal<Option | undefined>(undefined);
 

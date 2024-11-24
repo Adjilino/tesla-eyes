@@ -2,8 +2,8 @@ import { Component, Show, createSignal } from "solid-js";
 import { Button } from "../../ui";
 import { open } from "@tauri-apps/plugin-dialog";
 import { DirEntry, readDir } from "@tauri-apps/plugin-fs";
-import { MultipleOccurenceBuilder } from "../../builders";
-import { OccurenceFilesBuilder } from "../../builders/occurence-files.builders";
+import { MultipleOccurrenceBuilder } from "../../builders";
+import { OccurrenceFilesBuilder } from "../../builders/occurrence-files.builders";
 import { isTauri } from "../../utils/tauri";
 import { useApp } from "../../contexts";
 
@@ -20,12 +20,12 @@ export const AddFolderButton: Component<AddFolderButtonProps> = (
 
     const loadingOccurrences: boolean[] = [];
 
-    async function createMultipleOccurence(files: FileList | string[] | null) {
+    async function createMultipleOccurrence(files: FileList | string[] | null) {
         if (!files) {
             return;
         }
 
-        const separatedFilesByFolder = new MultipleOccurenceBuilder()
+        const separatedFilesByFolder = new MultipleOccurrenceBuilder()
             .addFileList(files)
             .separateFilesByFolders();
 
@@ -44,18 +44,18 @@ export const AddFolderButton: Component<AddFolderButtonProps> = (
             const files = separatedFilesByFolder[folder];
 
             try {
-                const occurenceFiles = await new OccurenceFilesBuilder()
+                const occurrenceFiles = await new OccurrenceFilesBuilder()
                     .addFiles(files)
                     .build();
                 loadingOccurrences.pop();
 
-                if (!occurenceFiles) {
-                    console.error(`Failed to create OccurenceFiles ${folder}`);
+                if (!occurrenceFiles) {
+                    console.error(`Failed to create OccurrenceFiles ${folder}`);
                     continue;
                 }
 
                 if (app) {
-                    app.fileByOccurrence.set((oF) => [...oF, occurenceFiles]);
+                    app.fileByOccurrence.set((oF) => [...oF, occurrenceFiles]);
                 }
             } catch (error) {
                 console.error("Ops");
@@ -77,7 +77,7 @@ export const AddFolderButton: Component<AddFolderButtonProps> = (
         input.addEventListener("change", async (event) => {
             const files = (event.target as HTMLInputElement).files;
 
-            createMultipleOccurence(files);
+            createMultipleOccurrence(files);
         });
 
         return input;
@@ -129,7 +129,7 @@ export const AddFolderButton: Component<AddFolderButtonProps> = (
         const files = await getFiles(folder, entries);
 
         loadingOccurrences.pop();
-        createMultipleOccurence(files);
+        createMultipleOccurrence(files);
     }
 
     const addFolderClick = () => {

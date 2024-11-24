@@ -1,1 +1,1 @@
-export * from './multiple-occurence.builder';
+export * from './multiple-occurrence.builder';

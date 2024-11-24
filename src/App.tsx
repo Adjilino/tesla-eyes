@@ -2,7 +2,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { Component, Show } from "solid-js";
 
 import { MainView, Navbar, Sidebar } from "./components";
-import NoOccurenceSelect from "./components/main-view/NoOccurenceSelect";
+import NoOccurrenceSelect from "./components/main-view/NoOccurenceSelect";
 import { MainViewProvider, useApp } from "./contexts";
 
 const App: Component = () => {
@@ -28,7 +28,7 @@ const App: Component = () => {
                 <div class="flex-grow flex overflow-hidden justify-center items-center">
                     <Show
                         when={app && !!app.selectedOccurrence.get()}
-                        fallback={<NoOccurenceSelect />}
+                        fallback={<NoOccurrenceSelect />}
                     >
                         <MainViewProvider>
                             <MainView />
