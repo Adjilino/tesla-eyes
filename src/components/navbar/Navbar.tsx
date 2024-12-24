@@ -1,9 +1,10 @@
 import { Component, createMemo, Show } from "solid-js";
 import Button from "../../ui/Button";
-import { useApp } from "../../contexts";
+import { useApp, useMainView } from "../../contexts";
 
 export const Navbar: Component = () => {
     const app = useApp();
+    const mainView = useMainView();
 
     const toggleSidebar = () => {
         if (app) {
@@ -12,13 +13,22 @@ export const Navbar: Component = () => {
     };
 
     const dateTitle = createMemo(() => {
-        const _selectedOccurrence = app && app.selectedOccurrence.get();
-        if (_selectedOccurrence && _selectedOccurrence?.getDateTime()) {
-            return (
-                _selectedOccurrence?.getDateTime()?.toDateString() +
-                ", " +
-                _selectedOccurrence?.getDateTime()?.toLocaleTimeString()
-            );
+        if (app && mainView) {
+            const _startAt = app.selectedOccurrence.get()?.videosStartAt;
+
+            if (_startAt) {
+                const _date = new Date(
+                    Number(_startAt) + mainView.currentTime.get() * 1000
+                );
+
+                if (_date) {
+                    return (
+                        _date?.toDateString() +
+                        ", " +
+                        _date?.toLocaleTimeString()
+                    );
+                }
+            }
         }
 
         return "";

@@ -15,27 +15,27 @@ const App: Component = () => {
     });
 
     return (
-        <Show when={app} >
-            <div
-                class={
-                    "bg-white dark:bg-slate-800 text-gray-900 dark:text-white " +
-                    "h-[calc(100dvh)] w-full relative flex flex-col"
-                }
-            >
-                <Sidebar class="z-30" />
-                <Navbar />
+        <Show when={app}>
+            <MainViewProvider>
+                <div
+                    class={
+                        "bg-white dark:bg-slate-800 text-gray-900 dark:text-white " +
+                        "h-[calc(100dvh)] w-full relative flex flex-col"
+                    }
+                >
+                    <Sidebar class="z-30" />
+                    <Navbar />
 
-                <div class="flex-grow flex overflow-hidden justify-center items-center">
-                    <Show
-                        when={app && !!app.selectedOccurrence.get()}
-                        fallback={<NoOccurrenceSelect />}
-                    >
-                        <MainViewProvider>
+                    <div class="flex-grow flex overflow-hidden justify-center items-center">
+                        <Show
+                            when={app && !!app.selectedOccurrence.get()}
+                            fallback={<NoOccurrenceSelect />}
+                        >
                             <MainView />
-                        </MainViewProvider>
-                    </Show>
+                        </Show>
+                    </div>
                 </div>
-            </div>
+            </MainViewProvider>
         </Show>
     );
 };

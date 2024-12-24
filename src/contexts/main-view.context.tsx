@@ -64,17 +64,17 @@ export const MainViewProvider = (props: MainViewProviderInterface) => {
     const [playbackRate, setPlaybackRate] = createSignal<number>(1);
 
     createEffect(() => {
-        // on select occurence auto play the video
+        // on select occurrence auto play the video
         app.isPlaying.set(true);
 
-        const _selectedOccurence = app.selectedOccurrence.get();
-        if (!_selectedOccurence) {
+        const _selectedOccurrence = app.selectedOccurrence.get();
+        if (!_selectedOccurrence) {
             return;
         }
 
-        videosPerTime = _selectedOccurence.videosPerTime;
+        videosPerTime = _selectedOccurrence.videosPerTime;
 
-        const playerStartPoint = _selectedOccurence.playerStartPoint;
+        const playerStartPoint = _selectedOccurrence.playerStartPoint;
         const videoStartIndex = playerStartPoint.index;
         const videoStartTime = playerStartPoint.videoStartAt;
         videoKey = playerStartPoint.key;
@@ -96,12 +96,12 @@ export const MainViewProvider = (props: MainViewProviderInterface) => {
         const [index, time = 0] = _selectedTimestampIndex;
         setStartAt(time);
 
-        const _selectedOccurence = app.selectedOccurrence.get();
-        if (!_selectedOccurence || !_selectedOccurence.videosPerTime) {
+        const _selectedOccurrence = app.selectedOccurrence.get();
+        if (!_selectedOccurrence || !_selectedOccurrence.videosPerTime) {
             return null;
         }
 
-        const _videosPerTime = _selectedOccurence.videosPerTime;
+        const _videosPerTime = _selectedOccurrence.videosPerTime;
 
         const _videosKeys = Object.keys(_videosPerTime);
         if (_videosKeys.length === 0) {

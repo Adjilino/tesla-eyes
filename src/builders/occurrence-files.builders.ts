@@ -19,7 +19,7 @@ export class OccurrenceFilesBuilder {
     async build(): Promise<OccurrenceFiles | undefined> {
         // build the files
         if (!this.files || this.files.length === 0) {
-            console.log('No files')
+            console.warn('No files')
             return undefined;
         }
 

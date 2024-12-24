@@ -48,7 +48,7 @@ export class OccurrenceBuilder {
 
         const timestamp = await this.getOccurrenceTimestamp();
         if (!timestamp) {
-            console.log("build: No timestamp");
+            console.warn("build: No timestamp");
             return;
         }
 
@@ -146,7 +146,7 @@ export class OccurrenceBuilder {
 
     async getOccurrenceConfig(): Promise<Config | undefined> {
         if (!this.files || this.files.length === 0) {
-            console.log("No files");
+            console.warn("No files");
             return;
         }
 
@@ -159,7 +159,7 @@ export class OccurrenceBuilder {
         });
 
         if (!configFile) {
-            console.log("Ops event.json file not found");
+            console.warn("Ops event.json file not found");
             return;
         }
 
@@ -173,7 +173,6 @@ export class OccurrenceBuilder {
         }
 
         const configJson = JSON.parse(configString);
-        console.log(configJson);
 
         const config = new Config(configJson);
 
@@ -189,7 +188,7 @@ export class OccurrenceBuilder {
         | undefined
     > {
         if (!this.files || this.files.length === 0) {
-            console.log("getOccurrenceTimestampL No videos provided");
+            console.warn("getOccurrenceTimestampL No videos provided");
             return;
         }
 
@@ -202,7 +201,7 @@ export class OccurrenceBuilder {
         });
 
         if (!videoFiles || videoFiles.length === 0) {
-            console.log("getOccurrenceTimestamp: No videos found");
+            console.warn("getOccurrenceTimestamp: No videos found");
             return;
         }
 
@@ -423,19 +422,19 @@ export class OccurrenceBuilder {
         const playerStartPoint = new PlayerStartPoint();
 
         if (!occurrence) {
-            console.log("occurrence not found");
+            console.warn("occurrence not found");
             return playerStartPoint;
         }
 
         const dateTime = occurrence.getDateTime();
         const videosStartAt = occurrence.videosStartAt;
-        console.log("Datetime and videosStartAt", dateTime, videosStartAt);
+
         if (!dateTime || !videosStartAt) {
             return playerStartPoint;
         }
 
         let triggerAt =
-            (dateTime.getTime() - videosStartAt.getTime()) / 1000 - 50;
+            (dateTime.getTime() - videosStartAt.getTime()) / 1000 - 80;
 
         if (triggerAt < 0 || triggerAt > (occurrence.duration || 0)) {
             triggerAt = 0;

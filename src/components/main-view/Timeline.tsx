@@ -28,7 +28,7 @@ export const Timeline: Component = () => {
 
     const occurredAt = createMemo(() => {
         if (!app) {
-            console.log('app not found');
+            console.error("app not found");
             return 0;
         }
 
@@ -37,7 +37,6 @@ export const Timeline: Component = () => {
             return 0;
         }
 
-        console.log(occurrence.playerStartPoint)
         const playerStartPoint = occurrence.playerStartPoint || 0;
 
         return playerStartPoint.key + playerStartPoint.videoStartAt;
@@ -144,22 +143,20 @@ export const Timeline: Component = () => {
 
         app.isPlaying.set(false);
         app.selectedOccurrence.set(null);
+        app.sidebar.setIsOpen(true);
 
         remove(occurrence.directory, {
             recursive: true,
         });
 
-        if (app) {
-            const _fileByOccurrence = app.fileByOccurrence.get();
-            const _selectedOccurrenceFile = app.fileByOccurrence.getSelected();
-            if (_fileByOccurrence && _selectedOccurrenceFile) {
-                app.fileByOccurrence.set(
-                    _fileByOccurrence.filter(
-                        (file) =>
-                            file.getId() !== _selectedOccurrenceFile.getId()
-                    )
-                );
-            }
+        const _fileByOccurrence = app.fileByOccurrence.get();
+        const _selectedOccurrenceFile = app.fileByOccurrence.getSelected();
+        if (_fileByOccurrence && _selectedOccurrenceFile) {
+            app.fileByOccurrence.set(
+                _fileByOccurrence.filter(
+                    (file) => file.getId() !== _selectedOccurrenceFile.getId()
+                )
+            );
         }
     };
 
@@ -249,14 +246,15 @@ export const Timeline: Component = () => {
                     />
                     <div
                         class={`
-            absolute ${timelineStyles.absoluteVerticalCenter} w-3 h-3 bg-red-600 
-            rounded-full transition-all duration-100
-          `}
+                            absolute ${timelineStyles.absoluteVerticalCenter} w-3 h-3 bg-red-600 
+                            rounded-full transition-all duration-100
+                        `}
                         style={
                             occurredAt()
                                 ? {
                                       left: `${
-                                          (occurredAt() / maxTime()) * 100
+                                          ((occurredAt() + 10) / maxTime()) *
+                                          100
                                       }%`,
                                   }
                                 : {}
@@ -268,9 +266,9 @@ export const Timeline: Component = () => {
                     >
                         <div
                             class={`
-              absolute ${timelineStyles.absoluteVerticalCenter} w-2 h-2 bg-slate-600 
-              rounded-full transition-all duration-100 -right-1
-            `}
+                                absolute ${timelineStyles.absoluteVerticalCenter} w-2 h-2 bg-slate-600 
+                                rounded-full transition-all duration-100 -right-1
+                            `}
                         />
                     </div>
                 </div>

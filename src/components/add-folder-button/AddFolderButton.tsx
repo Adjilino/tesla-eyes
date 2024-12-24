@@ -58,7 +58,7 @@ export const AddFolderButton: Component<AddFolderButtonProps> = (
                     app.fileByOccurrence.set((oF) => [...oF, occurrenceFiles]);
                 }
             } catch (error) {
-                console.error("Ops");
+                console.error("Ops", error);
             }
         }
 
@@ -95,8 +95,17 @@ export const AddFolderButton: Component<AddFolderButtonProps> = (
             if (entry.isFile) {
                 files.push(entryPath);
             } else {
-                const _entries = await readDir(entryPath);
-                files = [...files, ...(await getFiles(entryPath, _entries))];
+                try {
+                    const _entries = await readDir(entryPath);
+
+                    files = [
+                        ...files,
+                        ...(await getFiles(entryPath, _entries)),
+                    ];
+                } catch (error) {
+                    // Don't crash/stop when trying read files without permissions
+                    console.warn("Error reading dir", error);
+                }
             }
         }
 
