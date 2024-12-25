@@ -42,7 +42,7 @@
   },
   "productName": "Tesla eyes",
   "mainBinaryName": "Tesla eyes",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "identifier": "pt.adjilino.tesla-eyes",
   "plugins": {},
   "app": {
