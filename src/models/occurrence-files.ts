@@ -1,12 +1,11 @@
-import { FileEntry } from "@tauri-apps/api/fs";
-import { OccurenceBuilder } from "../builders/occurence.builder";
+import { OccurrenceBuilder } from "../builders/occurrence.builder";
 import { Config } from "./config";
-import { Occurrence } from "./occurence";
-import { uuidv4 } from "../utils";
+import { Occurrence } from "./occurrence";
+import { uuidV4 } from "../utils";
 
 export class OccurrenceFiles {
-    protected id: string = uuidv4();
-    files: Array<File | FileEntry> = [];
+    protected id: string = uuidV4();
+    files: Array<File | string> = [];
     config?: Config = undefined;
     thumbnail?: string | undefined = undefined;
 
@@ -28,14 +27,14 @@ export class OccurrenceFiles {
         return this.thumbnail;
     }
 
-    setFiles(files: Array<File | FileEntry>): void {
+    setFiles(files: Array<File | string>): void {
         this.files = files;
     }
-    getFiles(): Array<File | FileEntry> {
+    getFiles(): Array<File | string> {
         return this.files;
     }
 
     toOccurrence(): Promise<Occurrence | undefined> {
-        return new OccurenceBuilder().addFiles(this.files).build();
+        return new OccurrenceBuilder().addFiles(this.files).build();
     }
 }

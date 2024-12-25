@@ -1,5 +1,5 @@
-import { FileEntry, readTextFile } from "@tauri-apps/api/fs";
-import { convertFileSrc } from "@tauri-apps/api/tauri";
+import { convertFileSrc } from "@tauri-apps/api/core";
+import { readTextFile } from "@tauri-apps/plugin-fs";
 import { TimestampVideo } from "../interfaces";
 import {
     Config,
@@ -9,10 +9,10 @@ import {
 } from "../models";
 import { getBase64 } from "../utils";
 
-export class OccurenceBuilder {
+export class OccurrenceBuilder {
     videoElement = document.createElement("video");
 
-    files: (File | FileEntry)[] = [];
+    files: (File | string)[] = [];
 
     constructor() {
         this.videoElement.muted = true;
@@ -20,7 +20,7 @@ export class OccurenceBuilder {
         return this;
     }
 
-    addFiles(files: (File | FileEntry)[]) {
+    addFiles(files: (File | string)[]) {
         // add files to the builder
         this.files = files;
 
@@ -33,36 +33,37 @@ export class OccurenceBuilder {
             return;
         }
 
-        const occurence = new Occurrence();
+        const occurrence = new Occurrence();
 
-        occurence.directory = this.getOccurenceDirectory();
+        occurrence.directory = this.getOccurrenceDirectory();
 
-        const occurenceDateTime = this.getOccurenceDateTime();
-        occurence.setDateTime(occurenceDateTime);
+        const occurrenceDateTime = this.getOccurrenceDateTime();
+        occurrence.setDateTime(occurrenceDateTime);
 
-        const config = await this.getOccurenceConfig();
-        occurence.setConfig(config);
+        const config = await this.getOccurrenceConfig();
+        occurrence.setConfig(config);
 
-        const thumbnail = await this.getOccurenceThumbnail();
-        occurence.setThumbnail(thumbnail);
+        const thumbnail = await this.getOccurrenceThumbnail();
+        occurrence.setThumbnail(thumbnail);
 
-        const timestamp = await this.getOccurenceTimestamp();
+        const timestamp = await this.getOccurrenceTimestamp();
         if (!timestamp) {
+            console.warn("build: No timestamp");
             return;
         }
 
-        occurence.videosPerTime = timestamp?.timestampVideo || {};
-        occurence.videosStartAt = timestamp?.videosStartAt || new Date();
-        occurence.duration = timestamp?.duration || 0;
+        occurrence.videosPerTime = timestamp?.timestampVideo || {};
+        occurrence.videosStartAt = timestamp?.videosStartAt || new Date();
+        occurrence.duration = timestamp?.duration || 0;
 
         // get the player config
-        const playerStartPoint = await this.getPlayerStartPoint(occurence);
-        occurence.playerStartPoint = playerStartPoint;
+        const playerStartPoint = await this.getPlayerStartPoint(occurrence);
+        occurrence.playerStartPoint = playerStartPoint;
 
-        return occurence;
+        return occurrence;
     }
 
-    private getOccurenceDirectory(): string | undefined {
+    private getOccurrenceDirectory(): string | undefined {
         if (!this.files || this.files.length === 0) {
             return;
         }
@@ -72,7 +73,7 @@ export class OccurenceBuilder {
         if (this.files[0] instanceof File) {
             splittedPath = this.files[0].webkitRelativePath.split("/");
         } else {
-            splittedPath = this.files[0].path.split("/");
+            splittedPath = this.files[0].split("/");
         }
 
         if (splittedPath.length < 2) {
@@ -81,35 +82,34 @@ export class OccurenceBuilder {
 
         splittedPath.pop();
 
-        const occurenceDirectory = splittedPath.join("/");
+        const occurrenceDirectory = splittedPath.join("/");
 
-        return occurenceDirectory;
+        return occurrenceDirectory;
     }
 
-    private getOccurenceDateTime(): Date | undefined {
+    private getOccurrenceDateTime(): Date | undefined {
         if (!this.files || this.files.length === 0) {
             return;
         }
 
-        // retrieve occurence name from the first file
+        // retrieve occurrence name from the first file
         let splittedPath;
         if (this.files[0] instanceof File) {
             splittedPath = this.files[0].webkitRelativePath
                 .replaceAll("\\", "/")
                 .split("/");
         } else {
-            splittedPath = this.files[0].path.replaceAll("\\", "/").split("/");
+            splittedPath = this.files[0].replaceAll("\\", "/").split("/");
         }
 
         if (splittedPath.length < 2) {
             return;
         }
 
-        const occurenceName = splittedPath[splittedPath.length - 2];
+        const occurrenceName = splittedPath[splittedPath.length - 2];
+        const occurrenceDateTime = this.stringToDateTime(occurrenceName);
 
-        const occurenceDateTime = this.stringToDateTime(occurenceName);
-
-        return occurenceDateTime;
+        return occurrenceDateTime;
     }
 
     private stringToDateTime(dateTimeString: string): Date | undefined {
@@ -126,7 +126,7 @@ export class OccurenceBuilder {
 
         const timeString = timeStringToConvert.split("-").join(":");
 
-        // Convert occurence name to a date
+        // Convert occurrence name to a date
         const dateTime = new Date(`${dateString}T${timeString}`);
 
         return dateTime;
@@ -144,16 +144,22 @@ export class OccurenceBuilder {
         return this.stringToDateTime(dateString);
     }
 
-    async getOccurenceConfig(): Promise<Config | undefined> {
+    async getOccurrenceConfig(): Promise<Config | undefined> {
         if (!this.files || this.files.length === 0) {
+            console.warn("No files");
             return;
         }
 
         const configFile = this.files.find((file) => {
-            return file.name === "event.json";
+            if (file instanceof File) {
+                return file.name === "event.json";
+            }
+
+            return file.endsWith("event.json");
         });
 
         if (!configFile) {
+            console.warn("Ops event.json file not found");
             return;
         }
 
@@ -163,7 +169,7 @@ export class OccurenceBuilder {
             const configArrayBuffer = await configFile.arrayBuffer();
             configString = new TextDecoder("utf-8").decode(configArrayBuffer);
         } else {
-            configString = await readTextFile(configFile.path);
+            configString = await readTextFile(configFile);
         }
 
         const configJson = JSON.parse(configString);
@@ -173,7 +179,7 @@ export class OccurenceBuilder {
         return config;
     }
 
-    private async getOccurenceTimestamp(): Promise<
+    private async getOccurrenceTimestamp(): Promise<
         | {
               duration: number;
               videosStartAt: Date | undefined;
@@ -182,30 +188,59 @@ export class OccurenceBuilder {
         | undefined
     > {
         if (!this.files || this.files.length === 0) {
+            console.warn("getOccurrenceTimestampL No videos provided");
             return;
         }
 
         const videoFiles = this.files.filter((file) => {
-            return file.name && file.name.endsWith(".mp4");
+            if (file instanceof File) {
+                return file.name && file.name.endsWith(".mp4");
+            }
+
+            return file.endsWith(".mp4");
         });
 
         if (!videoFiles || videoFiles.length === 0) {
+            console.warn("getOccurrenceTimestamp: No videos found");
             return;
         }
 
         const videoFilesSorted = videoFiles.sort((a, b) => {
-            if (!a.name || !b.name) {
+            let aName: string;
+            let bName: string;
+
+            if (a instanceof File) {
+                aName = a.name;
+            } else {
+                aName = a;
+            }
+            if (b instanceof File) {
+                bName = b.name;
+            } else {
+                bName = b;
+            }
+
+            if (!aName || !bName) {
                 return 0;
             }
 
-            return a.name.localeCompare(b.name);
+            return aName.localeCompare(bName);
         });
+
+        let firstVideoFileName: string;
+
+        if (videoFilesSorted[0] instanceof File) {
+            firstVideoFileName = videoFilesSorted[0].name;
+        } else {
+            const _splittedPath = videoFilesSorted[0]
+                .replaceAll("\\", "/")
+                .split("/");
+            firstVideoFileName = _splittedPath.pop() as string;
+        }
 
         const separatedShorts = {
             duration: 0,
-            videosStartAt: this.folderNameToDateTime(
-                videoFilesSorted[0].name || ""
-            ),
+            videosStartAt: this.folderNameToDateTime(firstVideoFileName || ""),
             timestampVideo: {} as Record<number, TimestampVideo>,
         };
 
@@ -218,7 +253,7 @@ export class OccurenceBuilder {
             try {
                 duration = await this._getVideoDuration(sourceString);
             } catch (error) {
-                console.warn(`Video ${file.name} is corrupted`);
+                console.warn(`Video ${file} is corrupted`);
             }
 
             let splittedPath: string[];
@@ -227,7 +262,7 @@ export class OccurenceBuilder {
                     .replaceAll("\\", "/")
                     .split("/");
             } else {
-                splittedPath = file.path.replaceAll("\\", "/").split("/");
+                splittedPath = file.replaceAll("\\", "/").split("/");
             }
 
             // get file name
@@ -319,11 +354,11 @@ export class OccurenceBuilder {
 
         return separatedShorts;
     }
-    private async _createSourceString(file: File | FileEntry): Promise<string> {
+    private async _createSourceString(file: File | string): Promise<string> {
         if (file instanceof File) {
             return URL.createObjectURL(file);
         } else {
-            return convertFileSrc(file.path, "asset");
+            return convertFileSrc(file, "asset");
         }
     }
 
@@ -349,13 +384,17 @@ export class OccurenceBuilder {
         });
     }
 
-    async getOccurenceThumbnail(): Promise<string | undefined> {
+    async getOccurrenceThumbnail(): Promise<string | undefined> {
         if (!this.files || this.files.length === 0) {
             return;
         }
 
         const thumbnailFile = this.files.find((file) => {
-            return file.name && file.name.endsWith(".png");
+            if (file instanceof File) {
+                return file.name && file.name.endsWith(".png");
+            }
+
+            return file && file.endsWith(".png");
         });
 
         if (!thumbnailFile) {
@@ -367,7 +406,7 @@ export class OccurenceBuilder {
         if (thumbnailFile instanceof File) {
             thumbnailString = await getBase64(thumbnailFile);
         } else {
-            thumbnailString = convertFileSrc(thumbnailFile.path, "asset");
+            thumbnailString = convertFileSrc(thumbnailFile, "asset");
         }
 
         if (!thumbnailString) {
@@ -378,36 +417,37 @@ export class OccurenceBuilder {
     }
 
     private async getPlayerStartPoint(
-        occurence: Occurrence
+        occurrence: Occurrence
     ): Promise<PlayerStartPoint> {
         const playerStartPoint = new PlayerStartPoint();
 
-        if (!occurence) {
+        if (!occurrence) {
+            console.warn("occurrence not found");
             return playerStartPoint;
         }
 
-        const dateTime = occurence.getDateTime();
-        const videosStartAt = occurence.videosStartAt;
+        const dateTime = occurrence.getDateTime();
+        const videosStartAt = occurrence.videosStartAt;
 
         if (!dateTime || !videosStartAt) {
             return playerStartPoint;
         }
 
         let triggerAt =
-            (dateTime.getTime() - videosStartAt.getTime()) / 1000 - 50;
+            (dateTime.getTime() - videosStartAt.getTime()) / 1000 - 80;
 
-        if (triggerAt < 0 || triggerAt > (occurence.duration || 0)) {
+        if (triggerAt < 0 || triggerAt > (occurrence.duration || 0)) {
             triggerAt = 0;
         }
 
-        const videoXpto = this.getVideoTimeIndex(
-            occurence.videosPerTime || {},
+        const videoProps = this.getVideoTimeIndex(
+            occurrence.videosPerTime || {},
             triggerAt
         );
 
-        playerStartPoint.index = videoXpto.index;
-        playerStartPoint.key = videoXpto.key;
-        playerStartPoint.videoStartAt = videoXpto.videoStartAt;
+        playerStartPoint.index = videoProps.index;
+        playerStartPoint.key = videoProps.key;
+        playerStartPoint.videoStartAt = videoProps.videoStartAt;
 
         return playerStartPoint;
     }

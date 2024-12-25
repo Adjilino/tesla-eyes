@@ -1,10 +1,10 @@
 import { Component, Show, createSignal } from "solid-js";
 import { Button } from "../../ui";
-import { open } from "@tauri-apps/api/dialog";
-import { FileEntry, readDir } from "@tauri-apps/api/fs";
-import { MultipleOccurenceBuilder } from "../../builders";
-import { OccurenceFilesBuilder } from "../../builders/occurence-files.builders";
-import { tauri } from "../../utils/tauri";
+import { open } from "@tauri-apps/plugin-dialog";
+import { DirEntry, readDir } from "@tauri-apps/plugin-fs";
+import { MultipleOccurrenceBuilder } from "../../builders";
+import { OccurrenceFilesBuilder } from "../../builders/occurrence-files.builders";
+import { isTauri } from "../../utils/tauri";
 import { useApp } from "../../contexts";
 
 export interface AddFolderButtonProps {
@@ -20,14 +20,12 @@ export const AddFolderButton: Component<AddFolderButtonProps> = (
 
     const loadingOccurrences: boolean[] = [];
 
-    async function createMultipleOccurence(
-        files: FileList | FileEntry[] | null
-    ) {
+    async function createMultipleOccurrence(files: FileList | string[] | null) {
         if (!files) {
             return;
         }
 
-        const separatedFilesByFolder = new MultipleOccurenceBuilder()
+        const separatedFilesByFolder = new MultipleOccurrenceBuilder()
             .addFileList(files)
             .separateFilesByFolders();
 
@@ -46,21 +44,21 @@ export const AddFolderButton: Component<AddFolderButtonProps> = (
             const files = separatedFilesByFolder[folder];
 
             try {
-                const occurenceFiles = await new OccurenceFilesBuilder()
+                const occurrenceFiles = await new OccurrenceFilesBuilder()
                     .addFiles(files)
                     .build();
                 loadingOccurrences.pop();
 
-                if (!occurenceFiles) {
-                    console.error(`Failed to create OccurenceFiles ${folder}`);
+                if (!occurrenceFiles) {
+                    console.error(`Failed to create OccurrenceFiles ${folder}`);
                     continue;
                 }
 
                 if (app) {
-                    app.fileByOccurrence.set((oF) => [...oF, occurenceFiles]);
+                    app.fileByOccurrence.set((oF) => [...oF, occurrenceFiles]);
                 }
             } catch (error) {
-                console.error("Ops");
+                console.error("Ops", error);
             }
         }
 
@@ -79,20 +77,35 @@ export const AddFolderButton: Component<AddFolderButtonProps> = (
         input.addEventListener("change", async (event) => {
             const files = (event.target as HTMLInputElement).files;
 
-            createMultipleOccurence(files);
+            createMultipleOccurrence(files);
         });
 
         return input;
     }
 
-    function getFiles(fileEntries: FileEntry[]): FileEntry[] {
-        let files: FileEntry[] = [];
+    async function getFiles(
+        currentPath: string,
+        dirEntries: DirEntry[]
+    ): Promise<string[]> {
+        let files: string[] = [];
 
-        for (const entry of fileEntries) {
-            if (!entry.children) {
-                files.push(entry);
+        for (const entry of dirEntries) {
+            const entryPath = currentPath + "/" + entry.name;
+
+            if (entry.isFile) {
+                files.push(entryPath);
             } else {
-                files = [...files, ...getFiles(entry.children)];
+                try {
+                    const _entries = await readDir(entryPath);
+
+                    files = [
+                        ...files,
+                        ...(await getFiles(entryPath, _entries)),
+                    ];
+                } catch (error) {
+                    // Don't crash/stop when trying read files without permissions
+                    console.warn("Error reading dir", error);
+                }
             }
         }
 
@@ -102,7 +115,7 @@ export const AddFolderButton: Component<AddFolderButtonProps> = (
     const addFolderInput = createFolderInput();
 
     async function addFolder() {
-        if (!tauri?.tauri) {
+        if (!isTauri) {
             addFolderInput.click();
             return;
         }
@@ -120,12 +133,12 @@ export const AddFolderButton: Component<AddFolderButtonProps> = (
         loadingOccurrences.push(true);
         // setIsLoadingOccurrences(true);
 
-        const entries = await readDir(folder, { recursive: true });
+        const entries = await readDir(folder);
 
-        const files = getFiles(entries);
+        const files = await getFiles(folder, entries);
 
         loadingOccurrences.pop();
-        createMultipleOccurence(files);
+        createMultipleOccurrence(files);
     }
 
     const addFolderClick = () => {

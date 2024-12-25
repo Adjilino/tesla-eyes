@@ -79,9 +79,9 @@ export const AppProvider = (props: AppProviderInterface) => {
 
                 if (!occurrence) {
                     console.error(
-                        "Failed to convert OccurenceFiles to Occurence",
+                        "Failed to convert OccurrenceFiles to Occurrence",
                     );
-                    alert("Failed to convert OccurenceFiles to Occurence");
+                    alert("Failed to convert OccurrenceFiles to Occurrence");
                     return;
                 }
 
